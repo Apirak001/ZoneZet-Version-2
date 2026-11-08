@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark, Trash2, RotateCcw, Scale, ArrowUpRight, ArrowDownRight, ExternalLink } from 'lucide-react';
+import { Bookmark, Trash2, RotateCcw, Scale, ArrowUpRight, ArrowDownRight, Sparkles } from 'lucide-react';
 import { EmptyState } from './FeedbackStates';
 
 export default function WatchlistRecordView({
@@ -16,7 +16,7 @@ export default function WatchlistRecordView({
         <div>
           <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
             <Bookmark size={28} color="#f59e0b" />
-            <span>รายการที่บันทึกไว้ (Watchlist & Records)</span>
+            <span>รายการที่บันทึกไว้ (Watchlist & Records) ⭐</span>
           </h1>
           <p className="page-subtitle">
             รวมรายการประเทศที่ปักหมุดไว้สำหรับติดตาม พร้อมระบบกู้คืนประวัติด้วยโครงสร้างข้อมูล Stack (LIFO)
@@ -28,7 +28,7 @@ export default function WatchlistRecordView({
             <button
               onClick={onUndoLastRemove}
               className="btn btn-secondary btn-sm"
-              style={{ borderColor: '#6366f1', color: '#a5b4fc' }}
+              style={{ borderColor: '#818cf8', color: '#4338ca', background: '#eef2ff', borderRadius: '9999px' }}
             >
               <RotateCcw size={14} />
               <span>กู้คืนรายการล่าสุด (Undo Stack)</span>
@@ -39,6 +39,7 @@ export default function WatchlistRecordView({
             <button
               onClick={onCompareAll}
               className="btn btn-primary btn-sm"
+              style={{ borderRadius: '9999px' }}
             >
               <Scale size={14} />
               <span>ส่งไปเปรียบเทียบใน Compare Hub</span>
@@ -56,10 +57,10 @@ export default function WatchlistRecordView({
       ) : (
         <div className="glass-panel" style={{ padding: '0.5rem' }}>
           <div style={{ padding: '1rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.9rem', color: '#9ca3af' }}>
-              มีทั้งหมด <strong style={{ color: '#fff' }}>{watchlist.length}</strong> ประเทศที่บันทึกไว้
+            <span style={{ fontSize: '0.9rem', color: '#64748b' }}>
+              มีทั้งหมด <strong style={{ color: '#0f172a' }}>{watchlist.length}</strong> ประเทศที่บันทึกไว้
             </span>
-            <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+            <span style={{ fontSize: '0.75rem', color: '#4338ca', background: '#eef2ff', padding: '3px 10px', borderRadius: '9999px', fontWeight: 700, border: '1px solid #c7d2fe' }}>
               จัดการด้วย DSA Stack LIFO
             </span>
           </div>
@@ -82,7 +83,7 @@ export default function WatchlistRecordView({
                   const flagUrl = item.iso2 ? `https://flagcdn.com/w40/${item.iso2.toLowerCase()}.png` : null;
                   return (
                     <tr key={item.countryCode || index}>
-                      <td style={{ color: '#9ca3af', fontWeight: 600 }}>#{index + 1}</td>
+                      <td style={{ color: '#94a3b8', fontWeight: 700 }}>#{index + 1}</td>
                       <td>
                         <div className="country-cell">
                           {flagUrl && (
@@ -96,9 +97,9 @@ export default function WatchlistRecordView({
                           <span>{item.country}</span>
                         </div>
                       </td>
-                      <td style={{ color: '#9ca3af', fontFamily: 'monospace' }}>{item.countryCode}</td>
+                      <td style={{ color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{item.countryCode}</td>
                       <td>
-                        <span style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.05)', padding: '3px 8px', borderRadius: '4px', color: '#cbd5e1' }}>
+                        <span style={{ fontSize: '0.8rem', background: '#f1f5f9', padding: '3px 9px', borderRadius: '9999px', color: '#475569', fontWeight: 600 }}>
                           {item.region || 'Other'}
                         </span>
                       </td>
@@ -108,12 +109,12 @@ export default function WatchlistRecordView({
                           {item.displayValue || `${item.value}%`}
                         </span>
                       </td>
-                      <td style={{ color: '#9ca3af' }}>{item.year || '2025'}</td>
+                      <td style={{ color: '#64748b', fontWeight: 600 }}>{item.year || '2025'}</td>
                       <td style={{ textAlign: 'center' }}>
                         <button
                           onClick={() => onRemoveFromWatchlist(item.countryCode)}
                           className="btn btn-secondary btn-sm"
-                          style={{ color: '#f87171' }}
+                          style={{ color: '#be123c', background: '#fff1f2', borderColor: '#fecdd3', borderRadius: '8px' }}
                           title="ลบออกจาก Watchlist (สามารถ Undo ได้)"
                         >
                           <Trash2 size={13} />

@@ -15,7 +15,7 @@ export default function Header({
   return (
     <header className="top-header">
       <div className="header-search-bar">
-        <Search size={16} color="#9ca3af" />
+        <Search size={16} color="#64748b" />
         <input
           type="text"
           className="header-search-input"
@@ -28,8 +28,8 @@ export default function Header({
       <div className="header-actions">
         {/* Year Selector */}
         <div className="year-picker">
-          <Calendar size={15} color="#9ca3af" />
-          <span style={{ color: '#9ca3af' }}>ข้อมูลปี:</span>
+          <Calendar size={15} color="#4f46e5" />
+          <span style={{ color: '#64748b', fontWeight: 600 }}>ข้อมูลปี:</span>
           <select
             className="year-select"
             value={selectedYear}
@@ -52,11 +52,12 @@ export default function Header({
         {/* Quick Compare Button */}
         <button
           className="btn btn-secondary btn-sm"
+          style={{ borderRadius: '9999px', padding: '0.45rem 1rem' }}
           onClick={() => setActiveTab('compare')}
           title="เปิดหน้าต่างเปรียบเทียบประเทศ"
         >
-          <Scale size={15} />
-          <span>เปรียบเทียบ ({compareCount})</span>
+          <Scale size={15} color="#4f46e5" />
+          <span style={{ fontWeight: 700 }}>เปรียบเทียบ ({compareCount})</span>
         </button>
       </div>
     </header>

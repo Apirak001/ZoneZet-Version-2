@@ -102,16 +102,16 @@ export default function ComparisonHub({
         <div>
           <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
             <Scale size={28} color="#6366f1" />
-            <span>ศูนย์เปรียบเทียบเศรษฐกิจพหุภาคี (Multi-Country Comparison Hub)</span>
+            <span>ศูนย์เปรียบเทียบเศรษฐกิจพหุภาคี (Comparison Hub) 📊</span>
           </h1>
           <p className="page-subtitle">
-            เครื่องมือวิเคราะห์และเปรียบเทียบตัวเลขเศรษฐกิจข้ามประเทศแบบเจาะลึก 2020–2025 ตามคำแนะนำจาก V.1
+            เครื่องมือวิเคราะห์และเปรียบเทียบตัวเลขเศรษฐกิจข้ามประเทศแบบเจาะลึก 2020–2025 ในรูปแบบกราฟเส้นคลีนๆ
           </p>
         </div>
 
         {/* Quick Presets */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.8rem', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Sparkles size={14} color="#f59e0b" /> พรีเซ็ตแนะนำ:
           </span>
           {PRESETS.map(p => (
@@ -119,7 +119,7 @@ export default function ComparisonHub({
               key={p.name}
               onClick={() => handleApplyPreset(p.codes)}
               className="btn btn-secondary btn-sm"
-              style={{ fontSize: '0.75rem' }}
+              style={{ fontSize: '0.78rem', borderRadius: '9999px' }}
             >
               {p.name}
             </button>
@@ -131,10 +131,12 @@ export default function ComparisonHub({
       <div className="glass-panel" style={{ marginBottom: '1.5rem', position: 'relative' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#9ca3af' }}>ประเทศที่เลือกเปรียบเทียบ:</span>
+            <span style={{ fontSize: '0.88rem', fontWeight: 700, color: '#475569' }}>ประเทศที่เลือกเปรียบเทียบ:</span>
 
             {comparedList.length === 0 && (
-              <span style={{ fontSize: '0.85rem', color: '#ef4444' }}>ยังไม่ได้เลือกประเทศ กรุณากดปุ่มเพิ่มประเทศ</span>
+              <span style={{ fontSize: '0.85rem', color: '#be123c', background: '#ffe4e6', padding: '3px 10px', borderRadius: '9999px', fontWeight: 600 }}>
+                ยังไม่ได้เลือกประเทศ กรุณากดปุ่มเพิ่มประเทศ
+              </span>
             )}
 
             {comparedList.map((code, idx) => {
@@ -146,12 +148,12 @@ export default function ComparisonHub({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.45rem',
-                    padding: '0.35rem 0.75rem',
+                    padding: '0.35rem 0.85rem',
                     borderRadius: '9999px',
-                    background: `${color}20`,
-                    border: `1px solid ${color}60`,
-                    color: '#fff',
-                    fontWeight: 600,
+                    background: `${color}15`,
+                    border: `1px solid ${color}40`,
+                    color: '#0f172a',
+                    fontWeight: 700,
                     fontSize: '0.85rem'
                   }}
                 >
@@ -159,7 +161,7 @@ export default function ComparisonHub({
                   <span>{code}</span>
                   <button
                     onClick={() => onRemoveFromCompare(code)}
-                    style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                    style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '2px' }}
                     title="ลบออกจากรายการเปรียบเทียบ (มีระบบ Undo)"
                   >
                     <X size={14} />
@@ -174,7 +176,7 @@ export default function ComparisonHub({
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="btn btn-primary btn-sm"
-              style={{ padding: '0.45rem 1rem' }}
+              style={{ padding: '0.5rem 1.1rem', borderRadius: '9999px' }}
             >
               <Plus size={15} />
               <span>เพิ่มประเทศ (สูงสุด 5)</span>
@@ -188,12 +190,12 @@ export default function ComparisonHub({
                   right: 0,
                   marginTop: '0.5rem',
                   width: '280px',
-                  background: '#1f2937',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: '10px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '16px',
+                  boxShadow: '0 15px 35px rgba(148, 163, 184, 0.2)',
                   zIndex: 50,
-                  padding: '0.75rem'
+                  padding: '0.85rem'
                 }}
               >
                 <input
@@ -204,14 +206,15 @@ export default function ComparisonHub({
                   autoFocus
                   style={{
                     width: '100%',
-                    padding: '0.5rem 0.75rem',
-                    borderRadius: '6px',
-                    background: '#111827',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: '#fff',
+                    padding: '0.55rem 0.85rem',
+                    borderRadius: '10px',
+                    background: '#f8fafc',
+                    border: '1px solid #e2e8f0',
+                    color: '#0f172a',
                     fontSize: '0.85rem',
                     marginBottom: '0.5rem',
-                    outline: 'none'
+                    outline: 'none',
+                    fontFamily: 'inherit'
                   }}
                 />
 
@@ -224,24 +227,25 @@ export default function ComparisonHub({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '0.45rem 0.65rem',
+                        padding: '0.5rem 0.75rem',
                         background: 'transparent',
                         border: 'none',
-                        color: '#f3f4f6',
-                        borderRadius: '6px',
+                        color: '#0f172a',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         textAlign: 'left',
-                        fontSize: '0.85rem'
+                        fontSize: '0.85rem',
+                        fontFamily: 'inherit'
                       }}
-                      onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.06)'}
+                      onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
                       onMouseLeave={(e) => e.target.style.background = 'transparent'}
                     >
-                      <span>{c.name} ({c.code})</span>
-                      <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{c.region}</span>
+                      <span style={{ fontWeight: 600 }}>{c.name} ({c.code})</span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{c.region}</span>
                     </button>
                   ))}
                   {filteredSearchCountries.length === 0 && (
-                    <div style={{ color: '#9ca3af', fontSize: '0.8rem', padding: '0.5rem', textAlign: 'center' }}>
+                    <div style={{ color: '#94a3b8', fontSize: '0.8rem', padding: '0.5rem', textAlign: 'center' }}>
                       ไม่พบประเทศที่ค้นหา
                     </div>
                   )}
@@ -293,32 +297,34 @@ export default function ComparisonHub({
               </button>
             </div>
 
-            <div style={{ fontSize: '0.8rem', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ fontSize: '0.82rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Info size={14} /> กราฟเปรียบเทียบความต่อเนื่องเชิงเส้น (2020–2025)
             </div>
           </div>
 
-          {/* Interactive Recharts Multi-Line Comparison Chart */}
+          {/* Interactive Cute Pastel Recharts Line Chart */}
           <div className="glass-panel" style={{ marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>
               {getMetricLabel()}
             </h3>
-            <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+            <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '1.5rem' }}>
               วิเคราะห์แนวโน้มและเสถียรภาพทางเศรษฐกิจของประเทศที่เลือกเปรียบเทียบ
             </p>
 
             <div className="chart-container" style={{ height: '340px' }}>
               <ResponsiveContainer width="100%" height={340}>
                 <LineChart data={comparisonData?.timeline || []} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="year" stroke="#9ca3af" tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                  <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af', fontSize: 12 }} unit="%" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="year" stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} axisLine={{ stroke: '#e2e8f0' }} />
+                  <YAxis stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 12 }} unit="%" axisLine={{ stroke: '#e2e8f0' }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1f2937',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '8px',
-                      color: '#fff'
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '14px',
+                      color: '#0f172a',
+                      boxShadow: '0 10px 25px rgba(148, 163, 184, 0.15)',
+                      fontWeight: 600
                     }}
                   />
                   <Legend wrapperStyle={{ paddingTop: '10px' }} />
@@ -346,10 +352,10 @@ export default function ComparisonHub({
 
           {/* Side-by-Side Comparison Cards Matrix */}
           <div style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.35rem' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.35rem' }}>
               ตารางเปรียบเทียบสถิติล่าสุด (ปี {selectedYear})
             </h3>
-            <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+            <p style={{ color: '#64748b', fontSize: '0.88rem', marginBottom: '1.25rem' }}>
               เปรียบเทียบครบทั้ง 3 มิติ: การเติบโต, ภาวะเงินเฟ้อ และอัตราแรงงาน
             </p>
 
@@ -357,7 +363,7 @@ export default function ComparisonHub({
               style={{
                 display: 'grid',
                 gridTemplateColumns: `repeat(${Math.max(comparedList.length, 1)}, minmax(220px, 1fr))`,
-                gap: '1rem',
+                gap: '1.25rem',
                 overflowX: 'auto'
               }}
             >
@@ -379,21 +385,22 @@ export default function ComparisonHub({
                       borderTop: `4px solid ${color}`,
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '1rem'
+                      gap: '1rem',
+                      padding: '1.4rem'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       {flagUrl && <img src={flagUrl} alt={countryProfile.name} className="flag-img" onError={(e) => { e.target.style.display = 'none'; }} />}
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: '1rem' }}>{countryProfile.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{countryProfile.region} · {code}</div>
+                        <div style={{ fontWeight: 800, fontSize: '1rem', color: '#0f172a' }}>{countryProfile.name}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{countryProfile.region} · {code}</div>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', background: 'rgba(255,255,255,0.02)', padding: '0.75rem', borderRadius: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', background: '#f8fafc', padding: '0.85rem', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
                       {/* GDP */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>GDP Growth</span>
+                        <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>GDP Growth</span>
                         <span className={`value-badge ${gdpVal?.colorClass || 'green'}`}>
                           {gdpVal?.displayValue || 'N/A'}
                         </span>
@@ -401,7 +408,7 @@ export default function ComparisonHub({
 
                       {/* Inflation */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Inflation</span>
+                        <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Inflation</span>
                         <span className={`value-badge ${infVal?.colorClass || 'red'}`}>
                           {infVal?.displayValue || 'N/A'}
                         </span>
@@ -409,7 +416,7 @@ export default function ComparisonHub({
 
                       {/* Unemployment */}
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Unemployment</span>
+                        <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>Unemployment</span>
                         <span className={`value-badge ${uneVal?.colorClass || 'red'}`}>
                           {uneVal?.displayValue || 'N/A'}
                         </span>
@@ -419,7 +426,7 @@ export default function ComparisonHub({
                     <button
                       onClick={() => onRemoveFromCompare(code)}
                       className="btn btn-secondary btn-sm"
-                      style={{ marginTop: 'auto', color: '#f87171' }}
+                      style={{ marginTop: 'auto', color: '#be123c', background: '#fff1f2', borderColor: '#fecdd3', borderRadius: '8px' }}
                     >
                       <X size={13} />
                       <span>ลบออกจากการเปรียบเทียบ</span>

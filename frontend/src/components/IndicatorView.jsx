@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpDown, Scale, Bookmark, Plus, Check, ArrowUpRight, ArrowDownRight, BarChart2 } from 'lucide-react';
+import { ArrowUpDown, Scale, Bookmark, Plus, Check, ArrowUpRight, ArrowDownRight, BarChart2, Sparkles } from 'lucide-react';
 import { mergeSort } from '../utils/dsa/mergeSort';
 import { LoadingSkeleton, EmptyState, ErrorBanner } from './FeedbackStates';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -64,9 +64,9 @@ export default function IndicatorView({
   };
 
   const getBarColor = () => {
-    if (type === 'gdp') return '#10b981';
-    if (type === 'inflation') return '#ef4444';
-    return '#f59e0b';
+    if (type === 'gdp') return '#34d399';
+    if (type === 'inflation') return '#fb7185';
+    return '#fbbf24';
   };
 
   if (isLoading) {
@@ -99,12 +99,12 @@ export default function IndicatorView({
       {/* Interactive Distribution Chart */}
       {sortedData.length > 0 && (
         <div className="glass-panel" style={{ marginBottom: '1.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <BarChart2 size={18} color="#6366f1" />
-              <span>10 อันดับแรกในมุมมองนี้ (Top 10 Chart)</span>
+              <span>10 อันดับแรกในมุมมองนี้ (Top 10 Chart) ✨</span>
             </h3>
-            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
+            <span style={{ fontSize: '0.75rem', color: '#4338ca', background: '#eef2ff', padding: '3px 10px', borderRadius: '9999px', fontWeight: 700, border: '1px solid #c7d2fe' }}>
               จัดเรียงด้วย DSA Merge Sort O(n log n)
             </span>
           </div>
@@ -112,20 +112,22 @@ export default function IndicatorView({
           <div className="chart-container" style={{ height: '260px' }}>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={top10ChartData} margin={{ top: 5, right: 20, left: -10, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="country" stroke="#9ca3af" tick={{ fill: '#9ca3af', fontSize: 11 }} angle={-25} textAnchor="end" />
-                <YAxis stroke="#9ca3af" tick={{ fill: '#9ca3af', fontSize: 11 }} unit="%" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="country" stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} angle={-25} textAnchor="end" axisLine={{ stroke: '#e2e8f0' }} />
+                <YAxis stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 11 }} unit="%" axisLine={{ stroke: '#e2e8f0' }} />
                 <Tooltip
                   formatter={(val) => [`${val}%`, title]}
                   labelFormatter={(_, payload) => payload?.[0]?.payload?.fullName || ''}
                   contentStyle={{
-                    backgroundColor: '#1f2937',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    color: '#fff'
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '14px',
+                    color: '#0f172a',
+                    boxShadow: '0 10px 25px rgba(148, 163, 184, 0.15)',
+                    fontWeight: 600
                   }}
                 />
-                <Bar dataKey="value" fill={getBarColor()} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="value" fill={getBarColor()} radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -142,15 +144,19 @@ export default function IndicatorView({
       ) : (
         <div className="glass-panel" style={{ padding: '0.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '0.75rem' }}>
-            <div style={{ fontSize: '0.9rem', color: '#9ca3af' }}>
-              พบทั้งหมด <strong style={{ color: '#fff' }}>{sortedData.length}</strong> ประเทศ
+            <div style={{ fontSize: '0.9rem', color: '#64748b' }}>
+              พบทั้งหมด <strong style={{ color: '#0f172a' }}>{sortedData.length}</strong> ประเทศ
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>จัดเรียง:</span>
+              <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>จัดเรียง:</span>
               <button
                 onClick={() => handleSortToggle('value')}
-                className={`btn btn-secondary btn-sm ${sortKey === 'value' ? 'active-sort' : ''}`}
-                style={{ background: sortKey === 'value' ? 'rgba(99,102,241,0.2)' : undefined }}
+                className={`btn btn-secondary btn-sm`}
+                style={{
+                  background: sortKey === 'value' ? '#eef2ff' : '#ffffff',
+                  color: sortKey === 'value' ? '#4338ca' : '#334155',
+                  borderColor: sortKey === 'value' ? '#c7d2fe' : '#e2e8f0'
+                }}
               >
                 <ArrowUpDown size={13} />
                 <span>ค่าสถิติ ({sortKey === 'value' ? (sortDirection === 'desc' ? 'มาก➔น้อย' : 'น้อย➔มาก') : 'ตัวเลข'})</span>
@@ -158,7 +164,11 @@ export default function IndicatorView({
               <button
                 onClick={() => handleSortToggle('country')}
                 className={`btn btn-secondary btn-sm`}
-                style={{ background: sortKey === 'country' ? 'rgba(99,102,241,0.2)' : undefined }}
+                style={{
+                  background: sortKey === 'country' ? '#eef2ff' : '#ffffff',
+                  color: sortKey === 'country' ? '#4338ca' : '#334155',
+                  borderColor: sortKey === 'country' ? '#c7d2fe' : '#e2e8f0'
+                }}
               >
                 <ArrowUpDown size={13} />
                 <span>ชื่อประเทศ (A-Z)</span>
@@ -186,7 +196,7 @@ export default function IndicatorView({
 
                   return (
                     <tr key={item.countryCode || index}>
-                      <td style={{ color: '#9ca3af', fontWeight: 600 }}>#{index + 1}</td>
+                      <td style={{ color: '#94a3b8', fontWeight: 700 }}>#{index + 1}</td>
                       <td>
                         <div className="country-cell">
                           {flagUrl && (
@@ -200,9 +210,9 @@ export default function IndicatorView({
                           <span>{item.country}</span>
                         </div>
                       </td>
-                      <td style={{ color: '#9ca3af', fontFamily: 'monospace' }}>{item.countryCode}</td>
+                      <td style={{ color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{item.countryCode}</td>
                       <td>
-                        <span style={{ fontSize: '0.8rem', background: 'rgba(255,255,255,0.05)', padding: '3px 8px', borderRadius: '4px', color: '#cbd5e1' }}>
+                        <span style={{ fontSize: '0.8rem', background: '#f1f5f9', padding: '3px 9px', borderRadius: '9999px', color: '#475569', fontWeight: 600 }}>
                           {item.region || 'Other'}
                         </span>
                       </td>
@@ -218,24 +228,27 @@ export default function IndicatorView({
                             onClick={() => onAddToCompare(item.countryCode)}
                             className="btn btn-secondary btn-sm"
                             style={{
-                              background: isCompared ? 'rgba(99,102,241,0.25)' : undefined,
-                              borderColor: isCompared ? '#6366f1' : undefined
+                              background: isCompared ? '#eef2ff' : '#ffffff',
+                              borderColor: isCompared ? '#818cf8' : '#e2e8f0',
+                              color: isCompared ? '#4338ca' : '#334155',
+                              borderRadius: '9999px'
                             }}
                             title={isCompared ? 'อยู่ในรายการเปรียบเทียบแล้ว' : 'เพิ่มเพื่อเปรียบเทียบ'}
                           >
-                            {isCompared ? <Check size={13} color="#a5b4fc" /> : <Scale size={13} />}
-                            <span>{isCompared ? 'เปรียบเทียบ' : '+ เทียบ'}</span>
+                            {isCompared ? <Check size={13} color="#4338ca" /> : <Scale size={13} />}
+                            <span>{isCompared ? 'เทียบอยู่' : '+ เทียบ'}</span>
                           </button>
                           <button
                             onClick={() => onAddToWatchlist(item)}
                             className="btn btn-secondary btn-sm"
                             style={{
-                              background: isWatchlisted ? 'rgba(245,158,11,0.2)' : undefined,
-                              borderColor: isWatchlisted ? '#f59e0b' : undefined
+                              background: isWatchlisted ? '#fef3c7' : '#ffffff',
+                              borderColor: isWatchlisted ? '#fbbf24' : '#e2e8f0',
+                              borderRadius: '9999px'
                             }}
                             title={isWatchlisted ? 'บันทึกแล้ว' : 'บันทึกลง Watchlist'}
                           >
-                            <Bookmark size={13} color={isWatchlisted ? '#fbbf24' : undefined} />
+                            <Bookmark size={13} color={isWatchlisted ? '#d97706' : '#64748b'} />
                           </button>
                         </div>
                       </td>
