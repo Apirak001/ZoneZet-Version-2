@@ -1,36 +1,37 @@
 import React from 'react';
-import { AlertCircle, RefreshCw, SearchX, Loader2, Sparkles } from 'lucide-react';
+import { AlertCircle, RefreshCw, SearchX, Loader2 } from 'lucide-react';
 
-export function LoadingSkeleton({ text = 'กำลังโหลดข้อมูลจาก World Bank API...' }) {
+export function LoadingSkeleton({ text = 'กำลังเชื่อมต่อและดึงข้อมูลจาก World Bank API...' }) {
   return (
-    <div style={{ padding: '3.5rem 2rem', textAlign: 'center' }}>
+    <div style={{ padding: '3rem 2rem', textAlign: 'center' }}>
       <div style={{
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '64px',
-        height: '64px',
-        borderRadius: '50%',
-        background: '#eef2ff',
-        marginBottom: '1.25rem',
-        boxShadow: '0 8px 20px rgba(99, 102, 241, 0.15)'
+        width: '52px',
+        height: '52px',
+        borderRadius: '8px',
+        background: 'rgba(37, 99, 235, 0.1)',
+        border: '1px solid rgba(37, 99, 235, 0.25)',
+        marginBottom: '1rem'
       }}>
-        <Loader2 size={32} className="spin-animation" color="#4f46e5" />
+        <Loader2 size={26} className="spin-animation" color="#3b82f6" />
       </div>
-      <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.45rem' }}>{text}</h3>
-      <p style={{ color: '#64748b', fontSize: '0.9rem' }}>ระบบกำลังเชื่อมต่อผ่าน Express Proxy พร้อมตรวจสอบ In-Memory Cache O(1) ✨</p>
+      <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.35rem' }}>{text}</h3>
+      <p style={{ color: '#94a3b8', fontSize: '0.82rem', fontFamily: 'var(--font-mono)' }}>กำลังประมวลผลผ่าน Express Gateway · ตรวจสอบ In-Memory Cache O(1)</p>
       
-      {/* Cute Skeleton Shimmer Rows */}
-      <div style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+      {/* Skeleton Rows */}
+      <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
         {[1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
             style={{
-              height: '52px',
-              borderRadius: '14px',
-              background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
+              height: '46px',
+              borderRadius: '6px',
+              background: 'linear-gradient(90deg, #0d1527 25%, #16223b 50%, #0d1527 75%)',
               backgroundSize: '200% 100%',
-              animation: 'skeletonShimmer 1.5s infinite'
+              animation: 'skeletonShimmer 1.5s infinite',
+              border: '1px solid #1e293b'
             }}
           />
         ))}
@@ -39,60 +40,59 @@ export function LoadingSkeleton({ text = 'กำลังโหลดข้อ�
   );
 }
 
-export function EmptyState({ title = 'ไม่พบข้อมูลที่ค้นหา', message = 'ลองเปลี่ยนคำค้นหา หรือรีเซ็ตตัวกรองภูมิภาค', onReset }) {
+export function EmptyState({ title = 'ไม่พบข้อมูลที่ตรงกับเงื่อนไข', message = 'กรุณาปรับคำค้นหา หรือรีเซ็ตตัวกรองภูมิภาค', onReset }) {
   return (
-    <div style={{ padding: '4rem 2rem', textAlign: 'center' }} className="glass-panel">
+    <div style={{ padding: '3.5rem 2rem', textAlign: 'center' }} className="glass-panel">
       <div style={{
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '72px',
-        height: '72px',
-        borderRadius: '50%',
-        background: '#fff1f2',
-        color: '#f43f5e',
-        marginBottom: '1.25rem',
-        boxShadow: '0 8px 20px rgba(244, 63, 94, 0.1)'
+        width: '56px',
+        height: '56px',
+        borderRadius: '8px',
+        background: 'rgba(239, 68, 68, 0.08)',
+        border: '1px solid rgba(239, 68, 68, 0.2)',
+        color: '#f87171',
+        marginBottom: '1rem'
       }}>
-        <SearchX size={34} />
+        <SearchX size={28} />
       </div>
-      <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>{title} 🌱</h3>
-      <p style={{ color: '#64748b', fontSize: '0.92rem', maxWidth: '420px', margin: '0 auto 1.5rem', lineHeight: 1.5 }}>{message}</p>
+      <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.4rem' }}>{title}</h3>
+      <p style={{ color: '#94a3b8', fontSize: '0.85rem', maxWidth: '420px', margin: '0 auto 1.25rem', lineHeight: 1.5 }}>{message}</p>
       {onReset && (
-        <button onClick={onReset} className="btn btn-secondary btn-sm" style={{ borderRadius: '9999px', padding: '0.5rem 1.25rem' }}>
-          <RefreshCw size={14} />
-          <span>ล้างตัวกรองและค้นหาใหม่</span>
+        <button onClick={onReset} className="btn btn-secondary btn-sm" style={{ borderRadius: '6px', padding: '0.45rem 1.15rem' }}>
+          <RefreshCw size={13} />
+          <span>รีเซ็ตตัวกรองการค้นหา</span>
         </button>
       )}
     </div>
   );
 }
 
-export function ErrorBanner({ message = 'เกิดข้อผิดพลาดในการโหลดข้อมูล', onRetry }) {
+export function ErrorBanner({ message = 'เกิดข้อผิดพลาดในการดึงข้อมูลจาก API', onRetry }) {
   return (
     <div style={{
-      background: '#fff1f2',
-      border: '1px solid #fecdd3',
-      borderRadius: '16px',
-      padding: '1.25rem 1.5rem',
+      background: 'rgba(239, 68, 68, 0.08)',
+      border: '1px solid rgba(239, 68, 68, 0.3)',
+      borderRadius: '6px',
+      padding: '1rem 1.25rem',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: '1rem',
-      marginBottom: '1.5rem',
-      boxShadow: '0 4px 12px rgba(244, 63, 94, 0.06)'
+      marginBottom: '1.25rem'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <AlertCircle size={24} color="#f43f5e" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+        <AlertCircle size={20} color="#f87171" />
         <div>
-          <div style={{ fontWeight: 800, color: '#be123c', fontSize: '0.95rem' }}>ระบบตรวจพบข้อผิดพลาด</div>
-          <div style={{ fontSize: '0.86rem', color: '#e11d48' }}>{message} (กำลังใช้งานข้อมูลสำรอง Offline Fallback เพื่อให้ระบบทำงานต่อเนื่อง)</div>
+          <div style={{ fontWeight: 600, color: '#fca5a5', fontSize: '0.88rem' }}>การแจ้งเตือนสภาวะระบบ</div>
+          <div style={{ fontSize: '0.8rem', color: '#f87171' }}>{message} (ระบบเปิดใช้งานชุดข้อมูลสำรอง Offline Fallback อัตโนมัติ)</div>
         </div>
       </div>
       {onRetry && (
-        <button onClick={onRetry} className="btn btn-secondary btn-sm" style={{ borderColor: '#fca5a5', color: '#be123c', background: '#ffffff', borderRadius: '9999px' }}>
-          <RefreshCw size={14} />
-          <span>ลองใหม่</span>
+        <button onClick={onRetry} className="btn btn-secondary btn-sm" style={{ borderColor: 'rgba(239,68,68,0.4)', color: '#fca5a5' }}>
+          <RefreshCw size={13} />
+          <span>เรียกซ้ำ</span>
         </button>
       )}
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import MetricCard from './MetricCard';
-import { Scale, ArrowRight, BarChart3, TrendingUp, ShieldAlert, Users, Sparkles } from 'lucide-react';
+import { GitCompare, ArrowRight, BarChart3, TrendingUp, ShieldAlert, Users } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 
 export default function DashboardHome({
@@ -23,47 +23,42 @@ export default function DashboardHome({
 
   return (
     <div>
-      {/* Cute Minimal Hero Banner */}
+      {/* Executive Summary Banner */}
       <div
         className="glass-panel"
         style={{
-          background: 'linear-gradient(135deg, #eef2ff 0%, #fdf2f8 50%, #f0fdf4 100%)',
-          border: '1px solid #e0e7ff',
-          marginBottom: '2rem',
+          background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          border: '1px solid var(--border-card)',
+          marginBottom: '1.75rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '1.5rem',
-          position: 'relative',
-          overflow: 'hidden'
+          gap: '1.25rem'
         }}
       >
-        <div style={{ maxWidth: '640px' }}>
+        <div style={{ maxWidth: '680px' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.45rem',
-            background: '#ffffff',
-            color: '#4f46e5',
-            fontSize: '0.8rem',
-            fontWeight: 800,
-            padding: '4px 12px',
-            borderRadius: '9999px',
-            boxShadow: '0 2px 8px rgba(99, 102, 241, 0.1)',
-            marginBottom: '0.75rem',
-            border: '1px solid #e0e7ff'
+            color: '#60a5fa',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+            marginBottom: '0.5rem',
+            fontFamily: 'var(--font-mono)'
           }}>
-            <Sparkles size={14} color="#ec4899" />
-            ZONEZET 2.0 · CUTE & MINIMAL ECONOMIC HUB
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3b82f6' }} />
+            ZoneZet Macroeconomic Analytics · World Bank Data System
           </div>
-          <h1 style={{ fontSize: '1.9rem', fontWeight: 800, letterSpacing: '-0.025em', color: '#1e1b4b', marginBottom: '0.65rem' }}>
-            วิเคราะห์และเปรียบเทียบสถิติเศรษฐกิจโลก ✨
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff', marginBottom: '0.45rem' }}>
+            ระบบวิเคราะห์และเปรียบเทียบสถิติเศรษฐกิจมหภาคระดับสถาบัน
           </h1>
-          <p style={{ color: '#475569', fontSize: '0.96rem', lineHeight: 1.6 }}>
-            ต่อยอดจาก Version 1 ด้วยสถาปัตยกรรม <strong style={{ color: '#4338ca' }}>React + Express</strong> พร้อมกราฟเปรียบเทียบหลายประเทศ 
-            ระบบแคช In-Memory Hash Table <strong style={{ color: '#047857' }}>O(1)</strong> และอัลกอริทึม MergeSort <strong style={{ color: '#2563eb' }}>O(n log n)</strong> 
-            ในสไตล์คลีน มินิมอล สบายตา 🌸
+          <p style={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: 1.55 }}>
+            โครงสร้างสถาปัตยกรรมระดับองค์กรด้วย <strong style={{ color: '#f8fafc' }}>React-Vite & Express Gateway</strong> บูรณาการระบบแคชความเร็วสูง In-Memory Hash Table <strong style={{ color: '#34d399' }}>O(1)</strong>,
+            อัลกอริทึมจัดเรียงข้อมูลแบบเสถียร MergeSort <strong style={{ color: '#60a5fa' }}>O(n log n)</strong> และศูนย์เปรียบเทียบความสัมพันธ์เชิงสถิติ (Comparison Hub)
           </p>
         </div>
 
@@ -71,17 +66,17 @@ export default function DashboardHome({
           <button
             onClick={() => setActiveTab('compare')}
             className="btn btn-primary"
-            style={{ padding: '0.8rem 1.6rem', fontSize: '0.95rem', borderRadius: '14px' }}
+            style={{ padding: '0.65rem 1.25rem', fontSize: '0.86rem' }}
           >
-            <Scale size={18} />
-            <span>เริ่มเปรียบเทียบประเทศ (Compare Hub)</span>
-            <ArrowRight size={16} />
+            <GitCompare size={16} />
+            <span>เปิดศูนย์เปรียบเทียบ (Compare Hub)</span>
+            <ArrowRight size={15} />
           </button>
         </div>
       </div>
 
       {/* Top 5 Highlight Cards */}
-      <div className="grid-3" style={{ marginBottom: '2rem' }}>
+      <div className="grid-3" style={{ marginBottom: '1.75rem' }}>
         <MetricCard
           title={`GDP Growth TOP 5 (${selectedYear})`}
           type="gdp"
@@ -102,54 +97,55 @@ export default function DashboardHome({
         />
       </div>
 
-      {/* Interactive Cute Pastel Recharts Graph */}
-      <div className="glass-panel" style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+      {/* Institutional Recharts Graph */}
+      <div className="glass-panel" style={{ marginBottom: '1.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-subtle)' }}>
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <BarChart3 size={20} color="#6366f1" />
-              <span>ภาพรวมสถิติประเทศผู้นำ (Top Performers Overview)</span>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <BarChart3 size={18} color="#3b82f6" />
+              <span>ภาพรวมเปรียบเทียบสัดส่วนตัวชี้วัดเศรษฐกิจ (Top Performers Comparative Overview)</span>
             </h3>
-            <p style={{ color: '#64748b', fontSize: '0.88rem' }}>
-              เปรียบเทียบสัดส่วนตัวชี้วัด GDP Growth vs Inflation vs Unemployment ปี {selectedYear}
+            <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '2px' }}>
+              เปรียบเทียบอัตราการเติบโต GDP, อัตราเงินเฟ้อ และอัตราการว่างงานของ 5 ประเทศผู้นำ ประจำปี {selectedYear}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', gap: '0.4rem' }}>
             <button onClick={() => setActiveTab('gdp')} className="btn btn-secondary btn-sm">
-              <TrendingUp size={14} color="#10b981" />
-              <span>ดูตาราง GDP</span>
+              <TrendingUp size={13} color="#10b981" />
+              <span>ตาราง GDP</span>
             </button>
             <button onClick={() => setActiveTab('inflation')} className="btn btn-secondary btn-sm">
-              <ShieldAlert size={14} color="#f43f5e" />
-              <span>ดูตาราง เงินเฟ้อ</span>
+              <ShieldAlert size={13} color="#ef4444" />
+              <span>ตาราง เงินเฟ้อ</span>
             </button>
             <button onClick={() => setActiveTab('unemployment')} className="btn btn-secondary btn-sm">
-              <Users size={14} color="#f59e0b" />
-              <span>ดูตาราง การว่างงาน</span>
+              <Users size={13} color="#f59e0b" />
+              <span>ตาราง ว่างงาน</span>
             </button>
           </div>
         </div>
 
         <div className="chart-container">
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} axisLine={{ stroke: '#e2e8f0' }} />
-              <YAxis stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 12 }} unit="%" axisLine={{ stroke: '#e2e8f0' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <XAxis dataKey="name" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }} axisLine={{ stroke: '#1e293b' }} />
+              <YAxis stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }} unit="%" axisLine={{ stroke: '#1e293b' }} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '14px',
-                  color: '#0f172a',
-                  boxShadow: '0 10px 25px rgba(148, 163, 184, 0.15)',
-                  fontWeight: 600
+                  backgroundColor: '#0f172a',
+                  border: '1px solid #334155',
+                  borderRadius: '6px',
+                  color: '#f8fafc',
+                  boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)',
+                  fontSize: '0.82rem',
+                  fontFamily: 'var(--font-mono)'
                 }}
               />
-              <Legend wrapperStyle={{ paddingTop: '10px' }} />
-              <Bar dataKey="GDP" fill="#34d399" radius={[6, 6, 0, 0]} name="GDP Growth (%)" />
-              <Bar dataKey="Inflation" fill="#fb7185" radius={[6, 6, 0, 0]} name="Inflation (%)" />
-              <Bar dataKey="Unemployment" fill="#fbbf24" radius={[6, 6, 0, 0]} name="Unemployment (%)" />
+              <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '0.82rem' }} />
+              <Bar dataKey="GDP" fill="#10b981" radius={[3, 3, 0, 0]} name="GDP Growth (%)" />
+              <Bar dataKey="Inflation" fill="#ef4444" radius={[3, 3, 0, 0]} name="Inflation Rate (%)" />
+              <Bar dataKey="Unemployment" fill="#f59e0b" radius={[3, 3, 0, 0]} name="Unemployment (%)" />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Calendar, Zap, Scale } from 'lucide-react';
+import { Search, Calendar, Database, GitCompare } from 'lucide-react';
 
 export default function Header({
   searchQuery,
@@ -15,11 +15,11 @@ export default function Header({
   return (
     <header className="top-header">
       <div className="header-search-bar">
-        <Search size={16} color="#64748b" />
+        <Search size={15} color="#64748b" />
         <input
           type="text"
           className="header-search-input"
-          placeholder="ค้นหาชื่อประเทศ หรือภูมิภาค..."
+          placeholder="ค้นหาด้วยชื่อประเทศ, รหัส ISO หรือภูมิภาค..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -28,8 +28,8 @@ export default function Header({
       <div className="header-actions">
         {/* Year Selector */}
         <div className="year-picker">
-          <Calendar size={15} color="#4f46e5" />
-          <span style={{ color: '#64748b', fontWeight: 600 }}>ข้อมูลปี:</span>
+          <Calendar size={14} color="#94a3b8" />
+          <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>รอบปีข้อมูล:</span>
           <select
             className="year-select"
             value={selectedYear}
@@ -45,19 +45,18 @@ export default function Header({
 
         {/* DSA Cache Hit Stats Pill */}
         <div className="cache-indicator" title="Express In-Memory Hash Table Cache O(1)">
-          <Zap size={14} />
+          <Database size={13} />
           <span>Cache: {cacheStats.hitRate || '100%'} (&lt;2ms)</span>
         </div>
 
         {/* Quick Compare Button */}
         <button
           className="btn btn-secondary btn-sm"
-          style={{ borderRadius: '9999px', padding: '0.45rem 1rem' }}
           onClick={() => setActiveTab('compare')}
-          title="เปิดหน้าต่างเปรียบเทียบประเทศ"
+          title="เปิดศูนย์วิเคราะห์เปรียบเทียบ"
         >
-          <Scale size={15} color="#4f46e5" />
-          <span style={{ fontWeight: 700 }}>เปรียบเทียบ ({compareCount})</span>
+          <GitCompare size={14} color="#60a5fa" />
+          <span>เปรียบเทียบ ({compareCount})</span>
         </button>
       </div>
     </header>

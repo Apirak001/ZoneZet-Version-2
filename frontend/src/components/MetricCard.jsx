@@ -2,34 +2,23 @@ import React from 'react';
 import { ArrowUpRight, ArrowDownRight, Plus } from 'lucide-react';
 
 export default function MetricCard({ title, type, items = [], onAddToCompare }) {
-  const getBadgeStyle = (trend, colorClass) => {
-    if (colorClass === 'green') {
-      return { bg: '#ecfdf5', text: '#047857', border: '#a7f3d0' };
-    }
-    return { bg: '#fff1f2', text: '#be123c', border: '#fecdd3' };
-  };
-
-  const getEmoji = () => {
-    if (type === 'gdp') return '🌱';
-    if (type === 'inflation') return '🍓';
-    return '💼';
+  const getBadgeClass = (trend, colorClass) => {
+    return colorClass === 'green' ? 'value-badge green' : 'value-badge red';
   };
 
   return (
     <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-          <span>{getEmoji()}</span>
-          <span>{title}</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border-subtle)' }}>
+        <h3 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.01em', textTransform: 'uppercase' }}>
+          {title}
         </h3>
-        <span style={{ fontSize: '0.72rem', color: '#6366f1', background: '#eef2ff', border: '1px solid #c7d2fe', padding: '3px 9px', borderRadius: '9999px', fontWeight: 700 }}>
-          5 อันดับแรก
+        <span style={{ fontSize: '0.68rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-subtle)', padding: '2px 6px', borderRadius: '4px', fontFamily: 'var(--font-mono)' }}>
+          TOP 5
         </span>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', flex: 1 }}>
         {items.map((item, idx) => {
-          const style = getBadgeStyle(item.trend, item.colorClass);
           const flagUrl = item.iso2 ? `https://flagcdn.com/w40/${item.iso2.toLowerCase()}.png` : null;
 
           return (
@@ -39,15 +28,15 @@ export default function MetricCard({ title, type, items = [], onAddToCompare }) 
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0.65rem 0.85rem',
-                borderRadius: '14px',
-                background: '#f8fafc',
-                border: '1px solid #f1f5f9',
-                transition: 'all 0.2s ease'
+                padding: '0.55rem 0.75rem',
+                borderRadius: '6px',
+                background: 'rgba(255, 255, 255, 0.015)',
+                border: '1px solid rgba(255, 255, 255, 0.04)',
+                transition: 'background 0.15s ease'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#94a3b8', width: '18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', width: '16px', fontFamily: 'var(--font-mono)' }}>
                   #{idx + 1}
                 </span>
                 {flagUrl && (
@@ -58,25 +47,12 @@ export default function MetricCard({ title, type, items = [], onAddToCompare }) 
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
                 )}
-                <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>{item.country}</span>
+                <span style={{ fontWeight: 600, fontSize: '0.86rem', color: '#f8fafc' }}>{item.country}</span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                <span
-                  style={{
-                    padding: '0.25rem 0.6rem',
-                    borderRadius: '9999px',
-                    fontSize: '0.82rem',
-                    fontWeight: 800,
-                    background: style.bg,
-                    color: style.text,
-                    border: `1px solid ${style.border}`,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '2px'
-                  }}
-                >
-                  {item.trend === 'up' ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
+                <span className={getBadgeClass(item.trend, item.colorClass)}>
+                  {item.trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                   {item.displayValue || `${item.value}%`}
                 </span>
 
@@ -84,10 +60,10 @@ export default function MetricCard({ title, type, items = [], onAddToCompare }) 
                   <button
                     onClick={() => onAddToCompare(item.countryCode || item.iso2)}
                     className="btn btn-secondary btn-sm"
-                    style={{ padding: '5px', borderRadius: '8px' }}
-                    title="เพิ่มเข้าหน้าต่างเปรียบเทียบ"
+                    style={{ padding: '3px 6px', borderRadius: '4px' }}
+                    title="เพิ่มเข้าการเปรียบเทียบ"
                   >
-                    <Plus size={13} />
+                    <Plus size={12} />
                   </button>
                 )}
               </div>

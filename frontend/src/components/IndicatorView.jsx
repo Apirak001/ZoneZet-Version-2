@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpDown, Scale, Bookmark, Plus, Check, ArrowUpRight, ArrowDownRight, BarChart2, Sparkles } from 'lucide-react';
+import { ArrowUpDown, GitCompare, Bookmark, Plus, Check, ArrowUpRight, ArrowDownRight, BarChart2 } from 'lucide-react';
 import { mergeSort } from '../utils/dsa/mergeSort';
 import { LoadingSkeleton, EmptyState, ErrorBanner } from './FeedbackStates';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -48,7 +48,7 @@ export default function IndicatorView({
   // Top 10 for interactive Bar Chart
   const top10ChartData = useMemo(() => {
     return sortedData.slice(0, 10).map(item => ({
-      country: item.country.length > 12 ? item.country.substring(0, 12) + '...' : item.country,
+      country: item.country.length > 14 ? item.country.substring(0, 14) + '...' : item.country,
       fullName: item.country,
       value: item.value
     }));
@@ -64,19 +64,19 @@ export default function IndicatorView({
   };
 
   const getBarColor = () => {
-    if (type === 'gdp') return '#34d399';
-    if (type === 'inflation') return '#fb7185';
-    return '#fbbf24';
+    if (type === 'gdp') return '#10b981';
+    if (type === 'inflation') return '#ef4444';
+    return '#f59e0b';
   };
 
   if (isLoading) {
-    return <LoadingSkeleton text={`กำลังโหลดข้อมูล ${title}...`} />;
+    return <LoadingSkeleton text={`กำลังเรียกข้อมูลสถิติ ${title}...`} />;
   }
 
   return (
     <div>
       {/* Title & Stats */}
-      <div style={{ marginBottom: '1.5rem' }}>
+      <div style={{ marginBottom: '1.25rem' }}>
         <h1 className="page-title">{title}</h1>
         <p className="page-subtitle">{subtitle}</p>
       </div>
@@ -98,36 +98,37 @@ export default function IndicatorView({
 
       {/* Interactive Distribution Chart */}
       {sortedData.length > 0 && (
-        <div className="glass-panel" style={{ marginBottom: '1.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <BarChart2 size={18} color="#6366f1" />
-              <span>10 อันดับแรกในมุมมองนี้ (Top 10 Chart) ✨</span>
+        <div className="glass-panel" style={{ marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem', paddingBottom: '0.65rem', borderBottom: '1px solid var(--border-subtle)' }}>
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <BarChart2 size={16} color="#3b82f6" />
+              <span>การกระจายตัว 10 อันดับแรก (Top 10 Distribution)</span>
             </h3>
-            <span style={{ fontSize: '0.75rem', color: '#4338ca', background: '#eef2ff', padding: '3px 10px', borderRadius: '9999px', fontWeight: 700, border: '1px solid #c7d2fe' }}>
-              จัดเรียงด้วย DSA Merge Sort O(n log n)
+            <span style={{ fontSize: '0.72rem', color: '#60a5fa', background: 'rgba(37,99,235,0.1)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600, border: '1px solid rgba(37,99,235,0.25)', fontFamily: 'var(--font-mono)' }}>
+              อัลกอริทึม: MergeSort O(n log n)
             </span>
           </div>
 
-          <div className="chart-container" style={{ height: '260px' }}>
-            <ResponsiveContainer width="100%" height={260}>
+          <div className="chart-container" style={{ height: '240px' }}>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart data={top10ChartData} margin={{ top: 5, right: 20, left: -10, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="country" stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} angle={-25} textAnchor="end" axisLine={{ stroke: '#e2e8f0' }} />
-                <YAxis stroke="#94a3b8" tick={{ fill: '#64748b', fontSize: 11 }} unit="%" axisLine={{ stroke: '#e2e8f0' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="country" stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11 }} angle={-25} textAnchor="end" axisLine={{ stroke: '#1e293b' }} />
+                <YAxis stroke="#64748b" tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }} unit="%" axisLine={{ stroke: '#1e293b' }} />
                 <Tooltip
                   formatter={(val) => [`${val}%`, title]}
                   labelFormatter={(_, payload) => payload?.[0]?.payload?.fullName || ''}
                   contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '14px',
-                    color: '#0f172a',
-                    boxShadow: '0 10px 25px rgba(148, 163, 184, 0.15)',
-                    fontWeight: 600
+                    backgroundColor: '#0f172a',
+                    border: '1px solid #334155',
+                    borderRadius: '6px',
+                    color: '#f8fafc',
+                    boxShadow: 'var(--shadow-dropdown)',
+                    fontSize: '0.82rem',
+                    fontFamily: 'var(--font-mono)'
                   }}
                 />
-                <Bar dataKey="value" fill={getBarColor()} radius={[6, 6, 0, 0]} />
+                <Bar dataKey="value" fill={getBarColor()} radius={[2, 2, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -137,40 +138,40 @@ export default function IndicatorView({
       {/* Table & Sort Controls */}
       {sortedData.length === 0 ? (
         <EmptyState
-          title="ไม่พบประเทศในภูมิภาคหรือคำค้นหานี้"
-          message="กรุณากดเลือก 'ทุกภูมิภาค' หรือล้างคำค้นหาที่แถบด้านบน"
+          title="ไม่พบข้อมูลในเงื่อนไขการค้นหา"
+          message="กรุณากดเลือก 'ทุกภูมิภาค' หรือปรับคำค้นหาที่แถบด้านบน"
           onReset={() => setSelectedRegion('All')}
         />
       ) : (
-        <div className="glass-panel" style={{ padding: '0.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '0.75rem' }}>
-            <div style={{ fontSize: '0.9rem', color: '#64748b' }}>
-              พบทั้งหมด <strong style={{ color: '#0f172a' }}>{sortedData.length}</strong> ประเทศ
+        <div className="glass-panel" style={{ padding: '0.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1rem', borderBottom: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '0.65rem' }}>
+            <div style={{ fontSize: '0.84rem', color: '#94a3b8' }}>
+              จำนวนข้อมูลทั้งหมด <strong style={{ color: '#ffffff', fontFamily: 'var(--font-mono)' }}>{sortedData.length}</strong> รายการ
             </div>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>จัดเรียง:</span>
+            <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>จัดเรียง:</span>
               <button
                 onClick={() => handleSortToggle('value')}
-                className={`btn btn-secondary btn-sm`}
+                className="btn btn-secondary btn-sm"
                 style={{
-                  background: sortKey === 'value' ? '#eef2ff' : '#ffffff',
-                  color: sortKey === 'value' ? '#4338ca' : '#334155',
-                  borderColor: sortKey === 'value' ? '#c7d2fe' : '#e2e8f0'
+                  background: sortKey === 'value' ? 'rgba(37,99,235,0.15)' : undefined,
+                  borderColor: sortKey === 'value' ? '#3b82f6' : undefined,
+                  color: sortKey === 'value' ? '#ffffff' : undefined
                 }}
               >
-                <ArrowUpDown size={13} />
+                <ArrowUpDown size={12} />
                 <span>ค่าสถิติ ({sortKey === 'value' ? (sortDirection === 'desc' ? 'มาก➔น้อย' : 'น้อย➔มาก') : 'ตัวเลข'})</span>
               </button>
               <button
                 onClick={() => handleSortToggle('country')}
-                className={`btn btn-secondary btn-sm`}
+                className="btn btn-secondary btn-sm"
                 style={{
-                  background: sortKey === 'country' ? '#eef2ff' : '#ffffff',
-                  color: sortKey === 'country' ? '#4338ca' : '#334155',
-                  borderColor: sortKey === 'country' ? '#c7d2fe' : '#e2e8f0'
+                  background: sortKey === 'country' ? 'rgba(37,99,235,0.15)' : undefined,
+                  borderColor: sortKey === 'country' ? '#3b82f6' : undefined,
+                  color: sortKey === 'country' ? '#ffffff' : undefined
                 }}
               >
-                <ArrowUpDown size={13} />
+                <ArrowUpDown size={12} />
                 <span>ชื่อประเทศ (A-Z)</span>
               </button>
             </div>
@@ -180,12 +181,12 @@ export default function IndicatorView({
             <modern-table className="modern-table">
               <thead>
                 <tr>
-                  <th style={{ width: '60px' }}>อันดับ</th>
+                  <th style={{ width: '50px' }}>#</th>
                   <th>ประเทศ (Country)</th>
                   <th>รหัส (ISO)</th>
                   <th>ภูมิภาค (Region)</th>
                   <th>ค่าสถิติ (Value)</th>
-                  <th style={{ textAlign: 'center', width: '160px' }}>จัดการ (Actions)</th>
+                  <th style={{ textAlign: 'center', width: '150px' }}>การดำเนินการ</th>
                 </tr>
               </thead>
               <tbody>
@@ -196,7 +197,7 @@ export default function IndicatorView({
 
                   return (
                     <tr key={item.countryCode || index}>
-                      <td style={{ color: '#94a3b8', fontWeight: 700 }}>#{index + 1}</td>
+                      <td style={{ color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>{index + 1}</td>
                       <td>
                         <div className="country-cell">
                           {flagUrl && (
@@ -210,45 +211,42 @@ export default function IndicatorView({
                           <span>{item.country}</span>
                         </div>
                       </td>
-                      <td style={{ color: '#64748b', fontFamily: 'monospace', fontWeight: 600 }}>{item.countryCode}</td>
+                      <td style={{ color: '#94a3b8', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>{item.countryCode}</td>
                       <td>
-                        <span style={{ fontSize: '0.8rem', background: '#f1f5f9', padding: '3px 9px', borderRadius: '9999px', color: '#475569', fontWeight: 600 }}>
+                        <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.03)', padding: '2px 6px', borderRadius: '3px', color: '#cbd5e1' }}>
                           {item.region || 'Other'}
                         </span>
                       </td>
                       <td>
                         <span className={`value-badge ${item.colorClass}`}>
-                          {item.trend === 'up' ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                          {item.trend === 'up' ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
                           {item.displayValue || `${item.value}%`}
                         </span>
                       </td>
                       <td style={{ textAlign: 'center' }}>
-                        <div style={{ display: 'inline-flex', gap: '0.4rem' }}>
+                        <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
                           <button
                             onClick={() => onAddToCompare(item.countryCode)}
                             className="btn btn-secondary btn-sm"
                             style={{
-                              background: isCompared ? '#eef2ff' : '#ffffff',
-                              borderColor: isCompared ? '#818cf8' : '#e2e8f0',
-                              color: isCompared ? '#4338ca' : '#334155',
-                              borderRadius: '9999px'
+                              background: isCompared ? 'rgba(37,99,235,0.2)' : undefined,
+                              borderColor: isCompared ? '#3b82f6' : undefined
                             }}
                             title={isCompared ? 'อยู่ในรายการเปรียบเทียบแล้ว' : 'เพิ่มเพื่อเปรียบเทียบ'}
                           >
-                            {isCompared ? <Check size={13} color="#4338ca" /> : <Scale size={13} />}
-                            <span>{isCompared ? 'เทียบอยู่' : '+ เทียบ'}</span>
+                            {isCompared ? <Check size={12} color="#60a5fa" /> : <GitCompare size={12} />}
+                            <span>{isCompared ? 'เปรียบเทียบ' : '+ เทียบ'}</span>
                           </button>
                           <button
                             onClick={() => onAddToWatchlist(item)}
                             className="btn btn-secondary btn-sm"
                             style={{
-                              background: isWatchlisted ? '#fef3c7' : '#ffffff',
-                              borderColor: isWatchlisted ? '#fbbf24' : '#e2e8f0',
-                              borderRadius: '9999px'
+                              background: isWatchlisted ? 'rgba(245,158,11,0.15)' : undefined,
+                              borderColor: isWatchlisted ? '#f59e0b' : undefined
                             }}
                             title={isWatchlisted ? 'บันทึกแล้ว' : 'บันทึกลง Watchlist'}
                           >
-                            <Bookmark size={13} color={isWatchlisted ? '#d97706' : '#64748b'} />
+                            <Bookmark size={12} color={isWatchlisted ? '#fbbf24' : undefined} />
                           </button>
                         </div>
                       </td>
