@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ArrowRight,
   CheckCircle2,
@@ -18,8 +18,15 @@ import {
   ThumbsUp,
   Laptop,
   Cloud,
-  Globe
+  Globe,
+  Plus,
+  GraduationCap,
+  Briefcase,
+  Code2,
+  Terminal,
+  Mail
 } from 'lucide-react';
+import TeamShowcase from './TeamShowcase';
 
 /**
  * Animated Number Counter Hook & Component
@@ -67,12 +74,40 @@ export default function LandingAboutView({
 }) {
   const [barsLoaded, setBarsLoaded] = useState(false);
   const [activeFeature, setActiveFeature] = useState(1);
+  const chooseUsRef = useRef(null);
+  const [isSpread, setIsSpread] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setBarsLoaded(true);
     }, 250);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Scroll listener for Section 3 signature fan-out expansion
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!chooseUsRef.current) return;
+      const cardsRect = chooseUsRef.current.getBoundingClientRect();
+      const sectionEl = chooseUsRef.current.closest('.choose-us-section');
+      const sectionRect = sectionEl ? sectionEl.getBoundingClientRect() : null;
+
+      // Expand fully only when the user scrolls all the way into Section 3
+      // (Section top scrolled to <= 120px from top of viewport, or cards are centered <= 32% of screen)
+      const shouldSpread = sectionRect
+        ? (sectionRect.top <= 120 || cardsRect.top <= window.innerHeight * 0.32)
+        : (cardsRect.top <= window.innerHeight * 0.32);
+
+      setIsSpread(shouldSpread);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   const handleGoDashboard = () => {
@@ -407,123 +442,176 @@ export default function LandingAboutView({
       </section>
 
       {/* ====================================================================
-          3. ENTERPRISE VALUE PROPOSITIONS (Why ZoneZet?)
+          3. ENTERPRISE VALUE PROPOSITIONS (Why ZoneZet? - LuxDrive Architecture)
           ==================================================================== */}
-      <section className="landing-section bg-contrast-purple">
-        <div className="section-head-center">
-          <span className="section-pill-tag">WHY ZONEZET INTELLIGENCE</span>
-          <h2 className="section-title-large">ทำไมองค์กรชั้นนำจึงเลือก ZoneZet?</h2>
-          <p className="section-subtitle-center">
-            ผสานรวมข้อมูลสดระดับโลกเข้ากับสถาปัตยกรรมซอฟต์แวร์ที่เสถียร รวดเร็ว และแม่นยำที่สุด
-          </p>
+      <section className="choose-us-section fix section-padding">
+        <div
+          className="bg-image overflow-hidden ripple-image ripples z-0"
+          style={{
+            backgroundImage: `url("/img/choose-us-bg1-1.jpg")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center'
+          }}
+        >
+          <img src="/img/choose-us-bg1-1.jpg" alt="Why Choose ZoneZet" style={{ display: 'none' }} />
         </div>
 
-        <div className="grid-4-purple">
-          <div className="purple-solution-card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.65rem' }}>
-              <Zap size={20} color="#a855f7" />
-              <h3 className="solution-card-title" style={{ color: '#a855f7', margin: 0 }}>Ultra-Low Latency</h3>
+        <div className="choose-us-container">
+          <div className="choose-us-top-items">
+            <div className="sec-title">
+              <div className="hero-badge-tag" style={{ marginBottom: '1.25rem', display: 'inline-flex' }}>
+                <span className="badge-sparkle">✦</span>
+                <span>ENTERPRISE MACROECONOMIC INTELLIGENCE</span>
+              </div>
+              <h2 className="title split-title text-white">
+                <span className="title-en-gradient">Global Economic Intelligence</span>
+                <span className="title-thai">ทำไมองค์กรชั้นนำจึงเลือก ZoneZet?</span>
+              </h2>
+              <p className="choose-us-lead">
+                ผสานรวมข้อมูลสดระดับโลกเข้ากับสถาปัตยกรรมซอฟต์แวร์ที่เสถียร รวดเร็ว และแม่นยำที่สุด
+              </p>
             </div>
-            <p className="solution-card-body">
-              แคชข้อมูลในระดับ RAM ผ่าน In-Memory Hash Map ลดเวลาสืบค้นจาก 1,200ms เหลือเพียง 0.05ms ตอบสนองได้ทันทีโดยไม่ติด Rate Limit
-            </p>
+            <div className="top-icon">
+              <img src="/img/choose-us-icon1-1.png" alt="ZoneZet Intelligence Rotating Sunburst" />
+            </div>
           </div>
 
-          <div className="purple-solution-card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.65rem' }}>
-              <LineChart size={20} color="#818cf8" />
-              <h3 className="solution-card-title" style={{ color: '#818cf8', margin: 0 }}>Dynamic Analytics</h3>
+          <div
+            ref={chooseUsRef}
+            className={`row g-4 advance-wrap ${isSpread ? 'is-spread' : ''}`}
+          >
+            {/* 1. Ultra-Low Latency */}
+            <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
+              <div className="choose-us-block advance-item item-0 theme-purple">
+                <div className="inner-block">
+                  <div className="icon-block">
+                    <img src="/img/choose-icon1-1.png" alt="Ultra-Low Latency" />
+                  </div>
+                  <div className="content-block">
+                    <h4 className="title">Ultra-Low Latency</h4>
+                    <p className="text">
+                      แคชข้อมูลในระดับ RAM ผ่าน In-Memory Hash Map ลดเวลาสืบค้นจาก 1,200ms เหลือเพียง 0.05ms ตอบสนองได้ทันทีโดยไม่ติด Rate Limit
+                    </p>
+                    <div className="button-items">
+                      <div className="bottom-line"></div>
+                      <button type="button" className="plus-button" aria-label="Learn more about Ultra-Low Latency">
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="solution-card-body">
-              เปลี่ยนตัวเลขดิบของ World Bank ให้เป็นกราฟิก Recharts โต้ตอบได้ ทั้ง Bar Chart เปรียบเทียบอันดับ และ Multi-Line Chart เทรนด์ 5 ปี
-            </p>
-          </div>
 
-          <div className="purple-solution-card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.65rem' }}>
-              <Cpu size={20} color="#f472b6" />
-              <h3 className="solution-card-title" style={{ color: '#f472b6', margin: 0 }}>Sovereign Filtering</h3>
+            {/* 2. Dynamic Analytics */}
+            <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
+              <div className="choose-us-block advance-item item-1 theme-cyan">
+                <div className="inner-block">
+                  <div className="icon-block">
+                    <img src="/img/choose-icon1-2.png" alt="Dynamic Analytics" />
+                  </div>
+                  <div className="content-block">
+                    <h4 className="title">Dynamic Analytics</h4>
+                    <p className="text">
+                      เปลี่ยนตัวเลขดิบของ World Bank ให้เป็นกราฟิก Recharts โต้ตอบได้ ทั้ง Bar Chart เปรียบเทียบอันดับ และ Multi-Line Chart เทรนด์ 5 ปี
+                    </p>
+                    <div className="button-items">
+                      <div className="bottom-line"></div>
+                      <button type="button" className="plus-button" aria-label="Learn more about Dynamic Analytics">
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="solution-card-body">
-              คัดกรองกลุ่มองค์กรและทวีปออกด้วย Hash Set O(1) ทำให้ได้ข้อมูลเฉพาะประเทศจริง 100% ปราศจากข้อมูลซ้ำซ้อนหรือความคลาดเคลื่อน
-            </p>
-          </div>
 
-          <div className="purple-solution-card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.65rem' }}>
-              <ShieldCheck size={20} color="#34d399" />
-              <h3 className="solution-card-title" style={{ color: '#34d399', margin: 0 }}>Zero-Crash SLA</h3>
+            {/* 3. Sovereign Filtering */}
+            <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
+              <div className="choose-us-block advance-item item-2 theme-pink">
+                <div className="inner-block">
+                  <div className="icon-block">
+                    <img src="/img/choose-icon1-3.png" alt="Sovereign Filtering" />
+                  </div>
+                  <div className="content-block">
+                    <h4 className="title">Sovereign Filtering</h4>
+                    <p className="text">
+                      คัดกรองกลุ่มองค์กรและทวีปออกด้วย Hash Set O(1) ทำให้ได้ข้อมูลเฉพาะประเทศจริง 100% ปราศจากข้อมูลซ้ำซ้อนหรือความคลาดเคลื่อน
+                    </p>
+                    <div className="button-items">
+                      <div className="bottom-line"></div>
+                      <button type="button" className="plus-button" aria-label="Learn more about Sovereign Filtering">
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="solution-card-body">
-              มีระบบ Safe Fallback รองรับข้อมูลออฟไลน์ 182 ประเทศ พร้อมระบบ Undo Stack (LIFO) กู้คืนรายการที่เผลอลบได้ทันที
-            </p>
+
+            {/* 4. Zero-Crash SLA */}
+            <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
+              <div className="choose-us-block advance-item item-3 theme-emerald">
+                <div className="inner-block">
+                  <div className="icon-block">
+                    <img src="/img/choose-icon1-4.png" alt="Zero-Crash SLA" />
+                  </div>
+                  <div className="content-block">
+                    <h4 className="title">Zero-Crash SLA</h4>
+                    <p className="text">
+                      มีระบบ Safe Fallback รองรับข้อมูลออฟไลน์ 182 ประเทศ พร้อมระบบ Undo Stack (LIFO) กู้คืนรายการที่เผลอลบได้ทันที
+                    </p>
+                    <div className="button-items">
+                      <div className="bottom-line"></div>
+                      <button type="button" className="plus-button" aria-label="Learn more about Zero-Crash SLA">
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ====================================================================
-          4. CORE ENGINEERING TEAM (Leadership & Founders)
+          4. CORE PLATFORM ARCHITECTURE & ENGINEERING TEAM
           ==================================================================== */}
-      <section className="landing-section">
-        <div className="section-head-center">
-          <span className="section-pill-tag">PLATFORM LEADERSHIP &amp; ENGINEERING</span>
-          <h2 className="section-title-large">ทีมวิศวกรผู้พัฒนาแพลตฟอร์ม</h2>
-          <p className="section-subtitle-center">
-            ผสานความเชี่ยวชาญด้าน Frontend Interactive Visualization และ Backend High-Performance Systems
-          </p>
-        </div>
-
-        <div className="grid-2-team">
-          {/* Member 1: Apirak */}
-          <div className="purple-solution-card" style={{ borderLeft: '4px solid #a855f7' }}>
-            <div style={{ fontSize: '0.74rem', color: '#a855f7', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>
-              Frontend Architect &amp; Interactive UX Lead
-            </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
-              นาย อภิรักษ์ ถนอมวงษ์
-            </h3>
-            <div style={{ fontSize: '0.82rem', color: '#c084fc', marginBottom: '0.75rem', fontWeight: 500 }}>
-              Specialization: Modern React SPA &amp; Recharts Data Visualization
-            </div>
-            <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-              รับผิดชอบการออกแบบสถาปัตยกรรม React SPA, ระบบ Data Visualization อินเทอร์แอคทีฟ, 
-              การจัดเรียงข้อมูล 196 ประเทศด้วย MergeSort O(n log n) และระบบกู้คืนข้อมูล Undo Stack (LIFO)
-            </p>
-          </div>
-
-          {/* Member 2: Anupong */}
-          <div className="purple-solution-card" style={{ borderLeft: '4px solid #3b82f6' }}>
-            <div style={{ fontSize: '0.74rem', color: '#60a5fa', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>
-              Backend Systems &amp; Distributed Cache Lead
-            </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '4px' }}>
-              นาย อนุพงษ์
-            </h3>
-            <div style={{ fontSize: '0.82rem', color: '#93c5fd', marginBottom: '0.75rem', fontWeight: 500 }}>
-              Specialization: Express Proxy Gateway &amp; In-Memory Cache O(1)
-            </div>
-            <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-              รับผิดชอบการพัฒนาระบบ Express API Proxy Gateway, แคชข้อมูลความเร็วสูง In-Memory Cache Hash Map O(1),
-              การคัดกรองข้อมูลทวีปด้วย Hash Set O(1) และระบบป้องกันเซิร์ฟเวอร์ล่ม Safe Fallback Resilience
-            </p>
-          </div>
-        </div>
-
-        {/* Final CTA Banner */}
-        <div className="purple-banner-cta">
-          <div className="banner-left">
-            <h3 className="banner-cta-title">พร้อมสัมผัสประสบการณ์การวิเคราะห์ข้อมูลเศรษฐกิจแล้วหรือยัง?</h3>
-            <p className="banner-cta-desc">
-              เข้าถึงข้อมูลสถิติเศรษฐกิจ 196 ประเทศทั่วโลกได้ทันทีผ่านแดชบอร์ดระบบ
-            </p>
-          </div>
-          <button
-            onClick={handleGoDashboard}
-            className="btn btn-purple-primary banner-btn"
+      <section className="team_area" id="team">
+        <div className="team-bg-overlay" />
+        <div className="team_container">
+          <div
+            className="section_title text-center"
+            style={{
+              marginBottom: '2.5rem',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              width: '100%',
+              margin: '0 auto 2.5rem auto'
+            }}
           >
-            <span>เปิดหน้าแดชบอร์ดหลัก</span>
-            <ArrowRight size={16} />
-          </button>
+            <div
+              className="hero-badge-tag"
+              style={{
+                marginBottom: '1.25rem',
+                display: 'inline-flex',
+                alignSelf: 'center',
+                margin: '0 auto 1.25rem auto'
+              }}
+            >
+              <span className="badge-sparkle">✦</span>
+              <span>CORE PLATFORM ARCHITECTURE &amp; ENGINEERING</span>
+            </div>
+            <h1 className="team-main-headline" style={{ textAlign: 'center', width: '100%', margin: 0 }}>
+              วิศวกรผู้อยู่เบื้องหลังแพลตฟอร์ม <span className="team-headline-gradient">ZoneZet</span>
+            </h1>
+          </div>
+
+          <TeamShowcase />
         </div>
       </section>
     </div>

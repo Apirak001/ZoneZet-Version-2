@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LandingAboutView from './components/LandingAboutView';
@@ -10,20 +12,75 @@ import WatchlistRecordView from './components/WatchlistRecordView';
 import SystemHealthView from './components/SystemHealthView';
 import UndoToast from './components/UndoToast';
 import PageTransitionLoader from './components/PageTransitionLoader';
+import CustomCursor from './components/CustomCursor';
 import { fetchIndicators, fetchDashboardSummary, fetchCacheStats } from './services/api';
 import { globalUndoStack } from './utils/dsa/undoStack';
 
 export default function App() {
+  const [lenisInstance, setLenisInstance] = useState(null);
+
+  // Initialize Lenis Ultra-Smooth Momentum Scrolling (LuxDrive Luxury Feel)
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.25,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Luxurious exponential decay
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1.05,
+      touchMultiplier: 1.5,
+      infinite: false,
+    });
+
+    window.__lenis = lenis;
+    setLenisInstance(lenis);
+
+    let rafId;
+    function raf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+
+    // Global anchor link smooth scroll handler
+    const handleAnchorClick = (e) => {
+      const target = e.target.closest('a[href^="#"]');
+      if (target) {
+        const href = target.getAttribute('href');
+        if (href && href.length > 1) {
+          const el = document.querySelector(href);
+          if (el) {
+            e.preventDefault();
+            lenis.scrollTo(el, { offset: -20, duration: 1.2 });
+          }
+        }
+      }
+    };
+    document.addEventListener('click', handleAnchorClick);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      document.removeEventListener('click', handleAnchorClick);
+      lenis.destroy();
+      delete window.__lenis;
+      setLenisInstance(null);
+    };
+  }, []);
+
   // Default to the new Clean Purple Business Landing Page
   const [activeTab, setActiveTabState] = useState('landing');
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
-  // Smooth Mario Page Transition Handler
+  // Smooth Page Transition Handler
   const setActiveTab = useCallback((tabId) => {
     setActiveTabState((prev) => {
       if (prev === tabId) return prev;
       setIsPageTransitioning(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (window.__lenis) {
+        window.__lenis.scrollTo(0, { immediate: true });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
       setTimeout(() => {
         setIsPageTransitioning(false);
       }, 500);
@@ -192,6 +249,9 @@ export default function App() {
 
   return (
     <div className="biz-app-layout">
+      {/* Luxury Interactive Trailing Cursor */}
+      <CustomCursor />
+
       {/* Top Corporate Purple Navigation Bar */}
       <Navbar
         activeTab={activeTab}
@@ -318,7 +378,7 @@ export default function App() {
       </main>
 
       {/* Universal Footer across ALL pages */}
-      <Footer setActiveTab={setActiveTab} />
+      <Footer setActiveTab={setActiveTab} lenis={lenisInstance} />
 
       {/* Floating Undo Notification */}
       <UndoToast
