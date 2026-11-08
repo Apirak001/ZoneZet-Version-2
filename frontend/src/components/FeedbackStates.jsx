@@ -1,27 +1,28 @@
 import React from 'react';
-import { AlertCircle, RefreshCw, SearchX, Loader2 } from 'lucide-react';
+import { AlertCircle, RefreshCw, SearchX } from 'lucide-react';
 
-export function LoadingSkeleton({ text = 'กำลังเชื่อมต่อและดึงข้อมูลจาก World Bank API...' }) {
+export function LoadingSkeleton({ text = 'กำลังโหลดข้อมูล' }) {
   return (
-    <div style={{ padding: '3rem 2rem', textAlign: 'center' }}>
-      <div style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '52px',
-        height: '52px',
-        borderRadius: '8px',
-        background: 'rgba(37, 99, 235, 0.1)',
-        border: '1px solid rgba(37, 99, 235, 0.25)',
-        marginBottom: '1rem'
-      }}>
-        <Loader2 size={26} className="spin-animation" color="#3b82f6" />
+    <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+      <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+        <img
+          src="/img/mario-loading.gif"
+          alt="Loading..."
+          className="mario-gif-sprite"
+          style={{ width: '180px' }}
+        />
+        <div className="mario-loading-text">
+          <span>{text}</span>
+          <span className="loading-dots">
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
+          </span>
+        </div>
       </div>
-      <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.35rem' }}>{text}</h3>
-      <p style={{ color: '#94a3b8', fontSize: '0.82rem', fontFamily: 'var(--font-mono)' }}>กำลังประมวลผลผ่าน Express Gateway · ตรวจสอบ In-Memory Cache O(1)</p>
       
       {/* Skeleton Rows */}
-      <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+      <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
         {[1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
@@ -80,19 +81,19 @@ export function ErrorBanner({ message = 'เกิดข้อผิดพลา
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: '1rem',
-      marginBottom: '1.25rem'
+      marginBottom: '1.5rem'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-        <AlertCircle size={20} color="#f87171" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <AlertCircle size={20} color="#f87171" style={{ flexShrink: 0 }} />
         <div>
-          <div style={{ fontWeight: 600, color: '#fca5a5', fontSize: '0.88rem' }}>การแจ้งเตือนสภาวะระบบ</div>
-          <div style={{ fontSize: '0.8rem', color: '#f87171' }}>{message} (ระบบเปิดใช้งานชุดข้อมูลสำรอง Offline Fallback อัตโนมัติ)</div>
+          <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#f87171' }}>การเชื่อมต่อขัดข้อง</div>
+          <div style={{ fontSize: '0.8rem', color: '#fca5a5' }}>{message}</div>
         </div>
       </div>
       {onRetry && (
-        <button onClick={onRetry} className="btn btn-secondary btn-sm" style={{ borderColor: 'rgba(239,68,68,0.4)', color: '#fca5a5' }}>
-          <RefreshCw size={13} />
-          <span>เรียกซ้ำ</span>
+        <button onClick={onRetry} className="btn btn-danger btn-sm">
+          <RefreshCw size={12} />
+          <span>ลองใหม่อีกครั้ง</span>
         </button>
       )}
     </div>

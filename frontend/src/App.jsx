@@ -1,25 +1,44 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import LandingAboutView from './components/LandingAboutView';
+import DashboardToolbar from './components/DashboardToolbar';
 import DashboardHome from './components/DashboardHome';
 import IndicatorView from './components/IndicatorView';
 import ComparisonHub from './components/ComparisonHub';
 import WatchlistRecordView from './components/WatchlistRecordView';
+import SystemHealthView from './components/SystemHealthView';
 import UndoToast from './components/UndoToast';
+import PageTransitionLoader from './components/PageTransitionLoader';
 import { fetchIndicators, fetchDashboardSummary, fetchCacheStats } from './services/api';
 import { globalUndoStack } from './utils/dsa/undoStack';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
+  // Default to the new Clean Purple Business Landing Page
+  const [activeTab, setActiveTabState] = useState('landing');
+  const [isPageTransitioning, setIsPageTransitioning] = useState(false);
+
+  // Smooth Mario Page Transition Handler
+  const setActiveTab = useCallback((tabId) => {
+    setActiveTabState((prev) => {
+      if (prev === tabId) return prev;
+      setIsPageTransitioning(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        setIsPageTransitioning(false);
+      }, 500);
+      return tabId;
+    });
+  }, []);
   const [selectedYear, setSelectedYear] = useState('2025');
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Data States
   const [topSummary, setTopSummary] = useState({});
   const [indicatorData, setIndicatorData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [cacheStats, setCacheStats] = useState({ hits: 0, misses: 0, hitRate: '100%' });
+  const [cacheStats, setCacheStats] = useState({ hits: 0, misses: 0, hitRate: '100%', size: 0 });
 
   // User Interactive Lists
   const [comparedList, setComparedList] = useState(['THA', 'USA', 'JPN', 'VNM']);
@@ -85,7 +104,8 @@ export default function App() {
       });
       setIndicatorData(res.data || []);
       setIsLoading(false);
-      // Refresh cache stats
+
+      // Refresh cache stats dynamically
       fetchCacheStats().then(setCacheStats).catch(() => {});
     } catch (err) {
       console.error('Error fetching indicator:', err);
@@ -104,6 +124,7 @@ export default function App() {
     const clean = countryCode.toUpperCase();
     if (comparedList.includes(clean)) {
       setActiveTab('compare');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
     if (comparedList.length >= 5) {
@@ -112,6 +133,7 @@ export default function App() {
     }
     setComparedList([...comparedList, clean]);
     setActiveTab('compare');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleRemoveFromCompare = (countryCode) => {
@@ -169,114 +191,146 @@ export default function App() {
   };
 
   return (
-    <div className="app-container">
-      {/* Sidebar Navigation */}
-      <Sidebar
+    <div className="biz-app-layout">
+      {/* Top Corporate Purple Navigation Bar */}
+      <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
         compareCount={comparedList.length}
         watchlistCount={watchlist.length}
+        cacheStats={cacheStats}
       />
 
-      {/* Main Workspace Area */}
-      <div className="main-area">
-        <Header
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear}
-        />
+      {/* Main Content Area */}
+      <main className="biz-main-content">
+        {/* Sleek Sub-Toolbar for Dashboard & Indicator views */}
+        {['home', 'gdp', 'inflation', 'unemployment', 'health'].includes(activeTab) && (
+          <DashboardToolbar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
+            cacheStats={cacheStats}
+          />
+        )}
 
-        <main className="content-body">
-          {activeTab === 'home' && (
-            <DashboardHome
-              topSummary={topSummary}
-              selectedYear={selectedYear}
-              setActiveTab={setActiveTab}
-              onAddToCompare={handleAddToCompare}
-            />
-          )}
+        {activeTab === 'landing' && (
+          <LandingAboutView
+            setActiveTab={setActiveTab}
+            selectedYear={selectedYear}
+            topSummary={topSummary}
+            cacheStats={cacheStats}
+          />
+        )}
 
-          {activeTab === 'gdp' && (
-            <IndicatorView
-              type="gdp"
-              title={`อัตราเติบโตทางเศรษฐกิจ GDP Growth (%) ประจำปี ${selectedYear}`}
-              subtitle="วัดการขยายตัวของมูลค่าผลผลิตมวลรวมในประเทศ (World Bank Code: NY.GDP.MKTP.KD.ZG)"
-              data={indicatorData}
-              isLoading={isLoading}
-              error={error}
-              onRetry={loadIndicatorData}
-              onAddToCompare={handleAddToCompare}
-              comparedList={comparedList}
-              onAddToWatchlist={handleAddToWatchlist}
-              watchlist={watchlist}
-            />
-          )}
+        {activeTab === 'home' && (
+          <DashboardHome
+            topSummary={topSummary}
+            selectedYear={selectedYear}
+            setActiveTab={setActiveTab}
+            onAddToCompare={handleAddToCompare}
+          />
+        )}
 
-          {activeTab === 'inflation' && (
-            <IndicatorView
-              type="inflation"
-              title={`อัตราเงินเฟ้อ Inflation Rate (%) ประจำปี ${selectedYear}`}
-              subtitle="วัดการเปลี่ยนแปลงของดัชนีราคาผู้บริโภค CPI (World Bank Code: FP.CPI.TOTL.ZG)"
-              data={indicatorData}
-              isLoading={isLoading}
-              error={error}
-              onRetry={loadIndicatorData}
-              onAddToCompare={handleAddToCompare}
-              comparedList={comparedList}
-              onAddToWatchlist={handleAddToWatchlist}
-              watchlist={watchlist}
-            />
-          )}
+        {activeTab === 'gdp' && (
+          <IndicatorView
+            type="gdp"
+            title={`อัตราการเติบโตทางเศรษฐกิจ GDP Growth (%) ประจำปี ${selectedYear}`}
+            subtitle="วัดการขยายตัวของมูลค่าผลผลิตมวลรวมในประเทศ (World Bank Code: NY.GDP.MKTP.KD.ZG)"
+            data={indicatorData}
+            isLoading={isLoading}
+            error={error}
+            onRetry={loadIndicatorData}
+            onAddToCompare={handleAddToCompare}
+            comparedList={comparedList}
+            onAddToWatchlist={handleAddToWatchlist}
+            watchlist={watchlist}
+          />
+        )}
 
-          {activeTab === 'unemployment' && (
-            <IndicatorView
-              type="unemployment"
-              title={`อัตราการว่างงาน Unemployment (%) ประจำปี ${selectedYear}`}
-              subtitle="สัดส่วนผู้ว่างงานต่อกำลังแรงงานรวม (World Bank Code: SL.UEM.TOTL.ZS)"
-              data={indicatorData}
-              isLoading={isLoading}
-              error={error}
-              onRetry={loadIndicatorData}
-              onAddToCompare={handleAddToCompare}
-              comparedList={comparedList}
-              onAddToWatchlist={handleAddToWatchlist}
-              watchlist={watchlist}
-            />
-          )}
+        {activeTab === 'inflation' && (
+          <IndicatorView
+            type="inflation"
+            title={`ดัชนีราคาผู้บริโภค / อัตราเงินเฟ้อ Inflation Rate (%) ประจำปี ${selectedYear}`}
+            subtitle="วัดการเปลี่ยนแปลงของดัชนีราคาสินค้าและบริการ CPI (World Bank Code: FP.CPI.TOTL.ZG)"
+            data={indicatorData}
+            isLoading={isLoading}
+            error={error}
+            onRetry={loadIndicatorData}
+            onAddToCompare={handleAddToCompare}
+            comparedList={comparedList}
+            onAddToWatchlist={handleAddToWatchlist}
+            watchlist={watchlist}
+          />
+        )}
 
-          {activeTab === 'compare' && (
-            <ComparisonHub
-              comparedList={comparedList}
-              setComparedList={setComparedList}
-              onRemoveFromCompare={handleRemoveFromCompare}
-              selectedYear={selectedYear}
-            />
-          )}
+        {activeTab === 'unemployment' && (
+          <IndicatorView
+            type="unemployment"
+            title={`อัตราการว่างงาน Unemployment Rate (%) ประจำปี ${selectedYear}`}
+            subtitle="สัดส่วนผู้ว่างงานต่อกำลังแรงงานรวม (World Bank Code: SL.UEM.TOTL.ZS)"
+            data={indicatorData}
+            isLoading={isLoading}
+            error={error}
+            onRetry={loadIndicatorData}
+            onAddToCompare={handleAddToCompare}
+            comparedList={comparedList}
+            onAddToWatchlist={handleAddToWatchlist}
+            watchlist={watchlist}
+          />
+        )}
 
-          {activeTab === 'watchlist' && (
-            <WatchlistRecordView
-              watchlist={watchlist}
-              onRemoveFromWatchlist={handleRemoveFromWatchlist}
-              onUndoLastRemove={handleUndo}
-              hasUndo={!globalUndoStack.isEmpty()}
-              onCompareAll={() => {
-                const codes = watchlist.map(w => w.countryCode).filter(Boolean);
-                if (codes.length > 0) {
-                  setComparedList(codes.slice(0, 5));
-                  setActiveTab('compare');
-                }
-              }}
-              setActiveTab={setActiveTab}
-            />
-          )}
-        </main>
-      </div>
+        {activeTab === 'compare' && (
+          <ComparisonHub
+            comparedList={comparedList}
+            setComparedList={setComparedList}
+            onRemoveFromCompare={handleRemoveFromCompare}
+            selectedYear={selectedYear}
+          />
+        )}
 
-      {/* Floating Undo Banner */}
+        {activeTab === 'watchlist' && (
+          <WatchlistRecordView
+            watchlist={watchlist}
+            onRemoveFromWatchlist={handleRemoveFromWatchlist}
+            onUndoLastRemove={handleUndo}
+            hasUndo={!globalUndoStack.isEmpty()}
+            onCompareAll={() => {
+              const codes = watchlist.map(w => w.countryCode).filter(Boolean);
+              if (codes.length > 0) {
+                setComparedList(codes.slice(0, 5));
+                setActiveTab('compare');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            setActiveTab={setActiveTab}
+          />
+        )}
+
+        {activeTab === 'health' && (
+          <SystemHealthView
+            selectedYear={selectedYear}
+            setActiveTab={setActiveTab}
+          />
+        )}
+      </main>
+
+      {/* Universal Footer across ALL pages */}
+      <Footer setActiveTab={setActiveTab} />
+
+      {/* Floating Undo Notification */}
       <UndoToast
         message={toastMessage}
         onUndo={handleUndo}
         onClose={() => setToastMessage(null)}
       />
+
+      {/* Mario Page Transition Loader */}
+      {isPageTransitioning && (
+        <PageTransitionLoader text="กำลังโหลดข้อมูล" />
+      )}
     </div>
   );
 }

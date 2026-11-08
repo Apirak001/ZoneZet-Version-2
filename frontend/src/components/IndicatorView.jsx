@@ -148,7 +148,8 @@ export default function IndicatorView({
 
       {/* Table & Sort Controls */}
       {sortedData.length === 0 ? (
-        <EmptyState
+        !error && (
+          <EmptyState
           title="ไม่พบข้อมูลในเงื่อนไขการค้นหา"
           message="กรุณากดเลือก 'ทุกภูมิภาค' หรือปรับคำค้นหา"
           onReset={() => {
@@ -156,6 +157,7 @@ export default function IndicatorView({
             setTableSearch('');
           }}
         />
+        )
       ) : (
         <div className="glass-panel" style={{ padding: '0.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1rem', borderBottom: '1px solid var(--border-subtle)', flexWrap: 'wrap', gap: '0.65rem' }}>
