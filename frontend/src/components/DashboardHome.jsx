@@ -1,6 +1,6 @@
 import React from 'react';
 import MetricCard from './MetricCard';
-import { GitCompare, ArrowRight, BarChart3, TrendingUp, ShieldAlert, Users } from 'lucide-react';
+import { BarChart3, TrendingUp, ShieldAlert, Users } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 
 export default function DashboardHome({
@@ -23,58 +23,6 @@ export default function DashboardHome({
 
   return (
     <div>
-      {/* Executive Summary Banner */}
-      <div
-        className="glass-panel"
-        style={{
-          background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%)',
-          border: '1px solid var(--border-card)',
-          marginBottom: '1.75rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '1.25rem'
-        }}
-      >
-        <div style={{ maxWidth: '680px' }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            color: '#60a5fa',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            marginBottom: '0.5rem',
-            fontFamily: 'var(--font-mono)'
-          }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#3b82f6' }} />
-            ZoneZet Macroeconomic Analytics · World Bank Data System
-          </div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff', marginBottom: '0.45rem' }}>
-            ระบบวิเคราะห์และเปรียบเทียบสถิติเศรษฐกิจมหภาคระดับสถาบัน
-          </h1>
-          <p style={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: 1.55 }}>
-            โครงสร้างสถาปัตยกรรมระดับองค์กรด้วย <strong style={{ color: '#f8fafc' }}>React-Vite & Express Gateway</strong> บูรณาการระบบแคชความเร็วสูง In-Memory Hash Table <strong style={{ color: '#34d399' }}>O(1)</strong>,
-            อัลกอริทึมจัดเรียงข้อมูลแบบเสถียร MergeSort <strong style={{ color: '#60a5fa' }}>O(n log n)</strong> และศูนย์เปรียบเทียบความสัมพันธ์เชิงสถิติ (Comparison Hub)
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button
-            onClick={() => setActiveTab('compare')}
-            className="btn btn-primary"
-            style={{ padding: '0.65rem 1.25rem', fontSize: '0.86rem' }}
-          >
-            <GitCompare size={16} />
-            <span>เปิดศูนย์เปรียบเทียบ (Compare Hub)</span>
-            <ArrowRight size={15} />
-          </button>
-        </div>
-      </div>
-
       {/* Top 5 Highlight Cards */}
       <div className="grid-3" style={{ marginBottom: '1.75rem' }}>
         <MetricCard

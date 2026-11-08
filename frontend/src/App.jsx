@@ -181,13 +181,8 @@ export default function App() {
       {/* Main Workspace Area */}
       <div className="main-area">
         <Header
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
           selectedYear={selectedYear}
           setSelectedYear={setSelectedYear}
-          cacheStats={cacheStats}
-          compareCount={comparedList.length}
-          setActiveTab={setActiveTab}
         />
 
         <main className="content-body">

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpDown, GitCompare, Bookmark, Plus, Check, ArrowUpRight, ArrowDownRight, BarChart2 } from 'lucide-react';
+import { ArrowUpDown, GitCompare, Bookmark, Plus, Check, ArrowUpRight, ArrowDownRight, BarChart2, Search } from 'lucide-react';
 import { mergeSort } from '../utils/dsa/mergeSort';
 import { LoadingSkeleton, EmptyState, ErrorBanner } from './FeedbackStates';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -32,13 +32,24 @@ export default function IndicatorView({
   const [selectedRegion, setSelectedRegion] = useState('All');
   const [sortKey, setSortKey] = useState('value');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [tableSearch, setTableSearch] = useState('');
 
-  // Filter by Region
+  // Filter by Region and Local Search
   const filteredData = useMemo(() => {
     if (!Array.isArray(data)) return [];
-    if (selectedRegion === 'All') return data;
-    return data.filter(item => item.region && item.region.toLowerCase() === selectedRegion.toLowerCase());
-  }, [data, selectedRegion]);
+    let list = data;
+    if (selectedRegion !== 'All') {
+      list = list.filter(item => item.region && item.region.toLowerCase() === selectedRegion.toLowerCase());
+    }
+    if (tableSearch.trim()) {
+      const q = tableSearch.toLowerCase().trim();
+      list = list.filter(item =>
+        item.country.toLowerCase().includes(q) ||
+        (item.countryCode && item.countryCode.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [data, selectedRegion, tableSearch]);
 
   // Apply DSA: Merge Sort O(n log n)
   const sortedData = useMemo(() => {
@@ -139,8 +150,11 @@ export default function IndicatorView({
       {sortedData.length === 0 ? (
         <EmptyState
           title="ไม่พบข้อมูลในเงื่อนไขการค้นหา"
-          message="กรุณากดเลือก 'ทุกภูมิภาค' หรือปรับคำค้นหาที่แถบด้านบน"
-          onReset={() => setSelectedRegion('All')}
+          message="กรุณากดเลือก 'ทุกภูมิภาค' หรือปรับคำค้นหา"
+          onReset={() => {
+            setSelectedRegion('All');
+            setTableSearch('');
+          }}
         />
       ) : (
         <div className="glass-panel" style={{ padding: '0.25rem' }}>
@@ -149,6 +163,18 @@ export default function IndicatorView({
               จำนวนข้อมูลทั้งหมด <strong style={{ color: '#ffffff', fontFamily: 'var(--font-mono)' }}>{sortedData.length}</strong> รายการ
             </div>
             <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
+              {/* Compact In-Table Search */}
+              <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', borderRadius: '4px', padding: '0.25rem 0.55rem', gap: '0.45rem' }}>
+                <Search size={13} color="#64748b" />
+                <input
+                  type="text"
+                  placeholder="ค้นหาในตาราง..."
+                  value={tableSearch}
+                  onChange={(e) => setTableSearch(e.target.value)}
+                  style={{ background: 'transparent', border: 'none', outline: 'none', color: '#f8fafc', fontSize: '0.78rem', width: '120px', fontFamily: 'inherit' }}
+                />
+              </div>
+
               <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>จัดเรียง:</span>
               <button
                 onClick={() => handleSortToggle('value')}

@@ -15,10 +15,7 @@ export default function Sidebar({ activeTab, setActiveTab, compareCount, watchli
     <aside className="sidebar">
       <div className="sidebar-header">
         <img src="/img/logo.png" alt="ZoneZet" className="sidebar-brand-logo" onError={(e) => { e.target.style.display = 'none'; }} />
-        <div>
-          <div className="sidebar-brand-name">ZoneZet Platform</div>
-          <span className="sidebar-version-badge">v2.0 Enterprise</span>
-        </div>
+        <div className="sidebar-brand-name">ZoneZet</div>
       </div>
 
       <nav className="sidebar-nav">
