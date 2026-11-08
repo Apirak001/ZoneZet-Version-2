@@ -51,7 +51,7 @@ export default function DashboardHome({
           <div>
             <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <BarChart3 size={18} color="#3b82f6" />
-              <span>ภาพรวมเปรียบเทียบสัดส่วนตัวชี้วัดเศรษฐกิจ (Top Performers Comparative Overview)</span>
+              <span>เปรียบเทียบสัดส่วน 3 ตัวชี้วัดเศรษฐกิจ (Top Performers Comparative Chart)</span>
             </h3>
             <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '2px' }}>
               เปรียบเทียบอัตราการเติบโต GDP, อัตราเงินเฟ้อ และอัตราการว่างงานของ 5 ประเทศผู้นำ ประจำปี {selectedYear}

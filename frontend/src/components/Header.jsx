@@ -8,12 +8,7 @@ export default function Header({
   const years = ['2025', '2024', '2023', '2022', '2021', '2020'];
 
   return (
-    <header className="top-header">
-      {/* Clean left section */}
-      <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#94a3b8' }}>
-        ZoneZet Economic Intelligence
-      </div>
-
+    <header className="top-header" style={{ justifyContent: 'flex-end' }}>
       <div className="header-actions">
         {/* Year Selector */}
         <div className="year-picker">
