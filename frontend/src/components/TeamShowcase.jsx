@@ -95,7 +95,7 @@ function DevProfile({ dev }) {
   const SkillIcon = dev.skills.icon;
 
   return (
-    <article className={`tm-profile tm-${dev.key}`}>
+    <article className={`tm-profile tm-${dev.key} reveal-on-scroll ${dev.key === 'frontend' ? 'reveal-delay-1' : 'reveal-delay-2'}`}>
       <div className="tm-profile-glow" aria-hidden="true" />
 
       {/* Photo card (left) */}

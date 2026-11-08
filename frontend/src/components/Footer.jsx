@@ -270,7 +270,7 @@ export default function Footer({ setActiveTab, lenis }) {
       {/* Floating Circular Back-to-Top Button with Circular Scroll Progress */}
       <button
         onClick={scrollToTop}
-        className="floating-back-to-top"
+        className={`floating-back-to-top ${scrollProgress > 3 ? 'is-visible' : ''}`}
         title="เลื่อนกลับขึ้นด้านบน"
         aria-label="Back to Top"
       >

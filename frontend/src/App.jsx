@@ -11,6 +11,8 @@ import ComparisonHub from './components/ComparisonHub';
 import WatchlistRecordView from './components/WatchlistRecordView';
 import SystemHealthView from './components/SystemHealthView';
 import UndoToast from './components/UndoToast';
+import CompareFloatingDock from './components/CompareFloatingDock';
+import CompareModal from './components/CompareModal';
 import PageTransitionLoader from './components/PageTransitionLoader';
 import CustomCursor from './components/CustomCursor';
 import { fetchIndicators, fetchDashboardSummary, fetchCacheStats } from './services/api';
@@ -67,9 +69,51 @@ export default function App() {
     };
   }, []);
 
-  // Default to the new Clean Purple Business Landing Page
-  const [activeTab, setActiveTabState] = useState('landing');
+  // Persistent Active Tab from URL Hash or localStorage
+  const getInitialTab = () => {
+    try {
+      const hash = window.location.hash.replace('#', '').trim();
+      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'watchlist', 'health'];
+      if (hash && validTabs.includes(hash)) {
+        return hash;
+      }
+      const savedTab = localStorage.getItem('zonezet_active_tab');
+      if (savedTab && validTabs.includes(savedTab)) {
+        return savedTab;
+      }
+    } catch (e) {
+      console.warn('Tab persistence error:', e);
+    }
+    return 'landing';
+  };
+
+  const [activeTab, setActiveTabState] = useState(getInitialTab);
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
+
+  // Sync activeTab to localStorage and URL Hash
+  useEffect(() => {
+    try {
+      localStorage.setItem('zonezet_active_tab', activeTab);
+      if (window.location.hash.replace('#', '') !== activeTab) {
+        window.history.replaceState(null, '', `#${activeTab}`);
+      }
+    } catch (e) {
+      console.warn('Tab storage error:', e);
+    }
+  }, [activeTab]);
+
+  // Handle browser Back / Forward buttons
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').trim();
+      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'watchlist', 'health'];
+      if (hash && validTabs.includes(hash)) {
+        setActiveTabState(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   // Smooth Page Transition Handler
   const setActiveTab = useCallback((tabId) => {
@@ -97,8 +141,20 @@ export default function App() {
   const [error, setError] = useState(null);
   const [cacheStats, setCacheStats] = useState({ hits: 0, misses: 0, hitRate: '100%', size: 0 });
 
-  // User Interactive Lists
-  const [comparedList, setComparedList] = useState(['THA', 'USA', 'JPN', 'VNM']);
+  // User Interactive Lists with Permanent LocalStorage Persistence
+  const [comparedList, setComparedList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('zonezet_compared_list');
+      if (saved !== null) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn('Compared list localStorage load error:', e);
+    }
+    return ['THA', 'USA', 'JPN', 'VNM'];
+  });
+
   const [watchlist, setWatchlist] = useState(() => {
     try {
       const saved = localStorage.getItem('zonezet_watchlist');
@@ -112,6 +168,16 @@ export default function App() {
   });
 
   const [toastMessage, setToastMessage] = useState(null);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
+  // Sync Compared List to localStorage (Permanent deletion and persistence)
+  useEffect(() => {
+    try {
+      localStorage.setItem('zonezet_compared_list', JSON.stringify(comparedList));
+    } catch (err) {
+      console.warn('LocalStorage compared sync error:', err);
+    }
+  }, [comparedList]);
 
   // Sync Watchlist to localStorage
   useEffect(() => {
@@ -123,9 +189,9 @@ export default function App() {
   }, [watchlist]);
 
   // Load Initial Top Summary and Cache Stats
-  const loadSummaryAndStats = useCallback(async () => {
+  const loadSummaryAndStats = useCallback(async (year = selectedYear) => {
     try {
-      const summaryRes = await fetchDashboardSummary();
+      const summaryRes = await fetchDashboardSummary(year);
       setTopSummary(summaryRes.data || {});
       if (summaryRes.cacheStats) {
         setCacheStats(summaryRes.cacheStats);
@@ -140,11 +206,11 @@ export default function App() {
     } catch (err) {
       console.warn('Cache stats error:', err);
     }
-  }, []);
+  }, [selectedYear]);
 
   useEffect(() => {
-    loadSummaryAndStats();
-  }, [loadSummaryAndStats]);
+    loadSummaryAndStats(selectedYear);
+  }, [selectedYear, loadSummaryAndStats]);
 
   // Load Active Indicator Data when tab or year changes
   const loadIndicatorData = useCallback(async () => {
@@ -179,21 +245,36 @@ export default function App() {
   const handleAddToCompare = (countryCode) => {
     if (!countryCode) return;
     const clean = countryCode.toUpperCase();
-    if (comparedList.includes(clean)) {
-      setActiveTab('compare');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-    if (comparedList.length >= 5) {
-      alert('สามารถเปรียบเทียบพร้อมกันได้สูงสุด 5 ประเทศ');
-      return;
-    }
-    setComparedList([...comparedList, clean]);
-    setActiveTab('compare');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setComparedList((prev) => {
+      if (prev.includes(clean)) {
+        // Toggle OFF if already selected
+        globalUndoStack.push({
+          type: 'REMOVE_COMPARE',
+          payload: clean,
+          timestamp: Date.now()
+        });
+        setToastMessage(`นำ ${clean} ออกจากชุดเปรียบเทียบแล้ว`);
+        return prev.filter((c) => c && c.toUpperCase() !== clean);
+      }
+      if (prev.length >= 5) {
+        alert('สามารถเปรียบเทียบพร้อมกันได้สูงสุด 5 ประเทศ (หากต้องการเลือกประเทศใหม่ กรุณานำประเทศเดิมออกก่อน)');
+        return prev;
+      }
+      const updated = [...prev, clean];
+      setToastMessage(`เพิ่ม ${clean} เข้าชุดเปรียบเทียบแล้ว (${updated.length}/5) — ดูที่แถบลอยด้านล่าง`);
+      return updated;
+    });
+    // User remains on the current page to comfortably choose multiple countries!
+  };
+
+  const handleClearCompare = () => {
+    if (!comparedList || comparedList.length === 0) return;
+    setComparedList([]);
+    setToastMessage('ล้างรายชื่อประเทศในชุดเปรียบเทียบทั้งหมดแล้ว');
   };
 
   const handleRemoveFromCompare = (countryCode) => {
+    if (!countryCode) return;
     const clean = countryCode.toUpperCase();
     globalUndoStack.push({
       type: 'REMOVE_COMPARE',
@@ -201,21 +282,26 @@ export default function App() {
       timestamp: Date.now()
     });
 
-    setComparedList(comparedList.filter(c => c !== clean));
+    setComparedList((prev) => prev.filter((c) => c && c.toUpperCase() !== clean));
     setToastMessage(`ลบประเทศ ${clean} ออกจากการเปรียบเทียบแล้ว`);
   };
 
   // Watchlist Handlers
   const handleAddToWatchlist = (item) => {
-    if (watchlist.some(w => w.countryCode === item.countryCode)) {
-      alert('ประเทศนี้อยู่ใน Watchlist แล้ว');
-      return;
-    }
-    setWatchlist([item, ...watchlist]);
+    if (!item || !item.countryCode) return;
+    setWatchlist((prev) => {
+      if (prev.some((w) => w.countryCode === item.countryCode)) {
+        alert('ประเทศนี้อยู่ใน Watchlist แล้ว');
+        return prev;
+      }
+      return [item, ...prev];
+    });
   };
 
   const handleRemoveFromWatchlist = (countryCode) => {
-    const removedItem = watchlist.find(w => w.countryCode === countryCode);
+    if (!countryCode) return;
+    const clean = countryCode.toUpperCase();
+    const removedItem = watchlist.find((w) => w.countryCode && w.countryCode.toUpperCase() === clean);
     if (!removedItem) return;
 
     // Push into DSA Stack
@@ -225,7 +311,7 @@ export default function App() {
       timestamp: Date.now()
     });
 
-    setWatchlist(watchlist.filter(w => w.countryCode !== countryCode));
+    setWatchlist((prev) => prev.filter((w) => w.countryCode && w.countryCode.toUpperCase() !== clean));
     setToastMessage(`ลบ ${removedItem.country} ออกจาก Watchlist แล้ว`);
   };
 
@@ -266,7 +352,7 @@ export default function App() {
       {/* Main Content Area */}
       <main className="biz-main-content">
         {/* Sleek Sub-Toolbar for Dashboard & Indicator views */}
-        {['home', 'gdp', 'inflation', 'unemployment', 'health'].includes(activeTab) && (
+        {['home', 'gdp', 'inflation', 'unemployment'].includes(activeTab) && (
           <DashboardToolbar
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -289,6 +375,7 @@ export default function App() {
           <DashboardHome
             topSummary={topSummary}
             selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
             setActiveTab={setActiveTab}
             onAddToCompare={handleAddToCompare}
           />
@@ -297,8 +384,8 @@ export default function App() {
         {activeTab === 'gdp' && (
           <IndicatorView
             type="gdp"
-            title={`อัตราการเติบโตทางเศรษฐกิจ GDP Growth (%) ประจำปี ${selectedYear}`}
-            subtitle="วัดการขยายตัวของมูลค่าผลผลิตมวลรวมในประเทศ (World Bank Code: NY.GDP.MKTP.KD.ZG)"
+            title={`อัตราการเติบโตทางเศรษฐกิจ GDP Growth Rate ประจำปี ${selectedYear}`}
+            subtitle="วิเคราะห์การขยายตัวทางเศรษฐกิจและมูลค่าผลผลิตมวลรวมในแต่ละประเทศ"
             data={indicatorData}
             isLoading={isLoading}
             error={error}
@@ -307,14 +394,16 @@ export default function App() {
             comparedList={comparedList}
             onAddToWatchlist={handleAddToWatchlist}
             watchlist={watchlist}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
           />
         )}
 
         {activeTab === 'inflation' && (
           <IndicatorView
             type="inflation"
-            title={`ดัชนีราคาผู้บริโภค / อัตราเงินเฟ้อ Inflation Rate (%) ประจำปี ${selectedYear}`}
-            subtitle="วัดการเปลี่ยนแปลงของดัชนีราคาสินค้าและบริการ CPI (World Bank Code: FP.CPI.TOTL.ZG)"
+            title={`ดัชนีราคาผู้บริโภคและอัตราเงินเฟ้อ Inflation Rate (CPI) ประจำปี ${selectedYear}`}
+            subtitle="ติดตามเสถียรภาพระดับราคาสินค้า อัตราค่าครองชีพ และกำลังซื้อของผู้บริโภค"
             data={indicatorData}
             isLoading={isLoading}
             error={error}
@@ -323,14 +412,16 @@ export default function App() {
             comparedList={comparedList}
             onAddToWatchlist={handleAddToWatchlist}
             watchlist={watchlist}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
           />
         )}
 
         {activeTab === 'unemployment' && (
           <IndicatorView
             type="unemployment"
-            title={`อัตราการว่างงาน Unemployment Rate (%) ประจำปี ${selectedYear}`}
-            subtitle="สัดส่วนผู้ว่างงานต่อกำลังแรงงานรวม (World Bank Code: SL.UEM.TOTL.ZS)"
+            title={`ดัชนีตลาดแรงงานและอัตราการว่างงาน Unemployment Rate ประจำปี ${selectedYear}`}
+            subtitle="สำรวจโครงสร้างการจ้างงาน สัดส่วนประชากรในวัยทำงาน และศักยภาพตลาดแรงงาน"
             data={indicatorData}
             isLoading={isLoading}
             error={error}
@@ -339,6 +430,8 @@ export default function App() {
             comparedList={comparedList}
             onAddToWatchlist={handleAddToWatchlist}
             watchlist={watchlist}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear}
           />
         )}
 
@@ -361,10 +454,12 @@ export default function App() {
               const codes = watchlist.map(w => w.countryCode).filter(Boolean);
               if (codes.length > 0) {
                 setComparedList(codes.slice(0, 5));
-                setActiveTab('compare');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setIsCompareModalOpen(true);
               }
             }}
+            onAddToCompare={handleAddToCompare}
+            comparedList={comparedList}
+            onOpenCompareModal={() => setIsCompareModalOpen(true)}
             setActiveTab={setActiveTab}
           />
         )}
@@ -379,6 +474,35 @@ export default function App() {
 
       {/* Universal Footer across ALL pages */}
       <Footer setActiveTab={setActiveTab} lenis={lenisInstance} />
+
+      {/* Persistent Multi-Country Floating Compare Dock (Zero Disruption) */}
+      {activeTab !== 'compare' && (
+        <CompareFloatingDock
+          comparedList={comparedList}
+          onRemoveFromCompare={handleRemoveFromCompare}
+          onClearAll={handleClearCompare}
+          onOpenCompareModal={() => setIsCompareModalOpen(true)}
+          onNavigateToCompare={() => {
+            setActiveTab('compare');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+      )}
+
+      {/* In-Page Instant Comparison Modal (Zero Page Disruption) */}
+      <CompareModal
+        isOpen={isCompareModalOpen}
+        onClose={() => setIsCompareModalOpen(false)}
+        comparedList={comparedList}
+        setComparedList={setComparedList}
+        onRemoveFromCompare={handleRemoveFromCompare}
+        currentTab={activeTab}
+        selectedYear={selectedYear}
+        onOpenFullHub={() => {
+          setActiveTab('compare');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
 
       {/* Floating Undo Notification */}
       <UndoToast

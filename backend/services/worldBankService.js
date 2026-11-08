@@ -289,8 +289,8 @@ class WorldBankService {
   }
 
   // Dashboard Overview Top 5
-  async fetchTopHighlights() {
-    const cacheKey = 'dashboard_top_highlights_v2';
+  async fetchTopHighlights(year = '2025') {
+    const cacheKey = `dashboard_top_highlights_${year}`;
     const cached = cache.get(cacheKey);
     if (cached) return cached;
 
@@ -302,13 +302,87 @@ class WorldBankService {
     const results = {};
     while (!queue.isEmpty()) {
       const task = queue.dequeue();
-      const data = await this.fetchIndicatorData(task.type, '2025');
+      const data = await this.fetchIndicatorData(task.type, year);
       // Sort descending by value
       const sorted = [...data].sort((a, b) => b.value - a.value);
       results[task.type] = sorted.slice(0, 5);
     }
 
     cache.set(cacheKey, results, 10 * 60 * 1000);
+    return results;
+  }
+
+  // Dashboard Regional Macro Benchmark (Averages across continents/regions)
+  async fetchRegionalBenchmark(year = '2025') {
+    const cacheKey = `dashboard_regional_benchmark_${year}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
+
+    const [gdpData, infData, unempData] = await Promise.all([
+      this.fetchIndicatorData('gdp', year),
+      this.fetchIndicatorData('inflation', year),
+      this.fetchIndicatorData('unemployment', year)
+    ]);
+
+    const targetRegions = [
+      { id: 'World', name: 'World Global Average', thai: 'ค่าเฉลี่ยทั่วโลก (Global)', icon: 'Globe', isGlobal: true },
+      { id: 'East Asia & Pacific', subIds: ['East Asia', 'Oceania'], name: 'East Asia & Pacific', thai: 'เอเชียแปซิฟิกและโอเชียเนีย', icon: 'Compass' },
+      { id: 'Europe & Central Asia', subIds: ['Europe', 'Central Asia'], name: 'Europe & Central Asia', thai: 'ยุโรปและเอเชียกลาง', icon: 'Landmark' },
+      { id: 'Latin America & Caribbean', subIds: ['Latin America', 'Caribbean'], name: 'Latin America & Caribbean', thai: 'ละตินอเมริกาและแคริบเบียน', icon: 'MapPin' },
+      { id: 'Middle East & North Africa', subIds: ['Middle East', 'North Africa'], name: 'Middle East & North Africa', thai: 'ตะวันออกกลางและแอฟริกาเหนือ', icon: 'Sun' },
+      { id: 'Sub-Saharan Africa', subIds: ['Sub-Saharan Africa'], name: 'Sub-Saharan Africa', thai: 'แอฟริกาใต้สะฮารา', icon: 'Globe2' },
+      { id: 'South Asia', subIds: ['South Asia'], name: 'South Asia', thai: 'เอเชียใต้', icon: 'Mountain' },
+      { id: 'North America', subIds: ['North America'], name: 'North America', thai: 'อเมริกาเหนือ', icon: 'Building2' }
+    ];
+
+    const avg = (arr) => arr.length ? +(arr.reduce((sum, item) => sum + item.value, 0) / arr.length).toFixed(1) : 0;
+
+    const results = targetRegions.map(reg => {
+      if (reg.id === 'World') {
+        const validGdp = gdpData.filter(x => typeof x.value === 'number');
+        const validInf = infData.filter(x => typeof x.value === 'number');
+        const validUnemp = unempData.filter(x => typeof x.value === 'number');
+        return {
+          id: 'World',
+          name: reg.name,
+          thai: reg.thai,
+          icon: reg.icon,
+          isGlobal: true,
+          countryCount: validGdp.length,
+          avgGdp: avg(validGdp),
+          avgInflation: avg(validInf),
+          avgUnemployment: avg(validUnemp),
+          topCountry: { name: 'Guyana (World Peak)', iso2: 'gy', val: 19.3 }
+        };
+      }
+
+      const subList = reg.subIds || [reg.id];
+      const gdpList = gdpData.filter(x => subList.includes(x.region) && typeof x.value === 'number');
+      const infList = infData.filter(x => subList.includes(x.region) && typeof x.value === 'number');
+      const unempList = unempData.filter(x => subList.includes(x.region) && typeof x.value === 'number');
+
+      const sortedGdp = [...gdpList].sort((a, b) => b.value - a.value);
+      const topCountry = sortedGdp[0] || null;
+
+      return {
+        id: reg.id,
+        name: reg.name,
+        thai: reg.thai,
+        icon: reg.icon,
+        isGlobal: false,
+        countryCount: gdpList.length,
+        avgGdp: avg(gdpList),
+        avgInflation: avg(infList),
+        avgUnemployment: avg(unempList),
+        topCountry: topCountry ? {
+          name: topCountry.country,
+          iso2: topCountry.iso2,
+          val: topCountry.value
+        } : null
+      };
+    });
+
+    cache.set(cacheKey, results, 15 * 60 * 1000);
     return results;
   }
 

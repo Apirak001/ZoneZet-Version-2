@@ -84,20 +84,16 @@ export default function LandingAboutView({
     return () => clearTimeout(timer);
   }, []);
 
-  // Scroll listener for Section 3 signature fan-out expansion
+  // Signature Fan-Out Scroll Expansion for the 4 Value Proposition Cards
   useEffect(() => {
     const handleScroll = () => {
       if (!chooseUsRef.current) return;
-      const cardsRect = chooseUsRef.current.getBoundingClientRect();
-      const sectionEl = chooseUsRef.current.closest('.choose-us-section');
-      const sectionRect = sectionEl ? sectionEl.getBoundingClientRect() : null;
+      const rect = chooseUsRef.current.getBoundingClientRect();
+      const windowH = window.innerHeight || document.documentElement.clientHeight;
 
-      // Expand fully only when the user scrolls all the way into Section 3
-      // (Section top scrolled to <= 120px from top of viewport, or cards are centered <= 32% of screen)
-      const shouldSpread = sectionRect
-        ? (sectionRect.top <= 120 || cardsRect.top <= window.innerHeight * 0.32)
-        : (cardsRect.top <= window.innerHeight * 0.32);
-
+      // Expand into 4 columns when cards enter viewport (top <= 75% screen)
+      // Fold back into a center deck when scrolling back up (top > 75% screen)
+      const shouldSpread = rect.top <= windowH * 0.75;
       setIsSpread(shouldSpread);
     };
 
@@ -107,6 +103,37 @@ export default function LandingAboutView({
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
+  // Smooth Scroll Reveal Observer
+  // Ensures elements smoothly reveal on scroll into view without vanishing or flickering
+  useEffect(() => {
+    if (typeof IntersectionObserver === 'undefined') {
+      document.querySelectorAll('.reveal-on-scroll').forEach((el) => el.classList.add('is-revealed'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: '40px 0px 40px 0px',
+        threshold: 0.05,
+      }
+    );
+
+    const revealElements = document.querySelectorAll('.reveal-on-scroll');
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
     };
   }, []);
 
@@ -142,12 +169,12 @@ export default function LandingAboutView({
         <div className="purple-hero-container">
           {/* Left Column: Direct, Professional Product Pitch */}
           <div className="hero-text-col">
-            <div className="hero-badge-tag">
+            <div className="hero-badge-tag reveal-on-scroll">
               <span className="badge-sparkle">✦</span>
               <span>ENTERPRISE MACROECONOMIC INTELLIGENCE</span>
             </div>
 
-            <h1 className="hero-bold-heading">
+            <h1 className="hero-bold-heading reveal-on-scroll reveal-delay-1">
               Masterminds to Your <br />
               <span className="biz-highlight-word">
                 Global Economic
@@ -169,13 +196,13 @@ export default function LandingAboutView({
             </h1>
 
             {/* Clear, commercial product description */}
-            <p className="hero-subtext-paragraph">
+            <p className="hero-subtext-paragraph reveal-on-scroll reveal-delay-2">
               <strong>ZoneZet</strong> คือแพลตฟอร์มวิเคราะห์และเปรียบเทียบสถิติเศรษฐกิจมหภาค <strong>196 ประเทศทั่วโลก</strong> 
               เชื่อมต่อฐานข้อมูลสดของ World Bank API แสดงผล GDP Growth, อัตราเงินเฟ้อ CPI และอัตราการว่างงาน 
               ด้วยระบบ Data Visualization อินเทอร์แอคทีฟ และการประมวลผลความเร็วสูงระดับ Enterprise
             </p>
 
-            <div className="hero-cta-buttons-group">
+            <div className="hero-cta-buttons-group reveal-on-scroll reveal-delay-3">
               <button
                 onClick={handleGoDashboard}
                 className="btn btn-purple-primary hero-main-cta"
@@ -193,7 +220,7 @@ export default function LandingAboutView({
             </div>
 
             {/* Live Animated Metrics Ticker (Single Row Guarantee) */}
-            <div className="hero-trust-metrics">
+            <div className="hero-trust-metrics reveal-on-scroll reveal-delay-4">
               <div className="metric-tick-item">
                 <span className="metric-number">
                   <AnimatedCounter end={196} duration={1600} suffix="+" />
@@ -225,7 +252,7 @@ export default function LandingAboutView({
           </div>
 
           {/* Right Column: Visual Stage (Enlarged, Prominent, Real Dynamic Data) */}
-          <div className="hero-visual-col">
+          <div className="hero-visual-col reveal-on-scroll reveal-zoom reveal-delay-2">
             <div className="hero-illustration-wrapper">
               <div className="dotted-pattern-matrix" />
 
@@ -336,7 +363,7 @@ export default function LandingAboutView({
         <div className="why-choose-container">
           <div className="why-choose-row">
             {/* Left Column: Visual Thumb */}
-            <div className="why-choose-thumb-col">
+            <div className="why-choose-thumb-col reveal-on-scroll reveal-from-left">
               <div className="why_choose_thumb">
                 <img
                   src="/img/why-left-img.jpg"
@@ -349,7 +376,7 @@ export default function LandingAboutView({
             {/* Right Column: Title & 3 Single Items */}
             <div className="why-choose-content-col">
               <div className="choose_warpper">
-                <div className="why-section-title">
+                <div className="why-section-title reveal-on-scroll">
                   <div className="hero-badge-tag" style={{ marginBottom: '1.25rem' }}>
                     <span className="badge-sparkle">✦</span>
                     <span>ENTERPRISE MACROECONOMIC INTELLIGENCE</span>
@@ -362,7 +389,7 @@ export default function LandingAboutView({
 
                 <div className="why-items-list">
                   {/* Item 1 */}
-                  <div className="why_choose_single_item">
+                  <div className="why_choose_single_item reveal-on-scroll reveal-delay-1">
                     <div className="choose_icon">
                       <div className="icon-inner-symbol">
                         <Globe size={28} color="#ffffff" />
@@ -378,7 +405,7 @@ export default function LandingAboutView({
                   </div>
 
                   {/* Item 2 (Instant Multilateral Comparison Hub - Circle always spinning, equal color in resting state, stretches left on hover) */}
-                  <div className="why_choose_single_item item-always-spinning">
+                  <div className="why_choose_single_item item-always-spinning reveal-on-scroll reveal-delay-2">
                     <div className="choose_icon">
                       <div className="icon-inner-symbol">
                         <BarChart3 size={28} color="#ffffff" />
@@ -394,7 +421,7 @@ export default function LandingAboutView({
                   </div>
 
                   {/* Item 3 */}
-                  <div className="why_choose_single_item">
+                  <div className="why_choose_single_item reveal-on-scroll reveal-delay-3">
                     <div className="choose_icon">
                       <div className="icon-inner-symbol">
                         <ShieldCheck size={28} color="#ffffff" />
@@ -415,7 +442,7 @@ export default function LandingAboutView({
         </div>
 
         {/* Bottom Purple Ribbon Marquee */}
-        <div className="biz-bottom-teal-ribbon">
+        <div className="biz-bottom-teal-ribbon reveal-on-scroll reveal-delay-1">
           <div className="biz-teal-ticker-track">
             <div className="biz-teal-ticker-content">
               <span>✦ GLOBAL MACRO DATA NETWORK</span>
@@ -582,7 +609,7 @@ export default function LandingAboutView({
         <div className="team-bg-overlay" />
         <div className="team_container">
           <div
-            className="section_title text-center"
+            className="section_title text-center reveal-on-scroll"
             style={{
               marginBottom: '2.5rem',
               display: 'flex',

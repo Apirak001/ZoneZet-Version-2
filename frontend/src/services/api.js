@@ -22,10 +22,18 @@ export async function fetchIndicators({ type = 'gdp', year = '2025', region = ''
   return res.json();
 }
 
-export async function fetchDashboardSummary() {
-  const res = await fetch(`${API_BASE_URL}/dashboard/summary`);
+export async function fetchDashboardSummary(year = '2025') {
+  const res = await fetch(`${API_BASE_URL}/dashboard/summary?year=${year}`);
   if (!res.ok) {
     throw new Error(`Failed to load dashboard summary (HTTP ${res.status})`);
+  }
+  return res.json();
+}
+
+export async function fetchRegionalBenchmark(year = '2025') {
+  const res = await fetch(`${API_BASE_URL}/dashboard/regional-benchmark?year=${year}`);
+  if (!res.ok) {
+    throw new Error(`Failed to load regional benchmark (HTTP ${res.status})`);
   }
   return res.json();
 }

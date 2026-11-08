@@ -63,9 +63,11 @@ router.get('/indicators', validateIndicatorParams, async (req, res) => {
 // 2. Dashboard Top Highlights
 router.get('/dashboard/summary', async (req, res) => {
   try {
-    const data = await worldBankService.fetchTopHighlights();
+    const year = req.query.year || '2025';
+    const data = await worldBankService.fetchTopHighlights(year);
     res.json({
       status: 'success',
+      year,
       data,
       cacheStats: cache.getStats()
     });
@@ -74,6 +76,25 @@ router.get('/dashboard/summary', async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Failed to retrieve dashboard summary.'
+    });
+  }
+});
+
+// 3. Dashboard Regional Macro Benchmark
+router.get('/dashboard/regional-benchmark', async (req, res) => {
+  try {
+    const year = req.query.year || '2025';
+    const data = await worldBankService.fetchRegionalBenchmark(year);
+    res.json({
+      status: 'success',
+      data,
+      cacheStats: cache.getStats()
+    });
+  } catch (error) {
+    console.error('[indicatorRoutes /dashboard/regional-benchmark] Error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to retrieve regional benchmark.'
     });
   }
 });
