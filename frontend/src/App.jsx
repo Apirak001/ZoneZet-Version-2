@@ -4,7 +4,6 @@ import 'lenis/dist/lenis.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LandingAboutView from './components/LandingAboutView';
-import DashboardToolbar from './components/DashboardToolbar';
 import DashboardHome from './components/DashboardHome';
 import IndicatorView from './components/IndicatorView';
 import ComparisonHub from './components/ComparisonHub';
@@ -296,17 +295,6 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="biz-main-content">
-        {/* Sleek Sub-Toolbar for Dashboard & Indicator views */}
-        {['home', 'gdp', 'inflation', 'unemployment'].includes(activeTab) && (
-          <DashboardToolbar
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-            cacheStats={cacheStats}
-          />
-        )}
-
         {activeTab === 'landing' && (
           <LandingAboutView
             setActiveTab={setActiveTab}
