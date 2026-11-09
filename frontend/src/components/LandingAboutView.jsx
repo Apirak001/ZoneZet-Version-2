@@ -200,10 +200,8 @@ export default function LandingAboutView({
             </h1>
 
             {/* Clear, commercial product description */}
-            <p className="hero-subtext-paragraph reveal-on-scroll reveal-delay-2">
-              <strong>ZoneZet</strong> คือแพลตฟอร์มวิเคราะห์และเปรียบเทียบสถิติเศรษฐกิจมหภาค <strong>196 ประเทศทั่วโลก</strong> 
-              เชื่อมต่อฐานข้อมูลสดของ World Bank API แสดงผล GDP Growth, อัตราเงินเฟ้อ CPI และอัตราการว่างงาน 
-              ด้วยระบบ Data Visualization อินเทอร์แอคทีฟ และการประมวลผลความเร็วสูงระดับ Enterprise
+            <p className="hero-subtext-paragraph reveal-on-scroll reveal-delay-2" lang="th">
+              <strong>ZoneZet</strong> คือแพลตฟอร์มวิเคราะห์และเปรียบเทียบข้อมูลเศรษฐกิจมหภาคระดับโลก <span className="text-nowrap">ที่เชื่อมต่อกับ</span>ฐานข้อมูลของ <span className="text-nowrap">World Bank API</span> เพื่อดึงข้อมูลเชิงสถิติแบบเรียลไทม์ <span className="text-nowrap">ระบบถูกออกแบบมาให้</span>แสดงผลตัวชี้วัดที่สำคัญทางเศรษฐกิจ ได้แก่ อัตราการเติบโตของ GDP, อัตราเงินเฟ้อ และอัตราการว่างงานของประเทศต่างๆ ทั่วโลก ผ่านแดชบอร์ดที่ใช้งานง่าย ช่วยลดความซับซ้อนของข้อมูล และสนับสนุนให้ผู้ใช้งานสามารถติดตาม วิเคราะห์ <span className="text-nowrap">หรือเปรียบเทียบ</span>แนวโน้มทางเศรษฐกิจได้อย่างรวดเร็วและแม่นยำ
             </p>
 
             <div className="hero-cta-buttons-group reveal-on-scroll reveal-delay-3">
@@ -211,7 +209,7 @@ export default function LandingAboutView({
                 onClick={handleGoDashboard}
                 className="btn btn-purple-primary hero-main-cta"
               >
-                <span>สำรวจแดชบอร์ดข้อมูลจริง</span>
+                <span>สำรวจข้อมูลบนเดชบอร์ด</span>
                 <ArrowRight size={16} />
               </button>
 
@@ -219,7 +217,7 @@ export default function LandingAboutView({
                 onClick={handleGoCompare}
                 className="btn btn-purple-outline hero-secondary-cta"
               >
-                <span>ศูนย์เปรียบเทียบ (Compare Hub)</span>
+                <span>ศูนย์เปรียบเทียบ</span>
               </button>
             </div>
           </div>
@@ -237,8 +235,8 @@ export default function LandingAboutView({
                     <span className="dot yellow" />
                     <span className="dot green" />
                   </div>
-                  <span className="card-top-title">Live Economic Stream · {selectedYear}</span>
-                  <span className="live-status-pill">● World Bank Live</span>
+                  <span className="card-top-title">Live Economic Global · {selectedYear}</span>
+                  <span className="live-status-pill">● World Bank API</span>
                 </div>
 
                 <div className="card-inner-body">
@@ -279,7 +277,7 @@ export default function LandingAboutView({
                           transition: 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)'
                         }}
                       />
-                      <span className="preview-bar-text">GDP Growth Global</span>
+                      <span className="preview-bar-text">GDP Growth Global (88%)</span>
                     </div>
 
                     <div className="preview-bar-track">
@@ -291,7 +289,7 @@ export default function LandingAboutView({
                           transition: 'width 1.4s cubic-bezier(0.16, 1, 0.3, 1)'
                         }}
                       />
-                      <span className="preview-bar-text">Inflation Stability Global</span>
+                      <span className="preview-bar-text">Inflation Stability Global (64%)</span>
                     </div>
 
                     <div className="preview-bar-track">
@@ -303,7 +301,7 @@ export default function LandingAboutView({
                           transition: 'width 1.6s cubic-bezier(0.16, 1, 0.3, 1)'
                         }}
                       />
-                      <span className="preview-bar-text">Labor Force Stability Global</span>
+                      <span className="preview-bar-text">Labor Force Stability Global (92%)</span>
                     </div>
                   </div>
                 </div>
@@ -316,7 +314,7 @@ export default function LandingAboutView({
                 </div>
                 <div>
                   <div className="floating-title">Core Engineering</div>
-                  <div className="floating-desc">นาย อภิรักษ์ &amp; นาย อนุพงษ์</div>
+                  <div className="floating-desc">นายอภิรักษ์ &amp; นายอนุพงค์</div>
                 </div>
               </div>
             </div>
@@ -385,7 +383,7 @@ export default function LandingAboutView({
                     <div className="choose_content">
                       <h3 className="item-title">Instant Multilateral Comparison Hub</h3>
                       <p className="item-desc">
-                        เปรียบเทียบข้อมูล 2–5 ประเทศได้พร้อมกันในหน้าเดียว แสดงกราฟแนวโน้มหลายปีและตาราง Matrix วิเคราะห์เจาะลึก ประมวลผลรวดเร็ว ไม่ต้องจัดการข้อมูลเอง
+                        เปรียบเทียบข้อมูล 2-4 ประเทศได้พร้อมกันในหน้าเดียว แสดงกราฟแนวโน้มหลายปีและตาราง Matrix วิเคราะห์เจาะลึก ประมวลผลรวดเร็ว ไม่ต้องจัดการข้อมูลเอง
                       </p>
                     </div>
                   </div>
@@ -401,7 +399,7 @@ export default function LandingAboutView({
                     <div className="choose_content">
                       <h3 className="item-title">Verified High-Precision Insights</h3>
                       <p className="item-desc">
-                        คัดกรองและตรวจสอบความถูกต้องจากแหล่งการเงินระดับโลก ให้ข้อมูลพร้อมนำไปใช้ประกอบการตัดสินใจ นำเสนอบอร์ดบริหาร หรือทำรายงานวิจัยได้อย่างมั่นใจ 100%
+                        คัดกรองและตรวจสอบความถูกต้องจากแหล่งการเงินระดับโลก ให้ข้อมูลพร้อมนำไปใช้ประกอบการตัดสินใจ นำเสนอบอร์ดบริหาร หรือทำรายงานวิจัยได้อย่างมั่นใจ
                       </p>
                     </div>
                   </div>
@@ -462,11 +460,8 @@ export default function LandingAboutView({
               </div>
               <h2 className="title split-title text-white">
                 <span className="title-en-gradient">Global Economic Intelligence</span>
-                <span className="title-thai">ทำไมองค์กรชั้นนำจึงเลือก ZoneZet?</span>
+                <span className="title-thai">ทำไมต้องเลือกใช้ ZoneZet?</span>
               </h2>
-              <p className="choose-us-lead">
-                ผสานรวมข้อมูลสดระดับโลกเข้ากับสถาปัตยกรรมซอฟต์แวร์ที่เสถียร รวดเร็ว และแม่นยำที่สุด
-              </p>
             </div>
             <div className="top-icon">
               <img src="/img/choose-us-icon1-1.png" alt="ZoneZet Intelligence Rotating Sunburst" />

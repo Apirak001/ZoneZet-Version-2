@@ -6,8 +6,7 @@ import {
   Home,
   LayoutDashboard,
   GitCompare,
-  Bookmark,
-  TrendingUp,
+    TrendingUp,
   Percent,
   Users,
   ChevronDown
@@ -16,8 +15,7 @@ import {
 export default function Navbar({
   activeTab,
   setActiveTab,
-  compareCount = 0,
-  watchlistCount = 0
+  compareCount = 0
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
@@ -81,9 +79,7 @@ export default function Navbar({
   const navItems = [
     { id: 'landing', label: 'หน้าแรก', icon: Home },
     { id: 'home', label: 'แดชบอร์ดข้อมูล', icon: LayoutDashboard, hasDropdown: true },
-    { id: 'compare', label: 'ศูนย์เปรียบเทียบ', icon: GitCompare, badge: compareCount },
-    { id: 'watchlist', label: 'รายการบันทึก', icon: Bookmark, badge: watchlistCount }
-  ];
+    { id: 'compare', label: 'ศูนย์เปรียบเทียบ', icon: GitCompare, badge: compareCount }];
 
   const handleNavClick = (tabId) => {
     setActiveTab(tabId);

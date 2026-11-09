@@ -65,7 +65,7 @@ export default function SystemHealthView({ selectedYear, setActiveTab }) {
         <div>
           <div className="corporate-badge-pill">
             <Activity size={13} color="#3b82f6" />
-            <span>Backend & DSA Verification Dashboard · นาย อนุพงษ์ (Lead)</span>
+            <span>Backend & DSA Verification Dashboard · นายอนุพงค์ (Lead)</span>
           </div>
           <h1 className="page-title">สถานะระบบและความพร้อมของเซิร์ฟเวอร์ (System Health)</h1>
           <p className="page-subtitle">
@@ -246,7 +246,7 @@ export default function SystemHealthView({ selectedYear, setActiveTab }) {
           <span>การเปรียบเทียบความซับซ้อนอัลกอริทึม (DSA Big-O: V.1 vs V.2)</span>
         </h3>
         <p style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: '1rem' }}>
-          วิเคราะห์ประสิทธิภาพเชิงลึกสำหรับประกอบการนำเสนอคลิปช่วงที่ 5 ของนาย อนุพงษ์
+          วิเคราะห์ประสิทธิภาพเชิงลึกสำหรับประกอบการนำเสนอคลิปช่วงที่ 5 ของนายอนุพงค์
         </p>
 
         <div className="data-table-wrapper">

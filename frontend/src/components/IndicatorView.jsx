@@ -5,8 +5,7 @@ import {
   Users,
   ArrowUpDown,
   GitCompare,
-  Bookmark,
-  Check,
+    Check,
   ArrowUpRight,
   ArrowDownRight,
   BarChart2,
@@ -61,10 +60,7 @@ export default function IndicatorView({
   error = null,
   onRetry,
   onAddToCompare,
-  comparedList = [],
-  onAddToWatchlist,
-  watchlist = [],
-  selectedYear = '2025',
+  comparedList = [],  selectedYear = '2025',
   setSelectedYear
 }) {
   const [selectedRegion, setSelectedRegion] = useState('All');
@@ -816,7 +812,6 @@ export default function IndicatorView({
                 {paginatedData.map((item, index) => {
                   const absoluteIndex = (currentPage - 1) * (pageSize === -1 ? 0 : pageSize) + index;
                   const isCompared = comparedList.includes(item.countryCode);
-                  const isWatchlisted = watchlist.some(w => w.countryCode === item.countryCode);
                   const flagUrl = item.iso2
                     ? `https://flagcdn.com/w40/${item.iso2.toLowerCase()}.png`
                     : null;
@@ -927,16 +922,6 @@ export default function IndicatorView({
                           >
                             {isCompared ? <Check size={12} color="#34d399" strokeWidth={3} /> : <GitCompare size={12} />}
                             <span>{isCompared ? 'เลือกแล้ว' : '+ เทียบ'}</span>
-                          </button>
-
-                          {/* Watchlist Bookmark Button */}
-                          <button
-                            type="button"
-                            onClick={() => onAddToWatchlist(item)}
-                            className={`indicator-action-btn bookmark-btn ${isWatchlisted ? 'active' : ''}`}
-                            title={isWatchlisted ? 'บันทึกในรายการแล้ว' : 'บันทึกลง Watchlist'}
-                          >
-                            <Bookmark size={13} fill={isWatchlisted ? '#fbbf24' : 'none'} color={isWatchlisted ? '#fbbf24' : '#94a3b8'} />
                           </button>
                         </div>
                       </td>

@@ -1,15 +1,13 @@
 import React from 'react';
-import { LayoutDashboard, TrendingUp, DollarSign, Users, GitCompare, Bookmark, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, DollarSign, Users, GitCompare, ShieldCheck } from 'lucide-react';
 
-export default function Sidebar({ activeTab, setActiveTab, compareCount, watchlistCount }) {
+export default function Sidebar({ activeTab, setActiveTab, compareCount }) {
   const navItems = [
     { id: 'home', label: 'HOME', icon: LayoutDashboard, badge: null },
     { id: 'gdp', label: 'GDP GROWTH', icon: TrendingUp, badge: null },
     { id: 'inflation', label: 'INFLATION RATE', icon: DollarSign, badge: null },
     { id: 'unemployment', label: 'UNEMPLOYMENT', icon: Users, badge: null },
-    { id: 'compare', label: 'COMPARE HUB', icon: GitCompare, badge: compareCount > 0 ? compareCount : null },
-    { id: 'watchlist', label: 'WATCHLIST', icon: Bookmark, badge: watchlistCount > 0 ? watchlistCount : null }
-  ];
+    { id: 'compare', label: 'COMPARE HUB', icon: GitCompare, badge: compareCount > 0 ? compareCount : null }];
 
   return (
     <aside className="sidebar">

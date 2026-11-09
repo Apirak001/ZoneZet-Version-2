@@ -8,8 +8,7 @@ import {
   Percent,
   Users,
   GitCompare,
-  Bookmark,
-  Globe,
+    Globe,
   Zap,
   BarChart3,
   ShieldCheck,
@@ -202,12 +201,6 @@ export default function Footer({ setActiveTab, lenis }) {
                 <button onClick={() => handleNav('compare')} className="official-link-btn">
                   <GitCompare size={15} className="official-nav-icon" />
                   <span>ศูนย์เปรียบเทียบ</span>
-                </button>
-              </li>
-              <li>
-                <button onClick={() => handleNav('watchlist')} className="official-link-btn">
-                  <Bookmark size={15} className="official-nav-icon" />
-                  <span>รายการบันทึก</span>
                 </button>
               </li>
             </ul>

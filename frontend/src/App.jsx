@@ -8,7 +8,6 @@ import DashboardToolbar from './components/DashboardToolbar';
 import DashboardHome from './components/DashboardHome';
 import IndicatorView from './components/IndicatorView';
 import ComparisonHub from './components/ComparisonHub';
-import WatchlistRecordView from './components/WatchlistRecordView';
 import SystemHealthView from './components/SystemHealthView';
 import UndoToast from './components/UndoToast';
 import CompareFloatingDock from './components/CompareFloatingDock';
@@ -73,7 +72,7 @@ export default function App() {
   const getInitialTab = () => {
     try {
       const hash = window.location.hash.replace('#', '').trim();
-      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'watchlist', 'health'];
+      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'health'];
       if (hash && validTabs.includes(hash)) {
         return hash;
       }
@@ -106,7 +105,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').trim();
-      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'watchlist', 'health'];
+      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'health'];
       if (hash && validTabs.includes(hash)) {
         setActiveTabState(hash);
       }
@@ -154,19 +153,6 @@ export default function App() {
     }
     return ['THA', 'USA', 'JPN', 'VNM'];
   });
-
-  const [watchlist, setWatchlist] = useState(() => {
-    try {
-      const saved = localStorage.getItem('zonezet_watchlist');
-      return saved ? JSON.parse(saved) : [
-        { country: 'Thailand', countryCode: 'THA', iso2: 'th', region: 'East Asia', value: 2.8, displayValue: '2.8%', trend: 'up', colorClass: 'green', year: '2025' },
-        { country: 'United States', countryCode: 'USA', iso2: 'us', region: 'North America', value: 2.5, displayValue: '2.5%', trend: 'up', colorClass: 'green', year: '2025' }
-      ];
-    } catch {
-      return [];
-    }
-  });
-
   const [toastMessage, setToastMessage] = useState(null);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
@@ -178,16 +164,6 @@ export default function App() {
       console.warn('LocalStorage compared sync error:', err);
     }
   }, [comparedList]);
-
-  // Sync Watchlist to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('zonezet_watchlist', JSON.stringify(watchlist));
-    } catch (err) {
-      console.warn('LocalStorage error:', err);
-    }
-  }, [watchlist]);
-
   // Load Initial Top Summary and Cache Stats
   const loadSummaryAndStats = useCallback(async (year = selectedYear) => {
     try {
@@ -285,45 +261,10 @@ export default function App() {
     setComparedList((prev) => prev.filter((c) => c && c.toUpperCase() !== clean));
     setToastMessage(`ลบประเทศ ${clean} ออกจากการเปรียบเทียบแล้ว`);
   };
-
-  // Watchlist Handlers
-  const handleAddToWatchlist = (item) => {
-    if (!item || !item.countryCode) return;
-    setWatchlist((prev) => {
-      if (prev.some((w) => w.countryCode === item.countryCode)) {
-        alert('ประเทศนี้อยู่ใน Watchlist แล้ว');
-        return prev;
-      }
-      return [item, ...prev];
-    });
-  };
-
-  const handleRemoveFromWatchlist = (countryCode) => {
-    if (!countryCode) return;
-    const clean = countryCode.toUpperCase();
-    const removedItem = watchlist.find((w) => w.countryCode && w.countryCode.toUpperCase() === clean);
-    if (!removedItem) return;
-
-    // Push into DSA Stack
-    globalUndoStack.push({
-      type: 'REMOVE_WATCHLIST',
-      payload: removedItem,
-      timestamp: Date.now()
-    });
-
-    setWatchlist((prev) => prev.filter((w) => w.countryCode && w.countryCode.toUpperCase() !== clean));
-    setToastMessage(`ลบ ${removedItem.country} ออกจาก Watchlist แล้ว`);
-  };
-
   // DSA Stack Undo / Rollback Handler
   const handleUndo = () => {
     const lastAction = globalUndoStack.pop();
-    if (!lastAction) return;
-
-    if (lastAction.type === 'REMOVE_WATCHLIST') {
-      setWatchlist(prev => [lastAction.payload, ...prev]);
-      setToastMessage(`กู้คืน ${lastAction.payload.country} กลับสู่ Watchlist แล้ว`);
-    } else if (lastAction.type === 'REMOVE_COMPARE') {
+    if (!lastAction) return;if (lastAction.type === 'REMOVE_COMPARE') {
       setComparedList(prev => [...prev, lastAction.payload]);
       setToastMessage(`กู้คืน ${lastAction.payload} สู่ Compare Hub แล้ว`);
     }
@@ -344,9 +285,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         selectedYear={selectedYear}
         setSelectedYear={setSelectedYear}
-        compareCount={comparedList.length}
-        watchlistCount={watchlist.length}
-        cacheStats={cacheStats}
+        compareCount={comparedList.length}        cacheStats={cacheStats}
       />
 
       {/* Main Content Area */}
@@ -391,10 +330,7 @@ export default function App() {
             error={error}
             onRetry={loadIndicatorData}
             onAddToCompare={handleAddToCompare}
-            comparedList={comparedList}
-            onAddToWatchlist={handleAddToWatchlist}
-            watchlist={watchlist}
-            selectedYear={selectedYear}
+            comparedList={comparedList}            selectedYear={selectedYear}
             setSelectedYear={setSelectedYear}
           />
         )}
@@ -409,10 +345,7 @@ export default function App() {
             error={error}
             onRetry={loadIndicatorData}
             onAddToCompare={handleAddToCompare}
-            comparedList={comparedList}
-            onAddToWatchlist={handleAddToWatchlist}
-            watchlist={watchlist}
-            selectedYear={selectedYear}
+            comparedList={comparedList}            selectedYear={selectedYear}
             setSelectedYear={setSelectedYear}
           />
         )}
@@ -427,10 +360,7 @@ export default function App() {
             error={error}
             onRetry={loadIndicatorData}
             onAddToCompare={handleAddToCompare}
-            comparedList={comparedList}
-            onAddToWatchlist={handleAddToWatchlist}
-            watchlist={watchlist}
-            selectedYear={selectedYear}
+            comparedList={comparedList}            selectedYear={selectedYear}
             setSelectedYear={setSelectedYear}
           />
         )}
@@ -441,26 +371,6 @@ export default function App() {
             setComparedList={setComparedList}
             onRemoveFromCompare={handleRemoveFromCompare}
             selectedYear={selectedYear}
-          />
-        )}
-
-        {activeTab === 'watchlist' && (
-          <WatchlistRecordView
-            watchlist={watchlist}
-            onRemoveFromWatchlist={handleRemoveFromWatchlist}
-            onUndoLastRemove={handleUndo}
-            hasUndo={!globalUndoStack.isEmpty()}
-            onCompareAll={() => {
-              const codes = watchlist.map(w => w.countryCode).filter(Boolean);
-              if (codes.length > 0) {
-                setComparedList(codes.slice(0, 5));
-                setIsCompareModalOpen(true);
-              }
-            }}
-            onAddToCompare={handleAddToCompare}
-            comparedList={comparedList}
-            onOpenCompareModal={() => setIsCompareModalOpen(true)}
-            setActiveTab={setActiveTab}
           />
         )}
 
