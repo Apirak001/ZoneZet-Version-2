@@ -71,11 +71,6 @@ export default function UndoToast({ message, onUndo, onClose, duration = 5000 })
     }, 200);
   };
 
-  const handleRollback = (e) => {
-    e.stopPropagation();
-    if (onUndo) onUndo();
-  };
-
   return (
     <div
       className={`undo-banner ${isExiting ? 'exiting' : ''}`}
@@ -99,22 +94,10 @@ export default function UndoToast({ message, onUndo, onClose, duration = 5000 })
             {isPaused
               ? 'หยุดเวลาชั่วคราวขณะเลื่อนเมาส์ผ่าน'
               : isUndoable
-              ? 'คลิกกู้คืนก่อนแถบเวลาจะเต็ม'
+              ? 'นำออกจากการเปรียบเทียบแล้ว'
               : 'อัปเดตสถานะสำเร็จ'}
           </span>
         </div>
-
-        {isUndoable && (
-          <button
-            type="button"
-            onClick={handleRollback}
-            className="undo-btn-rollback"
-            title="คลิกเพื่อยกเลิกและกู้คืนประเทศเดิมกลับมา"
-          >
-            <RotateCcw size={13} />
-            <span>กู้คืน (Rollback)</span>
-          </button>
-        )}
 
         <button
           type="button"

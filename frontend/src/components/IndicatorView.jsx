@@ -4,7 +4,6 @@ import {
   Percent,
   Users,
   ArrowUpDown,
-  GitCompare,
     Check,
   ArrowUpRight,
   ArrowDownRight,
@@ -22,8 +21,7 @@ import {
   Layers,
   ArrowRight,
   Calendar,
-  ChevronDown,
-  Zap
+  ChevronDown
 } from 'lucide-react';
 import { mergeSort } from '../utils/dsa/mergeSort';
 import { LoadingSkeleton, EmptyState, ErrorBanner } from './FeedbackStates';
@@ -56,7 +54,7 @@ const REGIONS = [
 export default function IndicatorView({
   type = 'gdp',
   title = 'อัตราการเติบโตทางเศรษฐกิจ GDP Growth (%)',
-  subtitle = 'วัดการขยายตัวของมูลค่าผลผลิตมวลรวมในประเทศ (World Bank Code: NY.GDP.MKTP.KD.ZG)',
+  subtitle = 'วิเคราะห์การขยายตัวทางเศรษฐกิจและมูลค่าผลผลิตมวลรวมในแต่ละประเทศ',
   data = [],
   isLoading = false,
   error = null,
@@ -102,8 +100,8 @@ export default function IndicatorView({
           gradEnd: '#e11d48',
           icon: Flame,
           badgeLabel: 'INFLATION RATE (CPI)',
-          titleTh: 'ดัชนีราคาผู้บริโภคและอัตราเงินเฟ้อ',
-          titleEn: 'Inflation Rate (CPI)',
+          titleTh: 'อัตราเงินเฟ้อ',
+          titleEn: 'Inflation Rate',
           defaultSubtitle: 'ติดตามเสถียรภาพระดับราคาสินค้า อัตราค่าครองชีพ และกำลังซื้อของผู้บริโภค',
           kpi1Label: 'อัตราเงินเฟ้อสูงสุด',
           kpi1Tag: '#1 HIGHEST INFLATION',
@@ -127,7 +125,7 @@ export default function IndicatorView({
           gradEnd: '#0284c7',
           icon: Users,
           badgeLabel: 'LABOR MARKET STATS',
-          titleTh: 'ดัชนีตลาดแรงงานและอัตราการว่างงาน',
+          titleTh: 'อัตราการว่างงาน',
           titleEn: 'Unemployment Rate',
           defaultSubtitle: 'สำรวจโครงสร้างการจ้างงาน สัดส่วนประชากรในวัยทำงาน และศักยภาพตลาดแรงงาน',
           kpi1Label: 'อัตราการว่างงานสูงสุด',
@@ -261,13 +259,6 @@ export default function IndicatorView({
     return sortedData.slice(start, start + pageSize);
   }, [sortedData, currentPage, pageSize]);
 
-  // Proportional scale for mini performance gauges
-  const maxLeaderVal = useMemo(() => {
-    if (!sortedData || sortedData.length === 0) return 10;
-    const maxVal = Math.max(...sortedData.map(d => Math.abs(d.value) || 0));
-    return maxVal > 0 ? maxVal : 10;
-  }, [sortedData]);
-
   const handleSortToggle = (key) => {
     if (sortKey === key) {
       setSortDirection(prev => (prev === 'desc' ? 'asc' : 'desc'));
@@ -301,38 +292,14 @@ export default function IndicatorView({
           ==================================================================== */}
       <div className="db-home-header-row" style={{ marginBottom: '2rem', position: 'relative', zIndex: 10 }}>
         <div className="db-home-title-col">
-          <div className="hero-badge-tag" style={{ marginBottom: '0.65rem' }}>
-            <span className="badge-sparkle">✦</span>
-            <span>WORLD BANK ECONOMIC BENCHMARK · {selectedYear}</span>
-          </div>
-
           <h1 className="indicator-hero-big-title">
             {config.titleTh}{' '}
             <span className="title-en-gradient">{config.titleEn} ประจำปี {selectedYear}</span>
           </h1>
 
           <p className="indicator-hero-subtext">
-            {subtitle || config.defaultSubtitle}{' '}
-            <span style={{ whiteSpace: 'nowrap' }}>
-              ครอบคลุมสถิติและการวิเคราะห์เชิงลึก {sortedData.length} ประเทศทั่วโลก
-            </span>
+            {subtitle || config.defaultSubtitle}
           </p>
-
-          {/* Luxury Meta Trust Badges (Matching Landing Page) */}
-          <div className="indicator-meta-badges-row">
-            <div className="indicator-meta-pill">
-              <span className="pulse-indicator-dot green" />
-              <span>World Bank Live Stream</span>
-            </div>
-            <div className="indicator-meta-pill">
-              <ShieldCheck size={13} color={config.accentColor} />
-              <span>{sortedData.length} ชาติเอกราช (100% Sovereign)</span>
-            </div>
-            <div className="indicator-meta-pill">
-              <Zap size={13} color="#38bdf8" />
-              <span>In-Memory Hash Map O(1) &lt; 0.05ms</span>
-            </div>
-          </div>
         </div>
 
         {/* Luxury Year Selector Card with Custom Dropdown (Exact match to DashboardHome) */}
@@ -443,9 +410,6 @@ export default function IndicatorView({
             )}
             <span className="indicator-kpi-country">{kpiStats.topLeader?.country || 'กำลังประมวลผล...'}</span>
           </div>
-          <div className="indicator-kpi-gauge-track">
-            <div className="indicator-kpi-gauge-fill" style={{ width: '100%', background: config.accentColor }} />
-          </div>
         </div>
 
         {/* Card 2: Global Average Benchmark */}
@@ -483,17 +447,8 @@ export default function IndicatorView({
 
           <div className="indicator-kpi-footer">
             <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>
-              คำนวณจากสถิติแท้จริง <strong>{kpiStats.totalCount}</strong> ชาติ
+              คำนวณจาก <strong>{kpiStats.totalCount}</strong> ประเทศ
             </span>
-          </div>
-          <div className="indicator-kpi-gauge-track">
-            <div
-              className="indicator-kpi-gauge-fill"
-              style={{
-                width: `${Math.min(Math.max((Math.abs(kpiStats.average) / maxLeaderVal) * 100, 15), 100)}%`,
-                background: config.kpi2Color
-              }}
-            />
           </div>
         </div>
 
@@ -535,9 +490,6 @@ export default function IndicatorView({
               คิดเป็น <strong style={{ color: '#ffffff' }}>{kpiStats.positiveCount}</strong> จาก {kpiStats.totalCount} ประเทศ
             </span>
           </div>
-          <div className="indicator-kpi-gauge-track">
-            <div className="indicator-kpi-gauge-fill" style={{ width: kpiStats.positivePercent, background: config.kpi3Color }} />
-          </div>
         </div>
 
         {/* Card 4: Verified Sovereign Coverage */}
@@ -576,11 +528,8 @@ export default function IndicatorView({
           <div className="indicator-kpi-footer">
             <Check size={14} color="#34d399" />
             <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>
-              คัดกรององค์กร/ทวีปออก 100%
+              คัดกรองปลอดภัย 100%
             </span>
-          </div>
-          <div className="indicator-kpi-gauge-track">
-            <div className="indicator-kpi-gauge-fill" style={{ width: '100%', background: '#818cf8' }} />
           </div>
         </div>
       </div>
@@ -599,7 +548,7 @@ export default function IndicatorView({
                 >
                   <BarChart2 size={18} />
                 </div>
-                <span>การกระจายตัว {chartViewMode === 'top' ? '10 อันดับแรก (Top 10 Spectrum)' : '10 อันดับท้าย (Bottom 10 Spectrum)'}</span>
+                <span>การกระจายตัว {chartViewMode === 'top' ? '10 อันดับแรก' : '10 อันดับท้าย'}</span>
               </h3>
               <p className="indicator-chart-subtitle">
                 กราฟฟิกเปรียบเทียบสัดส่วนและแนวโน้มค่าสถิติเศรษฐกิจประจำปี {selectedYear}
@@ -607,11 +556,6 @@ export default function IndicatorView({
             </div>
 
             <div className="indicator-chart-controls">
-              {/* DSA Badge */}
-              <span className="indicator-dsa-badge">
-                MergeSort O(n log n)
-              </span>
-
               {/* View Switcher: Top 10 vs Bottom 10 */}
               <div className="indicator-chart-mode-toggle">
                 <button
@@ -715,7 +659,7 @@ export default function IndicatorView({
         <div className="indicator-region-pills-row">
           <div className="indicator-region-label">
             <Globe size={13} color="#c084fc" />
-            <span>ภูมิภาค:</span>
+            <span>ภูมิภาค</span>
           </div>
           <div className="indicator-region-pills-scroll">
             {REGIONS.map((reg) => {
@@ -734,7 +678,7 @@ export default function IndicatorView({
                   }}
                   className={`indicator-region-pill ${isActive ? 'active' : ''}`}
                 >
-                  <span>{reg === 'All' ? 'ทุกภูมิภาค (All)' : reg}</span>
+                  <span>{reg === 'All' ? 'ทุกภูมิภาค' : reg}</span>
                   {count > 0 && <span className="pill-count-tag">{count}</span>}
                 </button>
               );
@@ -771,7 +715,7 @@ export default function IndicatorView({
 
           {/* Right Sort Buttons & Total Counter */}
           <div className="indicator-sort-controls-wrap">
-            <span className="indicator-sort-label">เรียงตาม:</span>
+            <span className="indicator-sort-label">เรียงตาม</span>
             <button
               type="button"
               onClick={() => handleSortToggle('value')}
@@ -779,7 +723,7 @@ export default function IndicatorView({
             >
               <ArrowUpDown size={12} />
               <span>
-                ค่าสถิติ ({sortKey === 'value' ? (sortDirection === 'desc' ? 'มาก➔น้อย' : 'น้อย➔มาก') : 'ตัวเลข'})
+                ค่าสถิติ {sortKey === 'value' ? (sortDirection === 'desc' ? 'มาก➔น้อย' : 'น้อย➔มาก') : 'ตัวเลข'}
               </span>
             </button>
 
@@ -790,7 +734,7 @@ export default function IndicatorView({
             >
               <ArrowUpDown size={12} />
               <span>
-                ชื่อประเทศ ({sortKey === 'country' ? (sortDirection === 'desc' ? 'Z➔A' : 'A➔Z') : 'A-Z'})
+                ชื่อประเทศ {sortKey === 'country' ? (sortDirection === 'desc' ? 'Z➔A' : 'A➔Z') : 'A-Z'}
               </span>
             </button>
 
@@ -827,13 +771,11 @@ export default function IndicatorView({
                   <th style={{ width: '100px' }}>รหัส (ISO)</th>
                   <th>ภูมิภาค (Region)</th>
                   <th style={{ width: '170px' }}>ค่าสถิติ ({type.toUpperCase()} %)</th>
-                  <th style={{ textAlign: 'center', width: '160px' }}>การดำเนินการ</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedData.map((item, index) => {
                   const absoluteIndex = (currentPage - 1) * (pageSize === -1 ? 0 : pageSize) + index;
-                  const isCompared = comparedList.includes(item.countryCode);
                   const flagUrl = item.iso2
                     ? `https://flagcdn.com/w40/${item.iso2.toLowerCase()}.png`
                     : null;
@@ -877,7 +819,7 @@ export default function IndicatorView({
                         </span>
                       </td>
 
-                      {/* Stat Value Badge with Animated Number and Mini Performance Gauge */}
+                      {/* Stat Value Badge with Animated Number */}
                       <td>
                         <div className="indicator-val-cell-wrap">
                           <span
@@ -908,43 +850,6 @@ export default function IndicatorView({
                               delay={Math.min(index * 20, 250)}
                             />
                           </span>
-                          <div className="indicator-mini-bar-track">
-                            <div
-                              className={`indicator-mini-bar-fill ${
-                                type === 'gdp'
-                                  ? item.value >= 0 ? 'green' : 'red'
-                                  : type === 'inflation'
-                                  ? 'red'
-                                  : 'blue'
-                              }`}
-                              style={{
-                                width: `${Math.min(
-                                  Math.max((Math.abs(item.value) / maxLeaderVal) * 100, 6),
-                                  100
-                                )}%`
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Action Buttons */}
-                      <td style={{ textAlign: 'center' }}>
-                        <div className="indicator-row-actions">
-                          {/* Compare Button (Toggles in & out without leaving page) */}
-                          <button
-                            type="button"
-                            onClick={() => onAddToCompare(item.countryCode)}
-                            className={`indicator-action-btn compare-btn ${isCompared ? 'active' : ''}`}
-                            title={
-                              isCompared
-                                ? 'อยู่ในชุดเปรียบเทียบแล้ว (คลิกเพื่อนำออก)'
-                                : 'คลิกเพื่อเก็บประเทศนี้เข้าชุดเปรียบเทียบ (ดูที่แถบลอยด้านล่าง)'
-                            }
-                          >
-                            {isCompared ? <Check size={12} color="#34d399" strokeWidth={3} /> : <GitCompare size={12} />}
-                            <span>{isCompared ? 'เลือกแล้ว' : '+ เทียบ'}</span>
-                          </button>
                         </div>
                       </td>
                     </tr>
