@@ -242,7 +242,7 @@ export default function App() {
         return prev;
       }
       const updated = [...prev, clean];
-      setToastMessage(`เพิ่ม ${clean} เข้าชุดเปรียบเทียบแล้ว (${updated.length}/4) — ดูที่แถบลอยด้านล่าง`);
+      setToastMessage(`เพิ่ม ${clean} เข้าชุดเปรียบเทียบแล้ว (${updated.length}/4)`);
       return updated;
     });
     // User remains on the current page to comfortably choose multiple countries!
@@ -363,6 +363,7 @@ export default function App() {
           <ComparisonHub
             comparedList={comparedList}
             setComparedList={setComparedList}
+            onAddToCompare={handleAddToCompare}
             onRemoveFromCompare={handleRemoveFromCompare}
             selectedYear={selectedYear}
           />

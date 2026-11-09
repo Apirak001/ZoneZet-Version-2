@@ -111,6 +111,7 @@ const fmt = (metricKey, v) => {
 export default function ComparisonHub({
   comparedList = ['THA', 'USA', 'JPN', 'VNM'],
   setComparedList,
+  onAddToCompare,
   onRemoveFromCompare,
   selectedYear = '2025'
 }) {
@@ -208,7 +209,8 @@ export default function ComparisonHub({
     const clean = code.toUpperCase();
     if (comparedList.some(c => c && c.toUpperCase() === clean)) return;
     if (comparedList.length >= MAX_COUNTRIES) return;
-    if (setComparedList) setComparedList(prev => [...prev, clean]);
+    if (onAddToCompare) onAddToCompare(clean);
+    else if (setComparedList) setComparedList(prev => [...prev, clean]);
     setIsDropdownOpen(false);
     setSearchFilter('');
   };
