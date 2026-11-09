@@ -178,7 +178,7 @@ body {
   justify-self: center;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: clamp(0.9rem, 1.45vw, 1.6rem);
 }
 
 .biz-nav-link {
