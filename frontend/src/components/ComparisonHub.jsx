@@ -163,6 +163,7 @@ const RadarTooltip = memo(function RadarTooltip({ active, payload, profileOf, co
 const ComparisonHub = memo(function ComparisonHub({
   comparedList = ['THA', 'USA', 'JPN', 'VNM'],
   setComparedList,
+  onAddToCompare,
   onRemoveFromCompare,
   selectedYear = '2025'
 }) {
@@ -261,7 +262,8 @@ const ComparisonHub = memo(function ComparisonHub({
     const clean = code.toUpperCase();
     if (comparedList.some(c => c && c.toUpperCase() === clean)) return;
     if (comparedList.length >= MAX_COUNTRIES) return;
-    if (setComparedList) setComparedList(prev => [...prev, clean]);
+    if (onAddToCompare) onAddToCompare(clean);
+    else if (setComparedList) setComparedList(prev => [...prev, clean]);
     setIsDropdownOpen(false);
     setSearchFilter('');
   };
