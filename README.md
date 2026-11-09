@@ -84,7 +84,6 @@ App.jsx (Root State: activeTab, selectedYear, comparedList, topSummary, indicato
 │   │   ├── Direction-Aware Ranking Bars (จัดอันดับพร้อมแถบสีเขียว/แดงเทียบปีก่อนหน้า)
 │   │   ├── Multi-Mode Trend Chart (Bar / Line / Area / 5-Pillar RadarChart)
 │   │   └── Side-by-Side Comparison Matrix Table (ไฮไลต์ประเทศที่ดีที่สุดในแต่ละตัวชี้วัด)
-│   ├── CompareModal.jsx (หน้าต่างเปรียบเทียบด่วนแบบ In-Page Overlay)
 │   ├── SystemHealthView.jsx (หน้าตรวจสอบสถานะ Backend, Cache Hit Rate & Latency)
 │   └── FeedbackStates.jsx (คอมโพเนนต์สถานะ: LoadingSkeleton, EmptyState, ErrorBanner)
 └── Footer.jsx (Universal Footer & Circular Scroll-Progress Back-to-Top Button)

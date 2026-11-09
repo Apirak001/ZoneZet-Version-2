@@ -7,13 +7,11 @@ import {
   ShieldCheck,
   RefreshCw,
   Database,
-  Layers,
-  Clock,
-  ArrowRight
+  Layers
 } from 'lucide-react';
 import { fetchCacheStats } from '../services/api';
 
-export default function SystemHealthView({ selectedYear, setActiveTab }) {
+export default function SystemHealthView() {
   const [healthData, setHealthData] = useState({
     status: 'healthy',
     uptime: 0,
@@ -22,7 +20,6 @@ export default function SystemHealthView({ selectedYear, setActiveTab }) {
   });
   const [pingMs, setPingMs] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTabSub, setActiveTabSub] = useState('metrics');
 
   const checkHealth = async () => {
     setIsRefreshing(true);
@@ -49,14 +46,6 @@ export default function SystemHealthView({ selectedYear, setActiveTab }) {
   useEffect(() => {
     checkHealth();
   }, []);
-
-  const formatUptime = (seconds) => {
-    if (!seconds) return '0 วินาที';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    if (mins === 0) return `${secs} วินาที`;
-    return `${mins} นาที ${secs} วินาที`;
-  };
 
   return (
     <div className="health-view-page">

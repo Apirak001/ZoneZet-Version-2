@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { RotateCcw, X, CheckCircle2 } from 'lucide-react';
 
-export default function UndoToast({ message, onUndo, onClose, duration = 5000 }) {
+export default function UndoToast({ message, onUndo: _onUndo, onClose, duration = 5000 }) {
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isExiting, setIsExiting] = useState(false);

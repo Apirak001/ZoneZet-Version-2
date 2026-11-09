@@ -2,82 +2,23 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 import {
   ArrowRight,
   CheckCircle2,
-  TrendingUp,
-  Percent,
-  Users,
   ShieldCheck,
-  Zap,
   BarChart3,
-  ChevronRight,
-  Sparkles,
-  Layers,
-  Database,
-  LineChart,
-  Cpu,
-  Lock,
-  ThumbsUp,
-  Laptop,
-  Cloud,
   Globe,
   Plus,
   Target,
   PieChart,
   Activity,
-  Earth,
-  GraduationCap,
-  Briefcase,
-  Code2,
-  Terminal,
-  Mail
+  Earth
 } from 'lucide-react';
 import TeamShowcase from './TeamShowcase';
-
-/**
- * Animated Number Counter Hook & Component
- * Smoothly counts from 0 up to `end` with high-end ease-out animation
- */
-function AnimatedCounter({ end, duration = 1800, prefix = '', suffix = '' }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let startTimestamp = null;
-    let frameId;
-
-    const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const elapsed = timestamp - startTimestamp;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Smooth ease-out exponential curve
-      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      setCount(Math.floor(ease * end));
-
-      if (progress < 1) {
-        frameId = requestAnimationFrame(step);
-      }
-    };
-
-    frameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frameId);
-  }, [end, duration]);
-
-  return (
-    <span>
-      {prefix}
-      {count.toLocaleString()}
-      {suffix}
-    </span>
-  );
-}
 
 const LandingAboutView = memo(function LandingAboutView({
   setActiveTab,
   selectedYear = '2025',
-  topSummary = {},
-  cacheStats = {}
+  topSummary = {}
 }) {
   const [barsLoaded, setBarsLoaded] = useState(false);
-  const [activeFeature, setActiveFeature] = useState(1);
   const chooseUsRef = useRef(null);
   const [isSpread, setIsSpread] = useState(false);
   const isSpreadRef = useRef(false);

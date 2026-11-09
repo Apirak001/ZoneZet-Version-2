@@ -9,7 +9,6 @@ import {
   Percent,
   Users,
   Layers,
-  Sparkles,
   Globe,
   Globe2,
   Compass,
@@ -19,7 +18,6 @@ import {
   Mountain,
   Building2,
   Calendar,
-  History,
   ChevronDown,
   Check
 } from 'lucide-react';
@@ -322,7 +320,6 @@ const DashboardHome = memo(function DashboardHome({
   const [activeChartMode, setActiveChartMode] = useState('all');
   const [regionalChartMode, setRegionalChartMode] = useState('all');
   const [regionalData, setRegionalData] = useState([]);
-  const [isRegionalLoading, setIsRegionalLoading] = useState(false);
   const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
   const yearDropdownRef = useRef(null);
 
@@ -341,17 +338,13 @@ const DashboardHome = memo(function DashboardHome({
 
   useEffect(() => {
     let isMounted = true;
-    setIsRegionalLoading(true);
     fetchRegionalBenchmark(selectedYear)
       .then((res) => {
         if (isMounted && res.data) {
           setRegionalData(res.data);
         }
       })
-      .catch((err) => console.error('[DashboardHome] Failed to load regional benchmark:', err))
-      .finally(() => {
-        if (isMounted) setIsRegionalLoading(false);
-      });
+      .catch((err) => console.error('[DashboardHome] Failed to load regional benchmark:', err));
 
     return () => {
       isMounted = false;

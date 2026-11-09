@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue, memo } from 'react';
 import {
-  GitCompare,
   Plus,
   X,
   TrendingUp,
@@ -17,7 +16,6 @@ import {
   Compass,
   Layers,
   Hash,
-  ListOrdered,
   Table2,
   Info
 } from 'lucide-react';

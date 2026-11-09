@@ -16,14 +16,12 @@ const loadDashboardHome = () => import('./components/DashboardHome');
 const loadIndicatorView = () => import('./components/IndicatorView');
 const loadComparisonHub = () => import('./components/ComparisonHub');
 const loadSystemHealthView = () => import('./components/SystemHealthView');
-const loadCompareModal = () => import('./components/CompareModal');
 
 const LandingAboutView = lazy(loadLandingAboutView);
 const DashboardHome = lazy(loadDashboardHome);
 const IndicatorView = lazy(loadIndicatorView);
 const ComparisonHub = lazy(loadComparisonHub);
 const SystemHealthView = lazy(loadSystemHealthView);
-const CompareModal = lazy(loadCompareModal);
 
 const VALID_TABS = new Set(['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'health']);
 
@@ -212,7 +210,6 @@ export default function App() {
     return ['THA', 'USA', 'JPN', 'VNM'];
   });
   const [toastMessage, setToastMessage] = useState(null);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   // Sync Compared List to localStorage (Permanent deletion and persistence)
   useEffect(() => {
@@ -332,14 +329,6 @@ export default function App() {
     setToastMessage(null);
   }, []);
 
-  const handleCloseCompareModal = useCallback(() => {
-    setIsCompareModalOpen(false);
-  }, []);
-
-  const handleOpenFullHub = useCallback(() => {
-    setActiveTab('compare');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [setActiveTab]);
 
   return (
     <div className="biz-app-layout">
@@ -448,22 +437,6 @@ export default function App() {
 
       {/* Universal Footer across ALL pages */}
       <Footer setActiveTab={setActiveTab} lenis={lenisInstance} />
-
-      {/* In-Page Instant Comparison Modal (Lazy-loaded only when opened) */}
-      {isCompareModalOpen && (
-        <Suspense fallback={null}>
-          <CompareModal
-            isOpen={isCompareModalOpen}
-            onClose={handleCloseCompareModal}
-            comparedList={comparedList}
-            setComparedList={setComparedList}
-            onRemoveFromCompare={handleRemoveFromCompare}
-            currentTab={activeTab}
-            selectedYear={selectedYear}
-            onOpenFullHub={handleOpenFullHub}
-          />
-        </Suspense>
-      )}
 
       {/* Floating Undo Notification */}
       <UndoToast

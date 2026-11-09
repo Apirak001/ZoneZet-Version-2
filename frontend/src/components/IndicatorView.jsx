@@ -1,25 +1,19 @@
 import React, { useState, useMemo, useRef, useEffect, useDeferredValue, memo } from 'react';
 import {
   TrendingUp,
-  Percent,
   Users,
   ArrowUpDown,
-    Check,
+  Check,
   ArrowUpRight,
   ArrowDownRight,
   BarChart2,
   Search,
   Globe,
-  Award,
-  Sparkles,
-  Filter,
   X,
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
   Flame,
-  Layers,
-  ArrowRight,
   Calendar,
   ChevronDown
 } from 'lucide-react';
@@ -35,7 +29,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Cell,
   LabelList
 } from 'recharts';
 
@@ -59,8 +52,7 @@ const IndicatorView = memo(function IndicatorView({
   isLoading = false,
   error = null,
   onRetry,
-  onAddToCompare,
-  comparedList = [],  selectedYear = '2025',
+selectedYear = '2025',
   setSelectedYear
 }) {
   const [selectedRegion, setSelectedRegion] = useState('All');
