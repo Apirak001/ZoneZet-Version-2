@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { fetchCountryComparison, fetchCountriesDirectory } from '../services/api';
 import { LoadingSkeleton, EmptyState, ErrorBanner } from './FeedbackStates';
+import RunningBarLabel from './RunningBarLabel';
 import {
   ResponsiveContainer,
   LineChart,
@@ -427,23 +428,21 @@ export default function ComparisonHub({
     showDataLabels && (!highlightedCountry || highlightedCountry === code) ? (
       <LabelList
         dataKey={`${code}_${selectedMetric}`}
-        position="top"
-        fill={colorOf(code)}
-        fontSize={11}
-        fontWeight={700}
-        fontFamily="var(--font-mono)"
-        offset={8}
-        isAnimationActive={false}
-        formatter={(v) => (v !== undefined && v !== null ? fmt(selectedMetric, Number(v)) : '')}
+        content={<RunningBarLabel type={selectedMetric} color={colorOf(code)} offset={8} />}
       />
     ) : null;
 
   const renderChart = () => {
-    const chartMargin = { top: 24, right: 24, left: 0, bottom: 4 };
+    const chartMargin = { top: 32, right: 24, left: 0, bottom: 4 };
 
     if (chartType === 'radar') {
       return (
-        <RadarChart data={radarData} margin={{ top: 16, right: 40, left: 40, bottom: 16 }} outerRadius="72%">
+        <RadarChart
+          key={`radar-${selectedMetric}`}
+          data={radarData}
+          margin={{ top: 16, right: 40, left: 40, bottom: 16 }}
+          outerRadius="72%"
+        >
           <PolarGrid stroke="rgba(168, 85, 247, 0.22)" />
           <PolarAngleAxis dataKey="pillar" tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 600 }} />
           <PolarRadiusAxis domain={[0, 10]} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} />
@@ -460,7 +459,9 @@ export default function ComparisonHub({
                 fillOpacity={on ? 0.22 : 0.03}
                 strokeWidth={on ? 2.5 : 1}
                 strokeOpacity={on ? 1 : 0.2}
-                isAnimationActive={false}
+                isAnimationActive={true}
+                animationDuration={900}
+                animationEasing="ease-out"
               />
             );
           })}
@@ -470,7 +471,11 @@ export default function ComparisonHub({
 
     if (chartType === 'line') {
       return (
-        <LineChart data={timeline} margin={chartMargin}>
+        <LineChart
+          key={`line-${selectedMetric}`}
+          data={timeline}
+          margin={chartMargin}
+        >
           {axisPieces()}
           {comparedList.map(code => {
             const on = !highlightedCountry || highlightedCountry === code;
@@ -486,7 +491,9 @@ export default function ComparisonHub({
                 strokeOpacity={on ? 1 : 0.15}
                 dot={on ? { r: 4, strokeWidth: 2, fill: '#0c051a', stroke: c } : false}
                 activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff', fill: c }}
-                isAnimationActive={false}
+                isAnimationActive={true}
+                animationDuration={900}
+                animationEasing="ease-out"
               >
                 {labelFor(code)}
               </Line>
@@ -498,7 +505,11 @@ export default function ComparisonHub({
 
     if (chartType === 'area') {
       return (
-        <AreaChart data={timeline} margin={chartMargin}>
+        <AreaChart
+          key={`area-${selectedMetric}`}
+          data={timeline}
+          margin={chartMargin}
+        >
           <defs>
             {comparedList.map(code => (
               <linearGradient key={code} id={`cxArea-${code}`} x1="0" y1="0" x2="0" y2="1">
@@ -521,7 +532,9 @@ export default function ComparisonHub({
                 strokeOpacity={on ? 1 : 0.15}
                 fill={`url(#cxArea-${code})`}
                 fillOpacity={on ? 1 : 0.1}
-                isAnimationActive={false}
+                isAnimationActive={true}
+                animationDuration={900}
+                animationEasing="ease-out"
               />
             );
           })}
@@ -530,7 +543,13 @@ export default function ComparisonHub({
     }
 
     return (
-      <BarChart data={timeline} margin={chartMargin} barGap={4} barCategoryGap="24%">
+      <BarChart
+        key={`bar-${selectedMetric}-${comparedList.join('-')}`}
+        data={timeline}
+        margin={chartMargin}
+        barGap={4}
+        barCategoryGap="24%"
+      >
         <defs>
           {comparedList.map(code => (
             <linearGradient key={code} id={`cxBar-${code}`} x1="0" y1="0" x2="0" y2="1">
@@ -551,7 +570,9 @@ export default function ComparisonHub({
               opacity={on ? 1 : 0.15}
               radius={[6, 6, 2, 2]}
               maxBarSize={30}
-              isAnimationActive={false}
+              isAnimationActive={true}
+              animationDuration={900}
+              animationEasing="ease-out"
             >
               {labelFor(code)}
             </Bar>

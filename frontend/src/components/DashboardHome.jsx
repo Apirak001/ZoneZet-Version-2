@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MetricCard from './MetricCard';
 import AnimatedValue from './AnimatedValue';
+import RunningBarLabel from './RunningBarLabel';
 import { fetchRegionalBenchmark } from '../services/api';
 import {
   BarChart3,
@@ -566,8 +567,9 @@ export default function DashboardHome({
               {activeChartMode === 'all' ? (
                 /* Mode 1: Comparative Matrix across 3 indicators */
                 <BarChart
+                  key={activeChartMode}
                   data={comparativeChartData}
-                  margin={{ top: 25, right: 25, left: -10, bottom: 5 }}
+                  margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                   barGap={8}
                 >
                   <defs>
@@ -585,19 +587,19 @@ export default function DashboardHome({
                     </linearGradient>
                   </defs>
 
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                   <XAxis
                     dataKey="rankName"
                     stroke="#64748b"
                     tick={{ fill: '#e2e8f0', fontSize: 13, fontWeight: 700 }}
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <YAxis
                     stroke="#64748b"
                     tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                     unit="%"
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(168, 85, 247, 0.08)' }} />
@@ -608,30 +610,55 @@ export default function DashboardHome({
                   <Bar
                     dataKey="GDP"
                     fill="url(#dbGdpGrad)"
-                    radius={[8, 8, 2, 2]}
+                    radius={[6, 6, 2, 2]}
                     barSize={24}
                     name="GDP Growth (%)"
-                  />
+                    isAnimationActive={true}
+                    animationDuration={900}
+                    animationEasing="ease-out"
+                  >
+                    <LabelList
+                      dataKey="GDP"
+                      content={<RunningBarLabel type="gdp" color="#34d399" offset={6} />}
+                    />
+                  </Bar>
                   <Bar
                     dataKey="Inflation"
                     fill="url(#dbInflationGrad)"
-                    radius={[8, 8, 2, 2]}
+                    radius={[6, 6, 2, 2]}
                     barSize={24}
                     name="อัตราเงินเฟ้อ (%)"
-                  />
+                    isAnimationActive={true}
+                    animationDuration={900}
+                    animationEasing="ease-out"
+                  >
+                    <LabelList
+                      dataKey="Inflation"
+                      content={<RunningBarLabel type="inflation" color="#fb7185" offset={6} />}
+                    />
+                  </Bar>
                   <Bar
                     dataKey="Unemployment"
                     fill="url(#dbUnemploymentGrad)"
-                    radius={[8, 8, 2, 2]}
+                    radius={[6, 6, 2, 2]}
                     barSize={24}
                     name="อัตราการว่างงาน (%)"
-                  />
+                    isAnimationActive={true}
+                    animationDuration={900}
+                    animationEasing="ease-out"
+                  >
+                    <LabelList
+                      dataKey="Unemployment"
+                      content={<RunningBarLabel type="unemployment" color="#38bdf8" offset={6} />}
+                    />
+                  </Bar>
                 </BarChart>
               ) : activeChartMode === 'gdp' ? (
                 /* Mode 2: GDP Leaders Breakdown */
                 <BarChart
+                  key={`gdp-${activeChartMode}`}
                   data={gdpOnlyData}
-                  margin={{ top: 30, right: 25, left: -10, bottom: 5 }}
+                  margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                 >
                   <defs>
                     <linearGradient id="gdpSoloGrad" x1="0" y1="0" x2="0" y2="1">
@@ -639,45 +666,44 @@ export default function DashboardHome({
                       <stop offset="100%" stopColor="#059669" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                   <XAxis
                     dataKey="name"
                     stroke="#64748b"
                     tick={{ fill: '#e2e8f0', fontSize: 13, fontWeight: 700 }}
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <YAxis
                     stroke="#64748b"
                     tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                     unit="%"
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16, 185, 129, 0.08)' }} />
                   <Bar
                     dataKey="value"
                     fill="url(#gdpSoloGrad)"
-                    radius={[10, 10, 2, 2]}
+                    radius={[6, 6, 2, 2]}
                     barSize={48}
                     name="GDP Growth (%)"
+                    isAnimationActive={true}
+                    animationDuration={900}
+                    animationEasing="ease-out"
                   >
                     <LabelList
                       dataKey="value"
-                      position="top"
-                      fill="#34d399"
-                      fontSize={13}
-                      fontWeight={700}
-                      formatter={(v) => `+${v}%`}
-                      offset={10}
+                      content={<RunningBarLabel type="gdp" color="#34d399" offset={8} />}
                     />
                   </Bar>
                 </BarChart>
               ) : activeChartMode === 'inflation' ? (
                 /* Mode 3: Inflation Leaders Breakdown */
                 <BarChart
+                  key={`inf-${activeChartMode}`}
                   data={inflationOnlyData}
-                  margin={{ top: 30, right: 25, left: -10, bottom: 5 }}
+                  margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                 >
                   <defs>
                     <linearGradient id="inflationSoloGrad" x1="0" y1="0" x2="0" y2="1">
@@ -685,45 +711,44 @@ export default function DashboardHome({
                       <stop offset="100%" stopColor="#e11d48" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                   <XAxis
                     dataKey="name"
                     stroke="#64748b"
                     tick={{ fill: '#e2e8f0', fontSize: 13, fontWeight: 700 }}
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <YAxis
                     stroke="#64748b"
                     tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                     unit="%"
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(244, 63, 94, 0.08)' }} />
                   <Bar
                     dataKey="value"
                     fill="url(#inflationSoloGrad)"
-                    radius={[10, 10, 2, 2]}
+                    radius={[6, 6, 2, 2]}
                     barSize={48}
                     name="อัตราเงินเฟ้อ (%)"
+                    isAnimationActive={true}
+                    animationDuration={900}
+                    animationEasing="ease-out"
                   >
                     <LabelList
                       dataKey="value"
-                      position="top"
-                      fill="#fb7185"
-                      fontSize={13}
-                      fontWeight={700}
-                      formatter={(v) => `${v}%`}
-                      offset={10}
+                      content={<RunningBarLabel type="inflation" color="#fb7185" offset={8} />}
                     />
                   </Bar>
                 </BarChart>
               ) : (
                 /* Mode 4: Unemployment Leaders Breakdown */
                 <BarChart
+                  key={`unemp-${activeChartMode}`}
                   data={unemploymentOnlyData}
-                  margin={{ top: 30, right: 25, left: -10, bottom: 5 }}
+                  margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                 >
                   <defs>
                     <linearGradient id="unemploymentSoloGrad" x1="0" y1="0" x2="0" y2="1">
@@ -731,37 +756,35 @@ export default function DashboardHome({
                       <stop offset="100%" stopColor="#0284c7" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                   <XAxis
                     dataKey="name"
                     stroke="#64748b"
                     tick={{ fill: '#e2e8f0', fontSize: 13, fontWeight: 700 }}
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <YAxis
                     stroke="#64748b"
                     tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                     unit="%"
-                    axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                    axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
                   <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }} />
                   <Bar
                     dataKey="value"
                     fill="url(#unemploymentSoloGrad)"
-                    radius={[10, 10, 2, 2]}
+                    radius={[6, 6, 2, 2]}
                     barSize={48}
                     name="อัตราการว่างงาน (%)"
+                    isAnimationActive={true}
+                    animationDuration={900}
+                    animationEasing="ease-out"
                   >
                     <LabelList
                       dataKey="value"
-                      position="top"
-                      fill="#38bdf8"
-                      fontSize={13}
-                      fontWeight={700}
-                      formatter={(v) => `${v}%`}
-                      offset={10}
+                      content={<RunningBarLabel type="unemployment" color="#38bdf8" offset={8} />}
                     />
                   </Bar>
                 </BarChart>
@@ -912,7 +935,7 @@ export default function DashboardHome({
                 {regionalChartMode === 'all' ? (
                   <BarChart
                     data={regionalData.filter(r => !r.isGlobal)}
-                    margin={{ top: 25, right: 25, left: -10, bottom: 5 }}
+                    margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                     barGap={6}
                   >
                     <defs>
@@ -930,19 +953,19 @@ export default function DashboardHome({
                       </linearGradient>
                     </defs>
 
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                     <XAxis
                       dataKey="name"
                       stroke="#64748b"
                       tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 700 }}
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <YAxis
                       stroke="#64748b"
                       tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                       unit="%"
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(168, 85, 247, 0.08)' }} />
@@ -953,29 +976,53 @@ export default function DashboardHome({
                     <Bar
                       dataKey="avgGdp"
                       fill="url(#regGdpGrad)"
-                      radius={[8, 8, 2, 2]}
+                      radius={[6, 6, 2, 2]}
                       barSize={20}
                       name="GDP Growth เฉลี่ย (%)"
-                    />
+                      isAnimationActive={true}
+                      animationDuration={900}
+                      animationEasing="ease-out"
+                    >
+                      <LabelList
+                        dataKey="avgGdp"
+                        content={<RunningBarLabel type="gdp" color="#34d399" offset={6} />}
+                      />
+                    </Bar>
                     <Bar
                       dataKey="avgInflation"
                       fill="url(#regInfGrad)"
-                      radius={[8, 8, 2, 2]}
+                      radius={[6, 6, 2, 2]}
                       barSize={20}
                       name="อัตราเงินเฟ้อเฉลี่ย (%)"
-                    />
+                      isAnimationActive={true}
+                      animationDuration={900}
+                      animationEasing="ease-out"
+                    >
+                      <LabelList
+                        dataKey="avgInflation"
+                        content={<RunningBarLabel type="inflation" color="#fb7185" offset={6} />}
+                      />
+                    </Bar>
                     <Bar
                       dataKey="avgUnemployment"
                       fill="url(#regUnempGrad)"
-                      radius={[8, 8, 2, 2]}
+                      radius={[6, 6, 2, 2]}
                       barSize={20}
                       name="อัตราการว่างงานเฉลี่ย (%)"
-                    />
+                      isAnimationActive={true}
+                      animationDuration={900}
+                      animationEasing="ease-out"
+                    >
+                      <LabelList
+                        dataKey="avgUnemployment"
+                        content={<RunningBarLabel type="unemployment" color="#38bdf8" offset={6} />}
+                      />
+                    </Bar>
                   </BarChart>
                 ) : regionalChartMode === 'gdp' ? (
                   <BarChart
                     data={regionalData.filter(r => !r.isGlobal)}
-                    margin={{ top: 30, right: 25, left: -10, bottom: 5 }}
+                    margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                   >
                     <defs>
                       <linearGradient id="regSoloGdp" x1="0" y1="0" x2="0" y2="1">
@@ -983,44 +1030,42 @@ export default function DashboardHome({
                         <stop offset="100%" stopColor="#059669" />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                     <XAxis
                       dataKey="name"
                       stroke="#64748b"
                       tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 700 }}
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <YAxis
                       stroke="#64748b"
                       tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                       unit="%"
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(16, 185, 129, 0.08)' }} />
                     <Bar
                       dataKey="avgGdp"
                       fill="url(#regSoloGdp)"
-                      radius={[10, 10, 2, 2]}
+                      radius={[6, 6, 2, 2]}
                       barSize={44}
                       name="GDP Growth เฉลี่ย (%)"
+                      isAnimationActive={true}
+                      animationDuration={900}
+                      animationEasing="ease-out"
                     >
                       <LabelList
                         dataKey="avgGdp"
-                        position="top"
-                        fill="#34d399"
-                        fontSize={13}
-                        fontWeight={700}
-                        formatter={(v) => `+${v}%`}
-                        offset={10}
+                        content={<RunningBarLabel type="gdp" color="#34d399" offset={8} />}
                       />
                     </Bar>
                   </BarChart>
                 ) : regionalChartMode === 'inflation' ? (
                   <BarChart
                     data={regionalData.filter(r => !r.isGlobal)}
-                    margin={{ top: 30, right: 25, left: -10, bottom: 5 }}
+                    margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                   >
                     <defs>
                       <linearGradient id="regSoloInf" x1="0" y1="0" x2="0" y2="1">
@@ -1028,44 +1073,42 @@ export default function DashboardHome({
                         <stop offset="100%" stopColor="#e11d48" />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                     <XAxis
                       dataKey="name"
                       stroke="#64748b"
                       tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 700 }}
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <YAxis
                       stroke="#64748b"
                       tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                       unit="%"
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(244, 63, 94, 0.08)' }} />
                     <Bar
                       dataKey="avgInflation"
                       fill="url(#regSoloInf)"
-                      radius={[10, 10, 2, 2]}
+                      radius={[6, 6, 2, 2]}
                       barSize={44}
                       name="อัตราเงินเฟ้อเฉลี่ย (%)"
+                      isAnimationActive={true}
+                      animationDuration={900}
+                      animationEasing="ease-out"
                     >
                       <LabelList
                         dataKey="avgInflation"
-                        position="top"
-                        fill="#fb7185"
-                        fontSize={13}
-                        fontWeight={700}
-                        formatter={(v) => `${v}%`}
-                        offset={10}
+                        content={<RunningBarLabel type="inflation" color="#fb7185" offset={8} />}
                       />
                     </Bar>
                   </BarChart>
                 ) : (
                   <BarChart
                     data={regionalData.filter(r => !r.isGlobal)}
-                    margin={{ top: 30, right: 25, left: -10, bottom: 5 }}
+                    margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                   >
                     <defs>
                       <linearGradient id="regSoloUnemp" x1="0" y1="0" x2="0" y2="1">
@@ -1073,37 +1116,35 @@ export default function DashboardHome({
                         <stop offset="100%" stopColor="#0284c7" />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                     <XAxis
                       dataKey="name"
                       stroke="#64748b"
                       tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 700 }}
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <YAxis
                       stroke="#64748b"
                       tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                       unit="%"
-                      axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
                     <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }} />
                     <Bar
                       dataKey="avgUnemployment"
                       fill="url(#regSoloUnemp)"
-                      radius={[10, 10, 2, 2]}
+                      radius={[6, 6, 2, 2]}
                       barSize={44}
                       name="อัตราการว่างงานเฉลี่ย (%)"
+                      isAnimationActive={true}
+                      animationDuration={900}
+                      animationEasing="ease-out"
                     >
                       <LabelList
                         dataKey="avgUnemployment"
-                        position="top"
-                        fill="#38bdf8"
-                        fontSize={13}
-                        fontWeight={700}
-                        formatter={(v) => `${v}%`}
-                        offset={10}
+                        content={<RunningBarLabel type="unemployment" color="#38bdf8" offset={8} />}
                       />
                     </Bar>
                   </BarChart>
