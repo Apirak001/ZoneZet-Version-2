@@ -26,6 +26,7 @@ import {
 import { mergeSort } from '../utils/dsa/mergeSort';
 import { LoadingSkeleton, EmptyState, ErrorBanner } from './FeedbackStates';
 import AnimatedValue from './AnimatedValue';
+import RunningBarLabel from './RunningBarLabel';
 import {
   ResponsiveContainer,
   BarChart,
@@ -34,7 +35,8 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Cell
+  Cell,
+  LabelList
 } from 'recharts';
 
 const REGIONS = [
@@ -575,31 +577,40 @@ export default function IndicatorView({
           </div>
 
           <div className="indicator-chart-canvas-wrap">
-            <ResponsiveContainer width="100%" height={270}>
+            <ResponsiveContainer width="100%" height={310}>
               <BarChart
+                key={`${type}-${chartViewMode}`}
                 data={distributionChartData}
-                margin={{ top: 20, right: 25, left: -10, bottom: 25 }}
+                margin={{ top: 35, right: 25, left: -10, bottom: 28 }}
+                barCategoryGap="20%"
               >
                 <defs>
                   <linearGradient id={`indicatorGrad-${type}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={config.gradStart} stopOpacity={0.95} />
-                    <stop offset="100%" stopColor={config.gradEnd} stopOpacity={0.4} />
+                    <stop offset="0%" stopColor={config.gradStart} stopOpacity={1} />
+                    <stop offset="100%" stopColor={config.gradEnd} stopOpacity={0.35} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#22153d" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.06)" vertical={false} />
                 <XAxis
                   dataKey="country"
                   stroke="#64748b"
-                  tick={{ fill: '#94a3b8', fontSize: 11 }}
+                  tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
                   angle={-22}
                   textAnchor="end"
-                  axisLine={{ stroke: '#2e1c4a' }}
+                  axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
+                  tickLine={false}
                 />
                 <YAxis
                   stroke="#64748b"
                   tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                   unit="%"
-                  axisLine={{ stroke: '#2e1c4a' }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={48}
+                  domain={[
+                    (dataMin) => (dataMin < 0 ? Math.floor(dataMin * 1.15) : 0),
+                    (dataMax) => Math.ceil(dataMax * 1.2)
+                  ]}
                 />
                 <Tooltip
                   formatter={(val) => [`${val}%`, title]}
@@ -607,22 +618,33 @@ export default function IndicatorView({
                     const row = payload?.[0]?.payload;
                     return row ? `#${row.rank} ${row.fullName}` : '';
                   }}
+                  cursor={{ fill: 'rgba(168, 85, 247, 0.06)' }}
                   contentStyle={{
-                    backgroundColor: '#110822',
-                    border: `1px solid ${config.accentBorder}`,
-                    borderRadius: '10px',
+                    backgroundColor: 'rgba(18, 9, 38, 0.96)',
+                    border: `1px solid ${config.accentBorder || 'rgba(192, 132, 252, 0.35)'}`,
+                    borderRadius: '12px',
                     color: '#f8fafc',
-                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.7)',
+                    boxShadow: '0 16px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(168, 85, 247, 0.25)',
                     fontSize: '0.84rem',
-                    fontFamily: 'var(--font-mono)'
+                    fontFamily: 'var(--font-mono)',
+                    backdropFilter: 'blur(16px)',
+                    padding: '0.75rem 1rem'
                   }}
                 />
                 <Bar
                   dataKey="value"
                   fill={`url(#indicatorGrad-${type})`}
-                  radius={[5, 5, 0, 0]}
+                  radius={[6, 6, 2, 2]}
                   barSize={32}
-                />
+                  isAnimationActive={true}
+                  animationDuration={900}
+                  animationEasing="ease-out"
+                >
+                  <LabelList
+                    dataKey="value"
+                    content={<RunningBarLabel type={type} color={config.accentColor || '#ffffff'} />}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
