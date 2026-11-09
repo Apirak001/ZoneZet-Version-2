@@ -8991,7 +8991,6 @@ a.tm-contact-row:hover .tm-contact-arrow {
 }
 .cx-metric-text { display: flex; flex-direction: column; gap: 0.25rem; padding-right: 1.5rem; }
 .cx-metric-name { color: #fff; font-weight: 700; font-size: 1rem; }
-.cx-metric-explain { color: #94a3b8; font-size: 0.8rem; line-height: 1.5; }
 .cx-metric-hint {
   justify-self: start; font-size: 0.74rem; font-weight: 700; padding: 2px 9px; border-radius: 999px;
   color: var(--cx-c); background: color-mix(in srgb, var(--cx-c) 12%, transparent);
@@ -9006,7 +9005,6 @@ a.tm-contact-row:hover .tm-contact-arrow {
 .cx-result-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.25rem; margin-top: -0.75rem; }
 .cx-card-label { display: inline-flex; align-items: center; gap: 0.4rem; color: #c4b5fd; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
 .cx-card-label-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
-.cx-hint-pill { font-size: 0.74rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; border: 1px solid; }
 
 .cx-summary { position: relative; overflow: hidden; border-color: color-mix(in srgb, var(--cx-c) 30%, transparent); }
 .cx-summary::before {
@@ -9052,20 +9050,20 @@ a.tm-contact-row:hover .tm-contact-arrow {
 .cx-rank-track { height: 7px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
 .cx-rank-fill {
   display: block; height: 100%; border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--cx-c) 55%, transparent), var(--cx-c));
-  box-shadow: 0 0 10px color-mix(in srgb, var(--cx-c) 50%, transparent);
+  background: #475569;
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.cx-rank-fill.neg { background: repeating-linear-gradient(45deg, var(--cx-c) 0 6px, color-mix(in srgb, var(--cx-c) 50%, transparent) 6px 12px); }
-.cx-rank-diff {
-  display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; min-width: 52px; justify-content: center;
-  font-size: 0.74rem; font-weight: 700; font-family: var(--font-mono); padding: 3px 7px; border-radius: 7px;
+.cx-rank-fill.up {
+  background: linear-gradient(90deg, rgba(52, 211, 153, 0.55), #34d399);
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.45);
 }
-.cx-rank-diff.good { color: #34d399; background: rgba(52, 211, 153, 0.12); }
-.cx-rank-diff.bad { color: #f87171; background: rgba(248, 113, 113, 0.12); }
+.cx-rank-fill.down {
+  background: linear-gradient(90deg, rgba(248, 113, 113, 0.55), #f87171);
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.45);
+}
 .cx-footnote { display: flex; align-items: center; gap: 0.35rem; margin: 0.9rem 0 0; color: #64748b; font-size: 0.75rem; }
-.cx-footnote .good { color: #34d399; font-weight: 700; }
-.cx-footnote .bad { color: #f87171; font-weight: 700; }
+.cx-footnote .up { color: #34d399; font-weight: 700; }
+.cx-footnote .down { color: #f87171; font-weight: 700; }
 
 /* Chart card */
 .cx-chart-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
@@ -9156,16 +9154,7 @@ a.tm-contact-row:hover .tm-contact-arrow {
   .cx-segment button span { display: none; }
 }
 
-/* Vertical ranking list & pills */
-.cx-stat-pill {
-  font-size: 0.76rem;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: #cbd5e1;
-}
-
+/* Vertical ranking list */
 .cx-card.cx-ranking .cx-rank-list {
   display: flex;
   flex-direction: column;

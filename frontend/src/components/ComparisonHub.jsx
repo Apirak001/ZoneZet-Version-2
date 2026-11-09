@@ -12,8 +12,6 @@ import {
   Sparkles,
   Trash2,
   Crown,
-  ArrowUp,
-  ArrowDown,
   BarChart3,
   Activity,
   Compass,
@@ -60,8 +58,7 @@ const METRICS = {
     icon: TrendingUp,
     color: '#34d399',
     better: 'high',
-    hint: 'ยิ่งสูงยิ่งดี',
-    explain: 'บอกว่าเศรษฐกิจของประเทศขยายตัวเร็วแค่ไหนเมื่อเทียบกับปีก่อน'
+    hint: 'ยิ่งสูงยิ่งดี'
   },
   inflation: {
     key: 'inflation',
@@ -71,8 +68,7 @@ const METRICS = {
     color: '#f43f5e',
     better: 'target',
     target: 2,
-    hint: 'ใกล้ 2% ดีที่สุด',
-    explain: 'บอกว่าราคาสินค้าและค่าครองชีพเพิ่มขึ้นเร็วแค่ไหน (สูงไป = ของแพง, ติดลบ = เงินฝืด)'
+    hint: 'ใกล้ 2% ดีที่สุด'
   },
   unemployment: {
     key: 'unemployment',
@@ -81,8 +77,7 @@ const METRICS = {
     icon: Users,
     color: '#38bdf8',
     better: 'low',
-    hint: 'ยิ่งต่ำยิ่งดี',
-    explain: 'บอกสัดส่วนคนที่ต้องการทำงานแต่ยังหางานไม่ได้'
+    hint: 'ยิ่งต่ำยิ่งดี'
   }
 };
 
@@ -248,8 +243,8 @@ export default function ComparisonHub({
 
   const timeline = comparisonData?.timeline || [];
   const latestEntry = timeline[timeline.length - 1] || {};
-  const prevEntry = timeline.length > 1 ? timeline[timeline.length - 2] : null;
   const latestYear = latestEntry.year || selectedYear;
+  const prevEntry = timeline.length > 1 ? timeline[timeline.length - 2] : null;
 
   // Latest value for a country + metric (timeline first, snapshot fallback)
   const valueOf = (code, metricKey, entry = latestEntry) => {
@@ -266,11 +261,12 @@ export default function ComparisonHub({
     const list = comparedList.map((code) => {
       const value = valueOf(code, selectedMetric);
       const prev = prevEntry ? valueOf(code, selectedMetric, prevEntry) : null;
-      const diff = value !== null && prev !== null ? value - prev : null;
-      // Did it move in a "good" direction?
-      const improved = diff === null ? null : scoreOf(selectedMetric, value) >= scoreOf(selectedMetric, prev);
+      // gdp/inflation values are already YoY change; unemployment is a level, so compare against prev year
+      const grew = value === null ? null
+        : selectedMetric === 'unemployment' ? (prev === null ? null : value > prev)
+          : value > 0;
       const p = profileOf(code);
-      return { code, name: p.name || code, iso2: p.iso2, value, diff, improved, color: colorOf(code) };
+      return { code, name: p.name || code, iso2: p.iso2, value, grew, color: colorOf(code) };
     });
     return list.sort((a, b) => scoreOf(selectedMetric, b.value) - scoreOf(selectedMetric, a.value));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -280,22 +276,6 @@ export default function ComparisonHub({
     () => Math.max(1, ...ranking.map(r => Math.abs(r.value ?? 0))),
     [ranking]
   );
-
-  const validRankings = useMemo(() => ranking.filter(r => r.value !== null), [ranking]);
-
-  const groupAverage = useMemo(() => {
-    if (validRankings.length === 0) return null;
-    const avg = validRankings.reduce((sum, r) => sum + r.value, 0) / validRankings.length;
-    return fmt(selectedMetric, avg);
-  }, [validRankings, selectedMetric]);
-
-  const groupSpread = useMemo(() => {
-    if (validRankings.length < 2) return null;
-    const values = validRankings.map(r => r.value);
-    const max = Math.max(...values);
-    const min = Math.min(...values);
-    return (max - min).toFixed(1);
-  }, [validRankings]);
 
   // Best country per metric, for table highlighting
   const bestPerMetric = useMemo(() => {
@@ -571,14 +551,7 @@ export default function ComparisonHub({
 
       {/* ================= 1. HERO ================= */}
       <header className="cx-hero">
-        <div className="hero-badge-tag" style={{ marginBottom: '0.75rem' }}>
-          <span className="badge-sparkle">✦</span>
-          <span>เปรียบเทียบเศรษฐกิจ · ข้อมูล World Bank 2020 – 2025</span>
-        </div>
-        <h1 className="indicator-hero-big-title">
-          ศูนย์เปรียบเทียบเศรษฐกิจ{' '}
-          <span className="title-en-gradient">Comparison Hub</span>
-        </h1>
+        <h1 className="indicator-hero-big-title">ศูนย์เปรียบเทียบเศรษฐกิจโลก</h1>
         <p className="indicator-hero-subtext">
           เลือกได้สูงสุด 4 ประเทศ แล้วดูว่าใครเศรษฐกิจโตเร็วกว่า ค่าครองชีพมั่นคงกว่า หรือมีคนว่างงานน้อยกว่า — สรุปให้อ่านง่ายในหน้าเดียว
         </p>
@@ -779,7 +752,6 @@ export default function ComparisonHub({
                     <span className="cx-metric-icon"><Icon size={18} /></span>
                     <span className="cx-metric-text">
                       <span className="cx-metric-name">{m.label}</span>
-                      <span className="cx-metric-explain">{m.explain}</span>
                     </span>
                     <span className="cx-metric-hint">{m.hint}</span>
                     {active && <span className="cx-metric-check"><Check size={12} strokeWidth={3} /></span>}
@@ -795,21 +767,6 @@ export default function ComparisonHub({
               <div className="cx-section-title">
                 <span className="cx-step-num sm">3</span>
                 <h2>อันดับและสถิติเปรียบเทียบ · {metric.label} ปี {latestYear}</h2>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-                <span className="cx-hint-pill" style={{ color: metric.color, borderColor: `${metric.color}55` }}>
-                  {metric.hint}
-                </span>
-                {groupAverage !== null && (
-                  <span className="cx-stat-pill">
-                    ค่าเฉลี่ยกลุ่ม: <strong style={{ color: '#fff' }}>{groupAverage}</strong>
-                  </span>
-                )}
-                {groupSpread !== null && (
-                  <span className="cx-stat-pill">
-                    ส่วนต่าง: <strong style={{ color: '#fbbf24' }}>{groupSpread} จุด</strong>
-                  </span>
-                )}
               </div>
             </div>
 
@@ -834,22 +791,19 @@ export default function ComparisonHub({
                         <span className="cx-rank-val">{fmt(selectedMetric, r.value)}</span>
                       </span>
                       <span className="cx-rank-track">
-                        <span className={`cx-rank-fill ${r.value !== null && r.value < 0 ? 'neg' : ''}`} style={{ width: `${pct}%` }} />
+                        <span className={`cx-rank-fill ${r.grew === null ? '' : r.grew ? 'up' : 'down'}`} style={{ width: `${pct}%` }} />
                       </span>
                     </span>
-                    {r.diff !== null && (
-                      <span className={`cx-rank-diff ${r.improved ? 'good' : 'bad'}`} title="เปลี่ยนแปลงจากปีก่อน">
-                        {r.diff >= 0 ? <ArrowUp size={11} /> : <ArrowDown size={11} />}
-                        {Math.abs(r.diff).toFixed(1)}
-                      </span>
-                    )}
                   </button>
                 );
               })}
             </div>
 
             <p className="cx-footnote">
-              <Info size={12} /> ลูกศร <span className="good">เขียว</span> = ดีขึ้นจากปีก่อน · <span className="bad">แดง</span> = แย่ลง · คลิกที่การ์ดเพื่อไฮไลต์ในกราฟ
+              <Info size={12} />
+              <span>
+                <span className="up">เส้นสีเขียว</span> = เติบโตขึ้นจากปีก่อน · <span className="down">เส้นสีแดง</span> = ไม่เติบโตขึ้นจากปีก่อน · คลิกที่แถวเพื่อไฮไลต์ประเทศนั้นในกราฟ
+              </span>
             </p>
           </section>
 
@@ -866,7 +820,7 @@ export default function ComparisonHub({
                 <p className="cx-chart-sub">
                   {chartType === 'radar'
                     ? 'คะแนน 0–10 จาก 5 มิติ — พื้นที่ยิ่งกว้างและสมดุล ยิ่งแข็งแรงรอบด้าน'
-                    : `${metric.explain} · ${metric.hint}`}
+                    : metric.hint}
                 </p>
               </div>
 
