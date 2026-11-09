@@ -332,7 +332,7 @@ export default function App() {
         {activeTab === 'inflation' && (
           <IndicatorView
             type="inflation"
-            title={`ดัชนีราคาผู้บริโภคและอัตราเงินเฟ้อ Inflation Rate (CPI) ประจำปี ${selectedYear}`}
+            title={`อัตราเงินเฟ้อ Inflation Rate ประจำปี ${selectedYear}`}
             subtitle="ติดตามเสถียรภาพระดับราคาสินค้า อัตราค่าครองชีพ และกำลังซื้อของผู้บริโภค"
             data={indicatorData}
             isLoading={isLoading}
@@ -347,7 +347,7 @@ export default function App() {
         {activeTab === 'unemployment' && (
           <IndicatorView
             type="unemployment"
-            title={`ดัชนีตลาดแรงงานและอัตราการว่างงาน Unemployment Rate ประจำปี ${selectedYear}`}
+            title={`อัตราการว่างงาน Unemployment Rate ประจำปี ${selectedYear}`}
             subtitle="สำรวจโครงสร้างการจ้างงาน สัดส่วนประชากรในวัยทำงาน และศักยภาพตลาดแรงงาน"
             data={indicatorData}
             isLoading={isLoading}
