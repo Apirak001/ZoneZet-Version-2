@@ -79,29 +79,28 @@ export default function Navbar({
           </div>
         </div>
 
-        {/* Center: Desktop Navigation */}
-        <nav className="biz-nav-menu">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`biz-nav-link ${isActive ? 'active' : ''}`}
-              >
-                <Icon size={16} className="biz-nav-icon" />
-                <span>{item.label}</span>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span className="biz-nav-badge">{item.badge}</span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+        {/* Right: Desktop Navigation + Mobile Hamburger Toggle */}
+        <div className="biz-nav-right">
+          <nav className="biz-nav-menu">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`biz-nav-link ${isActive ? 'active' : ''}`}
+                >
+                  <Icon size={16} className="biz-nav-icon" />
+                  <span>{item.label}</span>
+                  {item.badge !== undefined && item.badge > 0 && (
+                    <span className="biz-nav-badge">{item.badge}</span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
 
-        {/* Right: Mobile Hamburger Toggle */}
-        <div className="biz-nav-actions">
           <button
             className="biz-mobile-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
