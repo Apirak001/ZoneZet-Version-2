@@ -232,12 +232,12 @@ export default function App() {
         setToastMessage(`นำ ${clean} ออกจากชุดเปรียบเทียบแล้ว`);
         return prev.filter((c) => c && c.toUpperCase() !== clean);
       }
-      if (prev.length >= 5) {
-        alert('สามารถเปรียบเทียบพร้อมกันได้สูงสุด 5 ประเทศ (หากต้องการเลือกประเทศใหม่ กรุณานำประเทศเดิมออกก่อน)');
+      if (prev.length >= 4) {
+        alert('สามารถเปรียบเทียบพร้อมกันได้สูงสุด 4 ประเทศ (หากต้องการเลือกประเทศใหม่ กรุณานำประเทศเดิมออกก่อน)');
         return prev;
       }
       const updated = [...prev, clean];
-      setToastMessage(`เพิ่ม ${clean} เข้าชุดเปรียบเทียบแล้ว (${updated.length}/5) — ดูที่แถบลอยด้านล่าง`);
+      setToastMessage(`เพิ่ม ${clean} เข้าชุดเปรียบเทียบแล้ว (${updated.length}/4) — ดูที่แถบลอยด้านล่าง`);
       return updated;
     });
     // User remains on the current page to comfortably choose multiple countries!

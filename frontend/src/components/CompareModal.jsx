@@ -13,7 +13,12 @@ import {
   ExternalLink,
   Trash2,
   Sparkles,
-  Info
+  Info,
+  BarChart3,
+  Activity,
+  Compass,
+  SlidersHorizontal,
+  Layers
 } from 'lucide-react';
 import { fetchCountryComparison } from '../services/api';
 import { LoadingSkeleton, EmptyState } from './FeedbackStates';
@@ -22,11 +27,22 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
-  Legend
+  Legend,
+  ReferenceLine,
+  LabelList,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis
 } from 'recharts';
 
 const COUNTRY_COLORS = [
@@ -54,6 +70,9 @@ export default function CompareModal({
     : 'gdp';
 
   const [selectedMetric, setSelectedMetric] = useState(initialMetric);
+  const [chartType, setChartType] = useState('bar'); // 'bar' | 'line' | 'area' | 'radar'
+  const [showDataLabels, setShowDataLabels] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
   const [comparisonData, setComparisonData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -133,33 +152,169 @@ export default function CompareModal({
     return { leader, lowest, avg, spread };
   }, [comparisonData, comparedList, selectedMetric]);
 
+  // 5-Axis Macro Dimensions for Radar Mode
+  const radarData = useMemo(() => {
+    if (!comparisonData?.latestSnapshot || comparedList.length === 0) return [];
+
+    const gdpMap = {};
+    (comparisonData.latestSnapshot.gdp || []).forEach(i => {
+      gdpMap[i.countryCode] = i.value;
+    });
+
+    const infMap = {};
+    (comparisonData.latestSnapshot.inflation || []).forEach(i => {
+      infMap[i.countryCode] = i.value;
+    });
+
+    const uneMap = {};
+    (comparisonData.latestSnapshot.unemployment || []).forEach(i => {
+      uneMap[i.countryCode] = i.value;
+    });
+
+    return [
+      {
+        pillar: 'GDP Growth',
+        fullName: 'อัตราการเติบโตทางเศรษฐกิจ GDP (%)',
+        ...comparedList.reduce((acc, code) => ({
+          ...acc,
+          [code]: Math.max(0, Number(gdpMap[code] ?? 0))
+        }), {})
+      },
+      {
+        pillar: 'Price Stability',
+        fullName: 'เสถียรภาพราคา (เงินเฟ้อใกล้ 2%)',
+        ...comparedList.reduce((acc, code) => {
+          const inf = Number(infMap[code] ?? 2);
+          const score = Math.max(1, 10 - Math.min(Math.abs(inf - 2) * 1.5, 9));
+          return { ...acc, [code]: Number(score.toFixed(1)) };
+        }, {})
+      },
+      {
+        pillar: 'Labor Market',
+        fullName: 'ความแข็งแกร่งตลาดแรงงาน',
+        ...comparedList.reduce((acc, code) => {
+          const une = Number(uneMap[code] ?? 4);
+          const score = Math.max(1, 12 - une);
+          return { ...acc, [code]: Number(score.toFixed(1)) };
+        }, {})
+      },
+      {
+        pillar: '3-Yr Momentum',
+        fullName: 'โมเมนตัม 3 ปีย้อนหลัง',
+        ...comparedList.reduce((acc, code) => {
+          const timeline = comparisonData.timeline || [];
+          const recent = timeline.slice(-3);
+          const avg = recent.length
+            ? recent.reduce((sum, yr) => sum + (Number(yr[`${code}_${selectedMetric}`]) || 0), 0) / recent.length
+            : 0;
+          return { ...acc, [code]: Number(Math.max(0, avg).toFixed(1)) };
+        }, {})
+      },
+      {
+        pillar: 'Macro Resilience',
+        fullName: 'ดัชนีความยืดหยุ่นทางเศรษฐกิจ',
+        ...comparedList.reduce((acc, code) => {
+          const g = Math.max(0, Number(gdpMap[code] ?? 0));
+          const u = Number(uneMap[code] ?? 4);
+          const score = Math.max(1, (g * 1.2) + (10 - Math.min(u, 9)));
+          return { ...acc, [code]: Number((score / 1.5).toFixed(1)) };
+        }, {})
+      }
+    ];
+  }, [comparisonData, comparedList, selectedMetric]);
+
   if (!isOpen) return null;
 
-  // Custom Glassmorphism Tooltip for Multi-Line Chart
+  // Custom Glassmorphism Tooltip for Modal Charts
   const CustomModalTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const sorted = [...payload].sort((a, b) => (b.value || 0) - (a.value || 0));
+      const sum = sorted.reduce((acc, curr) => acc + (Number(curr.value) || 0), 0);
+      const avg = (sum / sorted.length).toFixed(1);
 
       return (
-        <div className="db-custom-chart-tooltip" style={{ minWidth: 230, zIndex: 1200 }}>
-          <div className="tooltip-country-header">
-            <Calendar size={13} color="#c084fc" />
-            <span className="tooltip-country-name">ปี ค.ศ. {label}</span>
-            <span className="tooltip-year-badge">{payload.length} ประเทศ</span>
+        <div
+          className="db-custom-chart-tooltip"
+          style={{
+            minWidth: 260,
+            zIndex: 1200,
+            background: 'rgba(12, 6, 26, 0.95)',
+            border: '1px solid rgba(168, 85, 247, 0.4)',
+            boxShadow: '0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(168, 85, 247, 0.25)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '12px',
+            padding: '0.8rem'
+          }}
+        >
+          <div
+            className="tooltip-country-header"
+            style={{
+              paddingBottom: '0.5rem',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <Calendar size={13} color="#c084fc" />
+              <span className="tooltip-country-name" style={{ fontWeight: 700 }}>ปี ค.ศ. {label}</span>
+            </div>
+            <span
+              className="tooltip-year-badge"
+              style={{
+                background: 'rgba(168, 85, 247, 0.2)',
+                color: '#c084fc',
+                fontSize: '0.72rem',
+                padding: '2px 7px',
+                borderRadius: '5px'
+              }}
+            >
+              เฉลี่ย {selectedMetric === 'gdp' && Number(avg) > 0 ? '+' : ''}{avg}%
+            </span>
           </div>
 
-          <div className="tooltip-indicators-list">
-            {sorted.map((entry) => {
-              const countryCode = entry.dataKey.split('_')[0];
+          <div className="tooltip-indicators-list" style={{ marginTop: '0.55rem' }}>
+            {sorted.map((entry, idx) => {
+              const countryCode = entry.dataKey ? entry.dataKey.split('_')[0] : '';
               const profile = (comparisonData?.countries || []).find((c) => c.code === countryCode);
               const flagUrl = profile?.iso2
                 ? `https://flagcdn.com/w40/${profile.iso2.toLowerCase()}.png`
                 : null;
+              const countryIdx = comparedList.indexOf(countryCode);
+              const bulletColor = countryIdx >= 0 ? COUNTRY_COLORS[countryIdx % COUNTRY_COLORS.length] : (entry.color || '#c084fc');
+              const val = typeof entry.value === 'number' ? entry.value : Number(entry.value) || 0;
+              const isLead = idx === 0;
 
               return (
-                <div key={entry.dataKey} className="tooltip-indicator-row">
+                <div
+                  key={entry.dataKey}
+                  className="tooltip-indicator-row"
+                  style={{
+                    padding: '0.3rem 0.45rem',
+                    borderRadius: '6px',
+                    background: isLead ? 'rgba(251, 191, 36, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+                    border: isLead ? '1px solid rgba(251, 191, 36, 0.3)' : '1px solid rgba(255, 255, 255, 0.04)',
+                    marginBottom: '0.3rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}
+                >
                   <div className="tooltip-indicator-name" style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                    <span className="tooltip-color-bullet" style={{ background: entry.color }} />
+                    <span
+                      style={{
+                        fontSize: '0.64rem',
+                        fontWeight: 800,
+                        padding: '1px 4px',
+                        borderRadius: '3px',
+                        background: isLead ? '#fbbf24' : 'rgba(255, 255, 255, 0.12)',
+                        color: isLead ? '#110822' : '#94a3b8',
+                        fontFamily: 'var(--font-mono)'
+                      }}
+                    >
+                      {isLead ? '👑 #1' : `#${idx + 1}`}
+                    </span>
                     {flagUrl && (
                       <img
                         src={flagUrl}
@@ -168,12 +323,13 @@ export default function CompareModal({
                         onError={(e) => { e.target.style.display = 'none'; }}
                       />
                     )}
-                    <span>{profile?.name || countryCode}:</span>
+                    <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '0.8rem' }}>
+                      {profile?.name || countryCode}
+                    </span>
                   </div>
-                  <span className="tooltip-indicator-value" style={{ color: entry.color, fontWeight: 700 }}>
-                    {typeof entry.value === 'number'
-                      ? `${selectedMetric === 'gdp' && entry.value > 0 ? '+' : ''}${entry.value.toFixed(1)}%`
-                      : entry.value}
+
+                  <span className="tooltip-indicator-value" style={{ color: bulletColor, fontWeight: 800, fontSize: '0.86rem', fontFamily: 'var(--font-mono)' }}>
+                    {selectedMetric === 'gdp' && val > 0 ? '+' : ''}{val.toFixed(1)}%
                   </span>
                 </div>
               );
@@ -366,59 +522,309 @@ export default function CompareModal({
                 </div>
               )}
 
-              {/* Time-Series Recharts Line Chart */}
+              {/* Dynamic Multi-Mode Chart Card */}
               <div className="compare-modal-chart-card">
                 <div className="compare-modal-chart-header">
-                  <span className="compare-modal-chart-title">
-                    แนวโน้มย้อนหลัง 5 ปี (World Bank Time-Series 2020 – 2025)
-                  </span>
-                  <span className="compare-modal-chart-meta">
-                    อัปเดตแบบเรียลไทม์ · O(1) Memory Cache
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                    <span className="compare-modal-chart-title">
+                      แนวโน้มสถิติย้อนหลัง 5 ปี (2020 – 2025)
+                    </span>
+                    <div className="indicator-chart-mode-toggle">
+                      <button
+                        type="button"
+                        onClick={() => setChartType('bar')}
+                        className={`mode-toggle-btn ${chartType === 'bar' ? 'active' : ''}`}
+                        title="กราฟแท่งจัดกลุ่มเคียงข้างกัน"
+                      >
+                        <BarChart3 size={12} />
+                        <span>แท่งเคียงข้าง (Bar)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setChartType('line')}
+                        className={`mode-toggle-btn ${chartType === 'line' ? 'active' : ''}`}
+                        title="กราฟเส้นแนวโน้ม"
+                      >
+                        <TrendingUp size={12} />
+                        <span>เส้นแนวโน้ม (Line)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setChartType('area')}
+                        className={`mode-toggle-btn ${chartType === 'area' ? 'active' : ''}`}
+                        title="กราฟพื้นที่ไล่เฉด"
+                      >
+                        <Activity size={12} />
+                        <span>พื้นที่ (Area)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setChartType('radar')}
+                        className={`mode-toggle-btn ${chartType === 'radar' ? 'active' : ''}`}
+                        title="กราฟเรดาร์สมรรถนะ 5 เสาหลัก"
+                      >
+                        <Compass size={12} />
+                        <span>เรดาร์ (Radar)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowDataLabels(v => !v)}
+                      className={`compare-view-opt-btn ${showDataLabels ? 'active' : ''}`}
+                      style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
+                      title="เปิด/ปิดตัวเลขบนกราฟ"
+                    >
+                      <SlidersHorizontal size={11} />
+                      <span>ตัวเลข {showDataLabels ? '✓' : ''}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowGrid(v => !v)}
+                      className={`compare-view-opt-btn ${showGrid ? 'active' : ''}`}
+                      style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
+                      title="เปิด/ปิดเส้นสเกล"
+                    >
+                      <Layers size={11} />
+                      <span>สเกล</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div style={{ width: '100%', height: 320 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={comparisonData?.timeline || []}
-                      margin={{ top: 15, right: 25, left: -10, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(168, 85, 247, 0.08)" vertical={false} />
-                      <XAxis
-                        dataKey="year"
-                        stroke="#64748b"
-                        tick={{ fill: '#e2e8f0', fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)' }}
-                        axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        stroke="#64748b"
-                        tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
-                        unit="%"
-                        axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
-                        tickLine={false}
-                      />
-                      <Tooltip content={<CustomModalTooltip />} />
-                      <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '0.82rem' }} iconType="circle" />
-                      {comparedList.map((code, idx) => {
-                        const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
-                        const profile = (comparisonData?.countries || []).find((c) => c.code === code);
-                        const label = profile ? `${profile.name} (${code})` : code;
-                        return (
-                          <Line
-                            key={code}
-                            type="monotone"
-                            dataKey={`${code}_${selectedMetric}`}
-                            name={label}
-                            stroke={color}
-                            strokeWidth={3}
-                            dot={{ r: 4, strokeWidth: 2, fill: color, stroke: '#110822' }}
-                            activeDot={{ r: 7, strokeWidth: 2, stroke: '#ffffff' }}
-                          />
-                        );
-                      })}
-                    </LineChart>
-                  </ResponsiveContainer>
+                <div style={{ width: '100%', height: 360, marginTop: '0.5rem' }}>
+                  {chartType === 'bar' && (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={comparisonData?.timeline || []}
+                        margin={{ top: 20, right: 25, left: -10, bottom: 5 }}
+                        barGap={3}
+                        barCategoryGap="22%"
+                      >
+                        <defs>
+                          {comparedList.map((code, idx) => {
+                            const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
+                            return (
+                              <linearGradient key={code} id={`modalBarGrad-${code}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={color} stopOpacity={1} />
+                                <stop offset="45%" stopColor={color} stopOpacity={0.85} />
+                                <stop offset="100%" stopColor={color} stopOpacity={0.25} />
+                              </linearGradient>
+                            );
+                          })}
+                        </defs>
+                        <CartesianGrid strokeDasharray="4 6" stroke={showGrid ? "rgba(168, 85, 247, 0.12)" : "transparent"} vertical={false} />
+                        <ReferenceLine y={0} stroke="rgba(255, 255, 255, 0.35)" strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="year"
+                          stroke="#64748b"
+                          tick={{ fill: '#e2e8f0', fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)' }}
+                          axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          stroke="#64748b"
+                          tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
+                          unit="%"
+                          axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                          tickLine={false}
+                        />
+                        <Tooltip content={<CustomModalTooltip />} />
+                        <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '0.82rem' }} iconType="circle" />
+                        {comparedList.map((code, idx) => {
+                          const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
+                          const profile = (comparisonData?.countries || []).find((c) => c.code === code);
+                          const label = profile ? `${profile.name} (${code})` : code;
+                          return (
+                            <Bar
+                              key={code}
+                              dataKey={`${code}_${selectedMetric}`}
+                              name={label}
+                              fill={`url(#modalBarGrad-${code})`}
+                              stroke={color}
+                              strokeWidth={1}
+                              radius={[7, 7, 1, 1]}
+                              maxBarSize={28}
+                            >
+                              {showDataLabels && (
+                                <LabelList
+                                  dataKey={`${code}_${selectedMetric}`}
+                                  position="top"
+                                  fill={color}
+                                  fontSize={9}
+                                  fontFamily="var(--font-mono)"
+                                  fontWeight={700}
+                                  formatter={(val) => val !== undefined && val !== null ? `${Number(val) > 0 ? '+' : ''}${Number(val).toFixed(1)}%` : ''}
+                                />
+                              )}
+                            </Bar>
+                          );
+                        })}
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+
+                  {chartType === 'line' && (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={comparisonData?.timeline || []}
+                        margin={{ top: 20, right: 25, left: -10, bottom: 5 }}
+                      >
+                        <defs>
+                          <filter id="modalLineGlow" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feMerge>
+                              <feMergeNode in="blur" />
+                              <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                          </filter>
+                        </defs>
+                        <CartesianGrid strokeDasharray="4 6" stroke={showGrid ? "rgba(168, 85, 247, 0.12)" : "transparent"} vertical={false} />
+                        <ReferenceLine y={0} stroke="rgba(255, 255, 255, 0.35)" strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="year"
+                          stroke="#64748b"
+                          tick={{ fill: '#e2e8f0', fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)' }}
+                          axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          stroke="#64748b"
+                          tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
+                          unit="%"
+                          axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                          tickLine={false}
+                        />
+                        <Tooltip content={<CustomModalTooltip />} />
+                        <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '0.82rem' }} iconType="circle" />
+                        {comparedList.map((code, idx) => {
+                          const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
+                          const profile = (comparisonData?.countries || []).find((c) => c.code === code);
+                          const label = profile ? `${profile.name} (${code})` : code;
+                          return (
+                            <Line
+                              key={code}
+                              type="monotone"
+                              dataKey={`${code}_${selectedMetric}`}
+                              name={label}
+                              stroke={color}
+                              strokeWidth={3}
+                              filter="url(#modalLineGlow)"
+                              dot={{ r: 4, strokeWidth: 2, fill: '#0c051a', stroke: color }}
+                              activeDot={{ r: 7, strokeWidth: 2.5, stroke: '#ffffff', fill: color }}
+                            >
+                              {showDataLabels && (
+                                <LabelList
+                                  dataKey={`${code}_${selectedMetric}`}
+                                  position="top"
+                                  offset={10}
+                                  fill={color}
+                                  fontSize={9}
+                                  fontFamily="var(--font-mono)"
+                                  fontWeight={700}
+                                  formatter={(val) => val !== undefined && val !== null ? `${Number(val) > 0 ? '+' : ''}${Number(val).toFixed(1)}%` : ''}
+                                />
+                              )}
+                            </Line>
+                          );
+                        })}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
+
+                  {chartType === 'area' && (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={comparisonData?.timeline || []}
+                        margin={{ top: 20, right: 25, left: -10, bottom: 5 }}
+                      >
+                        <defs>
+                          {comparedList.map((code, idx) => {
+                            const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
+                            return (
+                              <linearGradient key={code} id={`modalAreaGrad-${code}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor={color} stopOpacity={0.6} />
+                                <stop offset="50%" stopColor={color} stopOpacity={0.2} />
+                                <stop offset="100%" stopColor={color} stopOpacity={0.0} />
+                              </linearGradient>
+                            );
+                          })}
+                        </defs>
+                        <CartesianGrid strokeDasharray="4 6" stroke={showGrid ? "rgba(168, 85, 247, 0.12)" : "transparent"} vertical={false} />
+                        <ReferenceLine y={0} stroke="rgba(255, 255, 255, 0.35)" strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="year"
+                          stroke="#64748b"
+                          tick={{ fill: '#e2e8f0', fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)' }}
+                          axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          stroke="#64748b"
+                          tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
+                          unit="%"
+                          axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
+                          tickLine={false}
+                        />
+                        <Tooltip content={<CustomModalTooltip />} />
+                        <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '0.82rem' }} iconType="circle" />
+                        {comparedList.map((code, idx) => {
+                          const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
+                          const profile = (comparisonData?.countries || []).find((c) => c.code === code);
+                          const label = profile ? `${profile.name} (${code})` : code;
+                          return (
+                            <Area
+                              key={code}
+                              type="monotone"
+                              dataKey={`${code}_${selectedMetric}`}
+                              name={label}
+                              stroke={color}
+                              strokeWidth={2.8}
+                              fill={`url(#modalAreaGrad-${code})`}
+                            />
+                          );
+                        })}
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  )}
+
+                  {chartType === 'radar' && (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart
+                        data={radarData}
+                        margin={{ top: 15, right: 35, left: 35, bottom: 15 }}
+                      >
+                        <PolarGrid stroke="rgba(168, 85, 247, 0.22)" strokeDasharray="3 3" />
+                        <PolarAngleAxis
+                          dataKey="pillar"
+                          tick={{ fill: '#e2e8f0', fontSize: 10, fontWeight: 700 }}
+                        />
+                        <PolarRadiusAxis
+                          stroke="rgba(148, 163, 184, 0.35)"
+                          tick={{ fill: '#94a3b8', fontSize: 9 }}
+                        />
+                        <Tooltip content={<CustomModalTooltip />} />
+                        <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '0.8rem' }} iconType="circle" />
+                        {comparedList.map((code, idx) => {
+                          const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
+                          const profile = (comparisonData?.countries || []).find((c) => c.code === code);
+                          const label = profile ? `${profile.name} (${code})` : code;
+                          return (
+                            <Radar
+                              key={code}
+                              name={label}
+                              dataKey={code}
+                              stroke={color}
+                              fill={color}
+                              fillOpacity={0.22}
+                              strokeWidth={2.5}
+                            />
+                          );
+                        })}
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </div>
 
