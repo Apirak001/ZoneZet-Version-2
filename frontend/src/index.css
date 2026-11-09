@@ -4978,26 +4978,77 @@ a.tm-contact-row:hover .tm-contact-arrow {
 }
 
 .db-card-explore-btn {
+  --explore-rgb: 168, 85, 247;
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.45rem 0.75rem;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  font-size: 0.76rem;
-  font-weight: 600;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(var(--explore-rgb), 0.18) 0%, rgba(var(--explore-rgb), 0.07) 100%);
+  border: 1px solid rgba(var(--explore-rgb), 0.35);
+  color: #e9d5ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.db-card-explore-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.16) 50%, transparent 100%);
+  transform: skewX(-18deg);
+  transition: left 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.db-card-explore-btn svg {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .db-card-explore-btn:hover {
-  background: rgba(168, 85, 247, 0.15);
-  border-color: rgba(192, 132, 252, 0.4);
+  background: linear-gradient(135deg, rgba(var(--explore-rgb), 0.32) 0%, rgba(var(--explore-rgb), 0.12) 100%);
+  border-color: rgba(var(--explore-rgb), 0.72);
   color: #ffffff;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -10px rgba(var(--explore-rgb), 0.65);
+}
+
+.db-card-explore-btn:hover::before {
+  left: 120%;
+}
+
+.db-card-explore-btn:hover svg {
+  transform: translateX(3px);
+}
+
+.db-card-explore-btn:active {
+  transform: translateY(0);
+}
+
+/* Type-specific accent colours for the explore button */
+.db-metric-card.theme-gdp .db-card-explore-btn {
+  --explore-rgb: 52, 211, 153;
+  color: #d1fae5;
+}
+
+.db-metric-card.theme-inflation .db-card-explore-btn {
+  --explore-rgb: 244, 63, 94;
+  color: #ffe4e6;
+}
+
+.db-metric-card.theme-unemployment .db-card-explore-btn {
+  --explore-rgb: 56, 189, 248;
+  color: #e0f2fe;
 }
 
 /* MetricCard Mini Visual Bar */
@@ -5549,114 +5600,146 @@ a.tm-contact-row:hover .tm-contact-arrow {
 }
 
 .db-region-box.is-global {
-  background: linear-gradient(145deg, rgba(34, 18, 64, 0.9) 0%, rgba(18, 10, 36, 0.95) 100%);
-  border: 1px solid rgba(234, 179, 8, 0.4);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), 0 0 25px rgba(234, 179, 8, 0.15);
+  background:
+    radial-gradient(150% 120% at 100% 0%, rgba(234, 179, 8, 0.16) 0%, transparent 55%),
+    linear-gradient(155deg, rgba(38, 24, 60, 0.94) 0%, rgba(18, 10, 34, 0.97) 100%);
+  border-color: rgba(234, 179, 8, 0.42);
+  box-shadow:
+    0 18px 38px -18px rgba(0, 0, 0, 0.85),
+    0 0 26px rgba(234, 179, 8, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .db-region-box.is-global::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #eab308, #c084fc, transparent);
+  background: radial-gradient(circle, #eab308 0%, transparent 68%);
+  opacity: 0.2;
 }
 
 .db-region-box {
   position: relative;
-  border-radius: 16px;
-  background: linear-gradient(145deg, rgba(22, 14, 44, 0.75) 0%, rgba(13, 8, 26, 0.88) 100%);
-  border: 1px solid rgba(168, 85, 247, 0.18);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 1.25rem 1.35rem;
+  border-radius: 20px;
+  background:
+    radial-gradient(140% 110% at 100% 0%, rgba(168, 85, 247, 0.1) 0%, transparent 55%),
+    linear-gradient(155deg, rgba(24, 15, 46, 0.92) 0%, rgba(11, 7, 24, 0.96) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  box-shadow:
+    0 16px 34px -18px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 1.3rem 1.35rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1rem;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 1.05rem;
+  min-height: 232px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease,
+              box-shadow 0.35s ease;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .db-region-box::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--region-accent, #a855f7), transparent);
-  opacity: 0.9;
+  top: -70px;
+  right: -60px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--region-accent, #a855f7) 0%, transparent 68%);
+  opacity: 0.15;
+  filter: blur(6px);
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.35s ease;
 }
 
 .db-region-box:hover {
   transform: translateY(-4px);
-  border-color: rgba(168, 85, 247, 0.4);
-  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.42);
+  box-shadow:
+    0 22px 42px -18px rgba(0, 0, 0, 0.85),
+    0 0 28px rgba(168, 85, 247, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.db-region-box:hover::before {
+  opacity: 0.26;
 }
 
 .db-region-box-header {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .db-region-title-wrap {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.db-region-name-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 3.7rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .db-region-icon-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(168, 85, 247, 0.15);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
-  border: 1px solid rgba(168, 85, 247, 0.25);
+  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .db-region-name-en {
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
-  line-height: 1.2;
+  padding-right: 88px;
+  line-height: 1.25;
 }
 
 .db-region-name-th {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #94a3b8;
-  margin: 0;
+  margin: 2px 0 0;
+  white-space: nowrap;
 }
 
 .db-region-nations-pill {
+  position: absolute;
+  top: 0;
+  right: 0;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 700;
-  padding: 0.2rem 0.55rem;
+  padding: 0.22rem 0.55rem;
   border-radius: 999px;
-  background: rgba(168, 85, 247, 0.12);
+  background: rgba(168, 85, 247, 0.1);
   color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.25);
+  border: 1px solid rgba(168, 85, 247, 0.24);
   white-space: nowrap;
 }
 
 .db-region-stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.5rem;
-  padding: 0.75rem 0.65rem;
-  border-radius: 10px;
-  background: rgba(10, 6, 22, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .db-region-stat-col {
@@ -5664,26 +5747,37 @@ a.tm-contact-row:hover .tm-contact-arrow {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 2px;
+  gap: 0.15rem;
+  padding: 0.7rem 0.3rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.db-region-stat-col:hover {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.26);
+  transform: translateY(-1px);
 }
 
 .db-region-stat-val {
   font-family: var(--font-mono);
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   font-weight: 800;
   line-height: 1.1;
 }
 
 .db-region-stat-lbl {
-  font-size: 0.68rem;
-  color: #64748b;
+  font-size: 0.66rem;
+  color: #94a3b8;
   font-weight: 600;
 }
 
 .db-region-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding-top: 0.65rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 0.78rem;
@@ -5955,11 +6049,18 @@ a.tm-contact-row:hover .tm-contact-arrow {
 }
 
 .indicator-hero-subtext {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   color: #94a3b8;
   line-height: 1.6;
   margin: 0;
-  max-width: 950px;
+  max-width: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .indicator-hero-subtext {
+    white-space: normal;
+  }
 }
 
 /* Meta Trust Pills Row */

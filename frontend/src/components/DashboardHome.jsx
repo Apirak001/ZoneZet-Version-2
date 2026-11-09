@@ -9,8 +9,6 @@ import {
   Users,
   Layers,
   Sparkles,
-  ShieldCheck,
-  CheckCircle2,
   Globe,
   Globe2,
   Compass,
@@ -19,12 +17,10 @@ import {
   Sun,
   Mountain,
   Building2,
-  ArrowRight,
   Calendar,
   History,
   ChevronDown,
-  Check,
-  Zap
+  Check
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -242,7 +238,7 @@ export default function DashboardHome({
               <div className="tooltip-indicator-row">
                 <div className="tooltip-indicator-name">
                   <span className="tooltip-color-bullet" style={{ background: '#f43f5e' }} />
-                  <span>อัตราเงินเฟ้อ CPI:</span>
+                  <span>อัตราเงินเฟ้อ:</span>
                 </div>
                 <span className="tooltip-indicator-value" style={{ color: '#fb7185' }}>
                   {dataPoint?.infCountry ? `${dataPoint.infCountry} ` : ''}
@@ -289,7 +285,7 @@ export default function DashboardHome({
                   {activeChartMode === 'gdp'
                     ? 'GDP Growth'
                     : activeChartMode === 'inflation'
-                    ? 'อัตราเงินเฟ้อ CPI'
+                    ? 'อัตราเงินเฟ้อ'
                     : 'อัตราการว่างงาน'}
                   :
                 </span>
@@ -362,7 +358,7 @@ export default function DashboardHome({
             <div className="tooltip-indicator-row">
               <div className="tooltip-indicator-name">
                 <span className="tooltip-color-bullet" style={{ background: '#f43f5e' }} />
-                <span>อัตราเงินเฟ้อ CPI เฉลี่ย:</span>
+                <span>อัตราเงินเฟ้อเฉลี่ย:</span>
               </div>
               <span className="tooltip-indicator-value" style={{ color: '#fb7185' }}>
                 {hasInf ? `${item.avgInflation}%` : '-'}
@@ -429,34 +425,18 @@ export default function DashboardHome({
               <span>GLOBAL MACRO BENCHMARK · {selectedYear}</span>
             </div>
             <h1 className="indicator-hero-big-title">
-              ภาพรวมแดชบอร์ดเศรษฐกิจมหภาค <span className="title-en-gradient">Global Macro Benchmark {selectedYear}</span>
+              ภาพรวมแดชบอร์ดเศรษฐกิจมหภาค
             </h1>
             <p className="indicator-hero-subtext">
-              ติดตามและวิเคราะห์ 5 อันดับแรกของดัชนีชี้วัดหลัก (GDP Growth, อัตราเงินเฟ้อ CPI, การว่างงาน) พร้อมสถิติเฉลี่ย 7 ทวีปทั่วโลก ย้อนหลัง 5 ปี (2020 - 2025)
+              ติดตามและวิเคราะห์ 5 อันดับแรกของดัชนีชี้วัดหลัก GDP Growth, อัตราเงินเฟ้อ, การว่างงาน พร้อมสถิติเฉลี่ย 7 ทวีปทั่วโลก ย้อนหลัง 5 ปี (2020 - 2025)
             </p>
-
-            {/* Luxury Meta Trust Badges */}
-            <div className="indicator-meta-badges-row">
-              <div className="indicator-meta-pill">
-                <span className="pulse-indicator-dot green" />
-                <span>World Bank Live Stream</span>
-              </div>
-              <div className="indicator-meta-pill">
-                <ShieldCheck size={13} color="#c084fc" />
-                <span>182 ประเทศเอกราช (100% Sovereign)</span>
-              </div>
-              <div className="indicator-meta-pill">
-                <Zap size={13} color="#38bdf8" />
-                <span>In-Memory Hash Map O(1) &lt; 0.05ms</span>
-              </div>
-            </div>
           </div>
 
           {/* Luxury Year Selector Card with Custom Dropdown & Fast Pills */}
           <div className="db-year-selector-card">
             <div className="db-year-selector-label">
               <Calendar size={14} color="#c084fc" />
-              <span>รอบปี ค.ศ.:</span>
+              <span>รอบปี ค.ศ.</span>
             </div>
 
             {/* Custom Interactive Year Dropdown (Clean & Simple) */}
@@ -540,10 +520,10 @@ export default function DashboardHome({
                 <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(168, 85, 247, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc', boxShadow: '0 0 15px rgba(168, 85, 247, 0.3)' }}>
                   <BarChart3 size={18} />
                 </div>
-                <span>ภาพรวมสัดส่วน 3 ดัชนีหลัก (Macroeconomic Comparative Matrix)</span>
+                <span>ภาพรวมสัดส่วน 3 ดัชนีหลัก</span>
               </h3>
               <p style={{ color: '#94a3b8', fontSize: '0.84rem', marginTop: '6px', margin: 0 }}>
-                เปรียบเทียบความสัมพันธ์ระหว่างอัตราการเติบโต GDP, เสถียรภาพอัตราเงินเฟ้อ CPI และตลาดแรงงานของกลุ่มประเทศผู้นำ
+                เปรียบเทียบความสัมพันธ์ระหว่างอัตราการเติบโต GDP, อัตราเงินเฟ้อ และอัตราการว่างงานของกลุ่มประเทศผู้นำ
               </p>
             </div>
 
@@ -568,7 +548,7 @@ export default function DashboardHome({
                 className={`db-chart-tab-btn ${activeChartMode === 'inflation' ? 'active' : ''}`}
               >
                 <Percent size={13} style={{ color: activeChartMode === 'inflation' ? '#ffffff' : '#f43f5e' }} />
-                <span>เงินเฟ้อ CPI</span>
+                <span>เงินเฟ้อ</span>
               </button>
               <button
                 onClick={() => setActiveChartMode('unemployment')}
@@ -577,150 +557,6 @@ export default function DashboardHome({
                 <Users size={13} style={{ color: activeChartMode === 'unemployment' ? '#ffffff' : '#38bdf8' }} />
                 <span>อัตราว่างงาน</span>
               </button>
-            </div>
-          </div>
-
-          {/* 4 Luxury KPI Cards */}
-          <div className="db-chart-kpi-bar">
-            {/* Card 1: GDP Leader */}
-            <div className="db-kpi-card" style={{ '--kpi-accent': '#34d399' }}>
-              <div className="db-kpi-card-top">
-                <div className="db-kpi-card-icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
-                  <TrendingUp size={20} />
-                </div>
-                <span className="db-kpi-tag" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
-                  TOP #1 GDP
-                </span>
-              </div>
-              <div className="db-kpi-card-middle">
-                <div className="db-kpi-val" style={{ color: '#34d399' }}>
-                  <AnimatedValue
-                    key={`gdp-${selectedYear}-${gdpItems[0]?.value}`}
-                    value={gdpItems[0] ? `+${gdpItems[0].value}%` : '+19.3%'}
-                    duration={1400}
-                    delay={100}
-                  />
-                </div>
-                <div className="db-kpi-lbl">ผู้นำการเติบโต GDP สูงสุด</div>
-              </div>
-              <div className="db-kpi-card-footer">
-                {gdpItems[0]?.iso2 && (
-                  <img
-                    src={`https://flagcdn.com/w40/${gdpItems[0].iso2.toLowerCase()}.png`}
-                    alt={gdpItems[0]?.country}
-                    className="db-kpi-country-flag"
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                )}
-                <span style={{ fontWeight: 600 }}>{gdpItems[0]?.country || 'Guyana'}</span>
-              </div>
-              <div className="indicator-kpi-gauge-track">
-                <div className="indicator-kpi-gauge-fill" style={{ width: '100%', background: '#34d399' }} />
-              </div>
-            </div>
-
-            {/* Card 2: CPI Peak */}
-            <div className="db-kpi-card" style={{ '--kpi-accent': '#f43f5e' }}>
-              <div className="db-kpi-card-top">
-                <div className="db-kpi-card-icon" style={{ background: 'rgba(244, 63, 94, 0.15)', color: '#f43f5e' }}>
-                  <Percent size={20} />
-                </div>
-                <span className="db-kpi-tag" style={{ background: 'rgba(244, 63, 94, 0.15)', color: '#fb7185', border: '1px solid rgba(244, 63, 94, 0.3)' }}>
-                  PEAK CPI
-                </span>
-              </div>
-              <div className="db-kpi-card-middle">
-                <div className="db-kpi-val" style={{ color: '#fb7185' }}>
-                  <AnimatedValue
-                    key={`inf-${selectedYear}-${inflationItems[0]?.value}`}
-                    value={inflationItems[0] ? `${inflationItems[0].value}%` : '42.2%'}
-                    duration={1400}
-                    delay={200}
-                  />
-                </div>
-                <div className="db-kpi-lbl">อัตราเงินเฟ้อสูงสุดในกลุ่ม</div>
-              </div>
-              <div className="db-kpi-card-footer">
-                {inflationItems[0]?.iso2 && (
-                  <img
-                    src={`https://flagcdn.com/w40/${inflationItems[0].iso2.toLowerCase()}.png`}
-                    alt={inflationItems[0]?.country}
-                    className="db-kpi-country-flag"
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                )}
-                <span style={{ fontWeight: 600 }}>{inflationItems[0]?.country || 'Iran, Islamic Rep.'}</span>
-              </div>
-              <div className="indicator-kpi-gauge-track">
-                <div className="indicator-kpi-gauge-fill" style={{ width: '85%', background: '#f43f5e' }} />
-              </div>
-            </div>
-
-            {/* Card 3: Labor Peak */}
-            <div className="db-kpi-card" style={{ '--kpi-accent': '#38bdf8' }}>
-              <div className="db-kpi-card-top">
-                <div className="db-kpi-card-icon" style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8' }}>
-                  <Users size={20} />
-                </div>
-                <span className="db-kpi-tag" style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-                  PEAK UNEMP
-                </span>
-              </div>
-              <div className="db-kpi-card-middle">
-                <div className="db-kpi-val" style={{ color: '#38bdf8' }}>
-                  <AnimatedValue
-                    key={`unemp-${selectedYear}-${unemploymentItems[0]?.value}`}
-                    value={unemploymentItems[0] ? `${unemploymentItems[0].value}%` : '34.2%'}
-                    duration={1400}
-                    delay={300}
-                  />
-                </div>
-                <div className="db-kpi-lbl">อัตราการว่างงานสูงสุด</div>
-              </div>
-              <div className="db-kpi-card-footer">
-                {unemploymentItems[0]?.iso2 && (
-                  <img
-                    src={`https://flagcdn.com/w40/${unemploymentItems[0].iso2.toLowerCase()}.png`}
-                    alt={unemploymentItems[0]?.country}
-                    className="db-kpi-country-flag"
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                )}
-                <span style={{ fontWeight: 600 }}>{unemploymentItems[0]?.country || 'Eswatini'}</span>
-              </div>
-              <div className="indicator-kpi-gauge-track">
-                <div className="indicator-kpi-gauge-fill" style={{ width: '70%', background: '#38bdf8' }} />
-              </div>
-            </div>
-
-            {/* Card 4: Verified World Bank */}
-            <div className="db-kpi-card" style={{ '--kpi-accent': '#818cf8' }}>
-              <div className="db-kpi-card-top">
-                <div className="db-kpi-card-icon" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}>
-                  <ShieldCheck size={20} />
-                </div>
-                <span className="db-kpi-tag" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', border: '1px solid rgba(129, 140, 248, 0.3)' }}>
-                  VERIFIED
-                </span>
-              </div>
-              <div className="db-kpi-card-middle">
-                <div className="db-kpi-val" style={{ color: '#ffffff' }}>
-                  <AnimatedValue
-                    key={`verified-${selectedYear}`}
-                    value="100%"
-                    duration={1200}
-                    delay={400}
-                  />
-                </div>
-                <div className="db-kpi-lbl">รับรองความถูกต้องของข้อมูล</div>
-              </div>
-              <div className="db-kpi-card-footer">
-                <CheckCircle2 size={15} color="#34d399" />
-                <span style={{ fontWeight: 600, color: '#94a3b8' }}>World Bank Live API</span>
-              </div>
-              <div className="indicator-kpi-gauge-track">
-                <div className="indicator-kpi-gauge-fill" style={{ width: '100%', background: '#818cf8' }} />
-              </div>
             </div>
           </div>
 
@@ -781,7 +617,7 @@ export default function DashboardHome({
                     fill="url(#dbInflationGrad)"
                     radius={[8, 8, 2, 2]}
                     barSize={24}
-                    name="อัตราเงินเฟ้อ CPI (%)"
+                    name="อัตราเงินเฟ้อ (%)"
                   />
                   <Bar
                     dataKey="Unemployment"
@@ -870,7 +706,7 @@ export default function DashboardHome({
                     fill="url(#inflationSoloGrad)"
                     radius={[10, 10, 2, 2]}
                     barSize={48}
-                    name="อัตราเงินเฟ้อ CPI (%)"
+                    name="อัตราเงินเฟ้อ (%)"
                   >
                     <LabelList
                       dataKey="value"
@@ -940,18 +776,14 @@ export default function DashboardHome({
         <div className="db-regional-card">
           {/* Section Header */}
           <div style={{ marginBottom: '1.25rem' }}>
-            <div className="hero-badge-tag" style={{ marginBottom: '0.45rem', display: 'inline-flex' }}>
-              <span className="badge-sparkle">✦</span>
-              <span>CONTINENTAL &amp; REGIONAL BENCHMARK · {selectedYear}</span>
-            </div>
             <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.65rem', margin: 0 }}>
               <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#38bdf8', boxShadow: '0 0 15px rgba(56, 189, 248, 0.25)' }}>
                 <Globe size={18} />
               </div>
-              <span>สถิติเศรษฐกิจเฉลี่ยรายภูมิภาคโลก (Regional Macro Benchmark)</span>
+              <span>สถิติเศรษฐกิจเฉลี่ยรายภูมิภาคโลก</span>
             </h3>
             <p style={{ color: '#94a3b8', fontSize: '0.86rem', marginTop: '6px', margin: 0 }}>
-              สรุปภาพรวมอัตราการเติบโตเฉลี่ย GDP, เสถียรภาพอัตราเงินเฟ้อ CPI และตลาดแรงงาน จำแนกตาม 7 ทวีปหลักทั่วโลกเทียบกับค่าเฉลี่ยสากล
+              สรุปภาพรวมอัตราการเติบโตเฉลี่ย GDP, อัตราเงินเฟ้อ และอัตราการว่างงาน จำแนกตาม 7 ทวีปหลักทั่วโลก
             </p>
           </div>
 
@@ -978,7 +810,7 @@ export default function DashboardHome({
                       >
                         {iconCfg.icon}
                       </div>
-                      <div>
+                      <div className="db-region-name-block">
                         <h4 className="db-region-name-en">{reg.name}</h4>
                         <div className="db-region-name-th">{reg.thai}</div>
                       </div>
@@ -1023,41 +855,6 @@ export default function DashboardHome({
                     <span className="db-region-stat-lbl">ว่างงานเฉลี่ย</span>
                   </div>
                 </div>
-
-                {/* Micro Performance Gauge for Continent GDP */}
-                <div className="db-region-micro-gauge">
-                  <div
-                    className="db-region-micro-fill"
-                    style={{
-                      width: `${Math.min(Math.max((reg.avgGdp / (regionalData[0]?.avgGdp || 10)) * 100, 15), 100)}%`,
-                      background: iconCfg.color
-                    }}
-                  />
-                </div>
-
-                <div className="db-region-footer">
-                  <div className="db-region-leader-info">
-                    {reg.topCountry?.iso2 && (
-                      <img
-                        src={`https://flagcdn.com/w40/${reg.topCountry.iso2.toLowerCase()}.png`}
-                        alt={reg.topCountry?.name}
-                        className="db-kpi-country-flag"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
-                    )}
-                    <span style={{ fontSize: '0.74rem' }}>
-                      {reg.isGlobal ? 'สถิติสูงสุด: ' : 'ผู้นำ GDP: '}
-                      <strong style={{ color: '#ffffff' }}>{reg.topCountry?.name || '-'}</strong> ({reg.topCountry?.val || 0}%)
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab('gdp')}
-                    className="db-region-explore-btn"
-                  >
-                    <span>ดูตาราง</span>
-                    <ArrowRight size={12} />
-                  </button>
-                </div>
               </div>
             );
           })}
@@ -1069,7 +866,7 @@ export default function DashboardHome({
               <div>
                 <h4 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
                   <BarChart3 size={16} color="#c084fc" />
-                  <span>กราฟวิเคราะห์เปรียบเทียบเชิงลึกรายภูมิภาค (Continental Comparative Matrix)</span>
+                  <span>กราฟวิเคราะห์เปรียบเทียบรายภูมิภาค</span>
                 </h4>
                 <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '4px', margin: 0 }}>
                   เปรียบเทียบดัชนีชี้วัดของแต่ละทวีปทั่วโลกแบบ Multi-Bar Dynamic View
@@ -1097,7 +894,7 @@ export default function DashboardHome({
                   className={`db-chart-tab-btn ${regionalChartMode === 'inflation' ? 'active' : ''}`}
                 >
                   <Percent size={13} style={{ color: regionalChartMode === 'inflation' ? '#ffffff' : '#f43f5e' }} />
-                  <span>เงินเฟ้อ CPI เฉลี่ย</span>
+                  <span>เงินเฟ้อเฉลี่ย</span>
                 </button>
                 <button
                   onClick={() => setRegionalChartMode('unemployment')}
@@ -1165,7 +962,7 @@ export default function DashboardHome({
                       fill="url(#regInfGrad)"
                       radius={[8, 8, 2, 2]}
                       barSize={20}
-                      name="อัตราเงินเฟ้อ CPI เฉลี่ย (%)"
+                      name="อัตราเงินเฟ้อเฉลี่ย (%)"
                     />
                     <Bar
                       dataKey="avgUnemployment"
@@ -1252,7 +1049,7 @@ export default function DashboardHome({
                       fill="url(#regSoloInf)"
                       radius={[10, 10, 2, 2]}
                       barSize={44}
-                      name="อัตราเงินเฟ้อ CPI เฉลี่ย (%)"
+                      name="อัตราเงินเฟ้อเฉลี่ย (%)"
                     >
                       <LabelList
                         dataKey="avgInflation"

@@ -337,7 +337,7 @@ export default function IndicatorView({
         <div className="db-year-selector-card">
           <div className="db-year-selector-label">
             <Calendar size={14} color="#c084fc" />
-            <span>รอบปี ค.ศ.:</span>
+            <span>รอบปี ค.ศ.</span>
           </div>
 
           {/* Custom Interactive Year Dropdown (Clean & Simple) */}

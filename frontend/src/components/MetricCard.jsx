@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   TrendingUp,
   Percent,
@@ -40,12 +40,6 @@ export default function MetricCard({
     if (idx === 2) return 'db-rank-pill bronze';
     return 'db-rank-pill';
   };
-
-  const maxVal = useMemo(() => {
-    if (!items || items.length === 0) return 10;
-    const peak = Math.max(...items.slice(0, 5).map(i => Math.abs(i.value) || 0));
-    return peak > 0 ? peak : 10;
-  }, [items]);
 
   return (
     <div className={`db-metric-card theme-${type}`}>
@@ -90,14 +84,6 @@ export default function MetricCard({
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                  <div className="db-country-bar-track">
-                    <div
-                      className={`db-country-bar-fill ${type}`}
-                      style={{
-                        width: `${Math.min(Math.max((Math.abs(item.value) / maxVal) * 100, 10), 100)}%`
-                      }}
-                    />
-                  </div>
                   <span className={getValueBadgeClass(item.trend, item.colorClass)}>
                     {item.trend === 'up' ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                     <AnimatedValue
@@ -122,7 +108,7 @@ export default function MetricCard({
           className="db-card-explore-btn"
           title={`คลิกเพื่อดูตารางสถิติและกราฟิกฉบับเต็มของ ${title}`}
         >
-          <span>เปิดตารางวิเคราะห์ฉบับเต็ม ({type.toUpperCase()})</span>
+          <span>เปิดตารางวิเคราะห์ฉบับเต็ม</span>
           <ArrowRight size={13} />
         </button>
       </div>
