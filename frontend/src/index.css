@@ -7163,6 +7163,238 @@ a.tm-contact-row:hover .tm-contact-arrow {
   box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
 }
 
+/* Compare Chart Toolbar Row & Mode Switcher */
+.compare-chart-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.15rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+  flex-wrap: wrap;
+}
+
+.compare-chart-mode-hint {
+  font-size: 0.76rem;
+  color: #c084fc;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Country Spotlight Ticker Bar (Interactive Nation Focus) */
+.compare-spotlight-bar {
+  margin-top: 1.15rem;
+  padding: 0.85rem 1rem;
+  background: rgba(14, 7, 30, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.18);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.compare-spotlight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.compare-spotlight-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  color: #c084fc;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.compare-spotlight-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compare-spotlight-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: #ffffff;
+}
+
+.compare-spotlight-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.65rem;
+}
+
+.compare-spotlight-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(17, 8, 34, 0.65);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+}
+
+.compare-spotlight-chip:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.compare-spotlight-chip.focused {
+  transform: translateY(-2px);
+}
+
+.compare-spotlight-chip.muted {
+  opacity: 0.35;
+  filter: grayscale(40%);
+}
+
+.compare-spotlight-chip-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.compare-spotlight-rank {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  line-height: 1.2;
+}
+
+.compare-spotlight-flag {
+  width: 18px;
+  height: 12px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.compare-spotlight-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-spotlight-chip-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.compare-spotlight-val {
+  font-size: 0.88rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+
+.compare-spotlight-diff {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+.compare-spotlight-diff.up {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+}
+
+.compare-spotlight-diff.down {
+  color: #fb7185;
+  background: rgba(251, 113, 133, 0.12);
+}
+
+/* Chart Canvas Container & View Controls */
+.compare-chart-view-options {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.compare-view-opt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compare-view-opt-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.compare-view-opt-btn.active {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: rgba(168, 85, 247, 0.55);
+  color: #c084fc;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+}
+
+.compare-chart-canvas-container {
+  width: 100%;
+  height: 440px;
+  margin-top: 1rem;
+  background: radial-gradient(ellipse at 50% 25%, rgba(168, 85, 247, 0.08) 0%, rgba(56, 189, 248, 0.03) 40%, rgba(10, 4, 22, 0.45) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem 0.85rem 0.75rem 0.5rem;
+  box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.compare-chart-canvas-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.6), rgba(56, 189, 248, 0.6), transparent);
+  pointer-events: none;
+}
+
 /* Side-by-Side Snapshot Cards Matrix */
 .compare-matrix-grid {
   display: grid;

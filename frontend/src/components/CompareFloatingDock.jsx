@@ -54,7 +54,7 @@ export default function CompareFloatingDock({
   if (!comparedList || comparedList.length === 0) return null;
 
   const count = comparedList.length;
-  const remainingSlots = Math.max(0, 5 - count);
+  const remainingSlots = Math.max(0, 4 - count);
 
   // If user minimized the bar to a compact pill
   if (isMinimized) {
@@ -70,7 +70,7 @@ export default function CompareFloatingDock({
           title="คลิกเพื่อขยายแถบเปรียบเทียบ"
         >
           <GitCompare size={15} color="#c084fc" />
-          <span>ชุดเปรียบเทียบ ({count}/5)</span>
+          <span>ชุดเปรียบเทียบ ({count}/4)</span>
           <ChevronUp size={14} color="#a855f7" />
         </button>
 
@@ -102,7 +102,7 @@ export default function CompareFloatingDock({
             <div className="compare-dock-title-wrap">
               <span className="compare-dock-title">ชุดเปรียบเทียบพหุภาคี</span>
               <span className="compare-dock-count-badge">
-                {count} / 5 ประเทศ
+                {count} / 4 ประเทศ
               </span>
             </div>
             <p className="compare-dock-subtitle">
