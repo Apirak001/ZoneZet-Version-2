@@ -1,20 +1,52 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import LandingAboutView from './components/LandingAboutView';
-import DashboardHome from './components/DashboardHome';
-import IndicatorView from './components/IndicatorView';
-import ComparisonHub from './components/ComparisonHub';
-import SystemHealthView from './components/SystemHealthView';
 import UndoToast from './components/UndoToast';
-import CompareFloatingDock from './components/CompareFloatingDock';
-import CompareModal from './components/CompareModal';
 import PageTransitionLoader from './components/PageTransitionLoader';
 import CustomCursor from './components/CustomCursor';
+import { LoadingSkeleton } from './components/FeedbackStates';
 import { fetchIndicators, fetchDashboardSummary, fetchCacheStats } from './services/api';
 import { globalUndoStack } from './utils/dsa/undoStack';
+
+// Route-level dynamic imports with preloader factories (bundle-dynamic-imports & bundle-preload)
+const loadLandingAboutView = () => import('./components/LandingAboutView');
+const loadDashboardHome = () => import('./components/DashboardHome');
+const loadIndicatorView = () => import('./components/IndicatorView');
+const loadComparisonHub = () => import('./components/ComparisonHub');
+const loadSystemHealthView = () => import('./components/SystemHealthView');
+const loadCompareModal = () => import('./components/CompareModal');
+
+const LandingAboutView = lazy(loadLandingAboutView);
+const DashboardHome = lazy(loadDashboardHome);
+const IndicatorView = lazy(loadIndicatorView);
+const ComparisonHub = lazy(loadComparisonHub);
+const SystemHealthView = lazy(loadSystemHealthView);
+const CompareModal = lazy(loadCompareModal);
+
+const VALID_TABS = new Set(['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'health']);
+
+// In-memory storage cache to minimize synchronous localStorage reads (js-cache-storage)
+const storageCache = new Map();
+function getCachedStorage(key) {
+  if (!storageCache.has(key)) {
+    try {
+      storageCache.set(key, localStorage.getItem(key));
+    } catch {
+      return null;
+    }
+  }
+  return storageCache.get(key);
+}
+function setCachedStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    storageCache.set(key, value);
+  } catch (e) {
+    console.warn('Storage error:', e);
+  }
+}
 
 export default function App() {
   const [lenisInstance, setLenisInstance] = useState(null);
@@ -77,12 +109,11 @@ export default function App() {
   const getInitialTab = () => {
     try {
       const hash = window.location.hash.replace('#', '').trim();
-      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'health'];
-      if (hash && validTabs.includes(hash)) {
+      if (hash && VALID_TABS.has(hash)) {
         return hash;
       }
-      const savedTab = localStorage.getItem('zonezet_active_tab');
-      if (savedTab && validTabs.includes(savedTab)) {
+      const savedTab = getCachedStorage('zonezet_active_tab');
+      if (savedTab && VALID_TABS.has(savedTab)) {
         return savedTab;
       }
     } catch (e) {
@@ -94,15 +125,36 @@ export default function App() {
   const [activeTab, setActiveTabState] = useState(getInitialTab);
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
+  // Preload route chunk on hover/focus (bundle-preload)
+  const handlePreloadTab = useCallback((tabId) => {
+    switch (tabId) {
+      case 'landing':
+        loadLandingAboutView();
+        break;
+      case 'home':
+        loadDashboardHome();
+        break;
+      case 'gdp':
+      case 'inflation':
+      case 'unemployment':
+        loadIndicatorView();
+        break;
+      case 'compare':
+        loadComparisonHub();
+        break;
+      case 'health':
+        loadSystemHealthView();
+        break;
+      default:
+        break;
+    }
+  }, []);
+
   // Sync activeTab to localStorage and URL Hash
   useEffect(() => {
-    try {
-      localStorage.setItem('zonezet_active_tab', activeTab);
-      if (window.location.hash.replace('#', '') !== activeTab) {
-        window.history.replaceState(null, '', `#${activeTab}`);
-      }
-    } catch (e) {
-      console.warn('Tab storage error:', e);
+    setCachedStorage('zonezet_active_tab', activeTab);
+    if (window.location.hash.replace('#', '') !== activeTab) {
+      window.history.replaceState(null, '', `#${activeTab}`);
     }
   }, [activeTab]);
 
@@ -110,8 +162,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').trim();
-      const validTabs = ['landing', 'home', 'gdp', 'inflation', 'unemployment', 'compare', 'health'];
-      if (hash && validTabs.includes(hash)) {
+      if (hash && VALID_TABS.has(hash)) {
         setActiveTabState(hash);
       }
     };
@@ -121,6 +172,7 @@ export default function App() {
 
   // Smooth Page Transition Handler
   const setActiveTab = useCallback((tabId) => {
+    handlePreloadTab(tabId);
     setActiveTabState((prev) => {
       if (prev === tabId) return prev;
       setIsPageTransitioning(true);
@@ -134,9 +186,10 @@ export default function App() {
       }, 500);
       return tabId;
     });
-  }, []);
+  }, [handlePreloadTab]);
+
   const [selectedYear, setSelectedYear] = useState('2025');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
 
   // Data States
   const [topSummary, setTopSummary] = useState({});
@@ -148,7 +201,7 @@ export default function App() {
   // User Interactive Lists with Permanent LocalStorage Persistence
   const [comparedList, setComparedList] = useState(() => {
     try {
-      const saved = localStorage.getItem('zonezet_compared_list');
+      const saved = getCachedStorage('zonezet_compared_list');
       if (saved !== null) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return parsed;
@@ -163,29 +216,27 @@ export default function App() {
 
   // Sync Compared List to localStorage (Permanent deletion and persistence)
   useEffect(() => {
-    try {
-      localStorage.setItem('zonezet_compared_list', JSON.stringify(comparedList));
-    } catch (err) {
-      console.warn('LocalStorage compared sync error:', err);
-    }
+    setCachedStorage('zonezet_compared_list', JSON.stringify(comparedList));
   }, [comparedList]);
-  // Load Initial Top Summary and Cache Stats
+
+  // Load Initial Top Summary and Cache Stats in parallel (async-parallel)
   const loadSummaryAndStats = useCallback(async (year = selectedYear) => {
-    try {
-      const summaryRes = await fetchDashboardSummary(year);
-      setTopSummary(summaryRes.data || {});
-      if (summaryRes.cacheStats) {
-        setCacheStats(summaryRes.cacheStats);
+    const [summaryResult, statsResult] = await Promise.allSettled([
+      fetchDashboardSummary(year),
+      fetchCacheStats()
+    ]);
+
+    if (summaryResult.status === 'fulfilled' && summaryResult.value) {
+      setTopSummary(summaryResult.value.data || {});
+      if (summaryResult.value.cacheStats) {
+        setCacheStats(summaryResult.value.cacheStats);
       }
-    } catch (err) {
-      console.warn('Dashboard summary error:', err);
+    } else if (summaryResult.status === 'rejected') {
+      console.warn('Dashboard summary error:', summaryResult.reason);
     }
 
-    try {
-      const stats = await fetchCacheStats();
-      setCacheStats(stats);
-    } catch (err) {
-      console.warn('Cache stats error:', err);
+    if (statsResult.status === 'fulfilled' && statsResult.value) {
+      setCacheStats(statsResult.value);
     }
   }, [selectedYear]);
 
@@ -193,8 +244,8 @@ export default function App() {
     loadSummaryAndStats(selectedYear);
   }, [selectedYear, loadSummaryAndStats]);
 
-  // Load Active Indicator Data when tab or year changes
-  const loadIndicatorData = useCallback(async () => {
+  // Load Active Indicator Data when tab or year changes with AbortController protection
+  const loadIndicatorData = useCallback(async (signal) => {
     if (!['gdp', 'inflation', 'unemployment'].includes(activeTab)) return;
 
     setIsLoading(true);
@@ -204,14 +255,17 @@ export default function App() {
       const res = await fetchIndicators({
         type: activeTab,
         year: selectedYear,
-        search: searchQuery
+        search: searchQuery,
+        signal
       });
+      if (signal?.aborted) return;
       setIndicatorData(res.data || []);
       setIsLoading(false);
 
-      // Refresh cache stats dynamically
+      // Refresh cache stats dynamically in background
       fetchCacheStats().then(setCacheStats).catch(() => {});
     } catch (err) {
+      if (err.name === 'AbortError' || signal?.aborted) return;
       console.error('Error fetching indicator:', err);
       setError(err.message || 'ไม่สามารถโหลดข้อมูลตัวชี้วัดได้');
       setIsLoading(false);
@@ -219,16 +273,17 @@ export default function App() {
   }, [activeTab, selectedYear, searchQuery]);
 
   useEffect(() => {
-    loadIndicatorData();
+    const controller = new AbortController();
+    loadIndicatorData(controller.signal);
+    return () => controller.abort();
   }, [loadIndicatorData]);
 
-  // Comparison Handlers
-  const handleAddToCompare = (countryCode) => {
+  // Memoized Comparison & Undo Handlers (rerender-functional-setstate)
+  const handleAddToCompare = useCallback((countryCode) => {
     if (!countryCode) return;
     const clean = countryCode.toUpperCase();
     setComparedList((prev) => {
       if (prev.includes(clean)) {
-        // Toggle OFF if already selected
         globalUndoStack.push({
           type: 'REMOVE_COMPARE',
           payload: clean,
@@ -245,16 +300,9 @@ export default function App() {
       setToastMessage(`เพิ่ม ${clean} เข้าชุดเปรียบเทียบแล้ว (${updated.length}/4) — ดูที่แถบลอยด้านล่าง`);
       return updated;
     });
-    // User remains on the current page to comfortably choose multiple countries!
-  };
+  }, []);
 
-  const handleClearCompare = () => {
-    if (!comparedList || comparedList.length === 0) return;
-    setComparedList([]);
-    setToastMessage('ล้างรายชื่อประเทศในชุดเปรียบเทียบทั้งหมดแล้ว');
-  };
-
-  const handleRemoveFromCompare = (countryCode) => {
+  const handleRemoveFromCompare = useCallback((countryCode) => {
     if (!countryCode) return;
     const clean = countryCode.toUpperCase();
     globalUndoStack.push({
@@ -265,19 +313,33 @@ export default function App() {
 
     setComparedList((prev) => prev.filter((c) => c && c.toUpperCase() !== clean));
     setToastMessage(`ลบประเทศ ${clean} ออกจากการเปรียบเทียบแล้ว`);
-  };
-  // DSA Stack Undo / Rollback Handler
-  const handleUndo = () => {
+  }, []);
+
+  const handleUndo = useCallback(() => {
     const lastAction = globalUndoStack.pop();
-    if (!lastAction) return;if (lastAction.type === 'REMOVE_COMPARE') {
-      setComparedList(prev => [...prev, lastAction.payload]);
+    if (!lastAction) return;
+    if (lastAction.type === 'REMOVE_COMPARE') {
+      setComparedList((prev) => (prev.includes(lastAction.payload) ? prev : [...prev, lastAction.payload]));
       setToastMessage(`กู้คืน ${lastAction.payload} สู่ Compare Hub แล้ว`);
     }
 
     setTimeout(() => {
       setToastMessage(null);
     }, 4000);
-  };
+  }, []);
+
+  const handleCloseToast = useCallback(() => {
+    setToastMessage(null);
+  }, []);
+
+  const handleCloseCompareModal = useCallback(() => {
+    setIsCompareModalOpen(false);
+  }, []);
+
+  const handleOpenFullHub = useCallback(() => {
+    setActiveTab('compare');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [setActiveTab]);
 
   return (
     <div className="biz-app-layout">
@@ -288,118 +350,125 @@ export default function App() {
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        onPreloadTab={handlePreloadTab}
         selectedYear={selectedYear}
         setSelectedYear={setSelectedYear}
-        compareCount={comparedList.length}        cacheStats={cacheStats}
+        compareCount={comparedList.length}
+        cacheStats={cacheStats}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content Area with Route-Level Code Splitting */}
       <main className="biz-main-content">
-        {activeTab === 'landing' && (
-          <LandingAboutView
-            setActiveTab={setActiveTab}
-            selectedYear={selectedYear}
-            topSummary={topSummary}
-            cacheStats={cacheStats}
-          />
-        )}
+        <Suspense fallback={<LoadingSkeleton text="กำลังโหลดโมดูลวิเคราะห์เศรษฐกิจ..." />}>
+          {activeTab === 'landing' && (
+            <LandingAboutView
+              setActiveTab={setActiveTab}
+              selectedYear={selectedYear}
+              topSummary={topSummary}
+              cacheStats={cacheStats}
+            />
+          )}
 
-        {activeTab === 'home' && (
-          <DashboardHome
-            topSummary={topSummary}
-            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-            setActiveTab={setActiveTab}
-            onAddToCompare={handleAddToCompare}
-          />
-        )}
+          {activeTab === 'home' && (
+            <DashboardHome
+              topSummary={topSummary}
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+              setActiveTab={setActiveTab}
+              onAddToCompare={handleAddToCompare}
+            />
+          )}
 
-        {activeTab === 'gdp' && (
-          <IndicatorView
-            type="gdp"
-            title={`อัตราการเติบโตทางเศรษฐกิจ GDP Growth Rate ประจำปี ${selectedYear}`}
-            subtitle="วิเคราะห์การขยายตัวทางเศรษฐกิจและมูลค่าผลผลิตมวลรวมในแต่ละประเทศ"
-            data={indicatorData}
-            isLoading={isLoading}
-            error={error}
-            onRetry={loadIndicatorData}
-            onAddToCompare={handleAddToCompare}
-            comparedList={comparedList}            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-          />
-        )}
+          {activeTab === 'gdp' && (
+            <IndicatorView
+              type="gdp"
+              title={`อัตราการเติบโตทางเศรษฐกิจ GDP Growth Rate ประจำปี ${selectedYear}`}
+              subtitle="วิเคราะห์การขยายตัวทางเศรษฐกิจและมูลค่าผลผลิตมวลรวมในแต่ละประเทศ"
+              data={indicatorData}
+              isLoading={isLoading}
+              error={error}
+              onRetry={() => loadIndicatorData()}
+              onAddToCompare={handleAddToCompare}
+              comparedList={comparedList}
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+            />
+          )}
 
-        {activeTab === 'inflation' && (
-          <IndicatorView
-            type="inflation"
-            title={`อัตราเงินเฟ้อ Inflation Rate ประจำปี ${selectedYear}`}
-            subtitle="ติดตามเสถียรภาพระดับราคาสินค้า อัตราค่าครองชีพ และกำลังซื้อของผู้บริโภค"
-            data={indicatorData}
-            isLoading={isLoading}
-            error={error}
-            onRetry={loadIndicatorData}
-            onAddToCompare={handleAddToCompare}
-            comparedList={comparedList}            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-          />
-        )}
+          {activeTab === 'inflation' && (
+            <IndicatorView
+              type="inflation"
+              title={`อัตราเงินเฟ้อ Inflation Rate ประจำปี ${selectedYear}`}
+              subtitle="ติดตามเสถียรภาพระดับราคาสินค้า อัตราค่าครองชีพ และกำลังซื้อของผู้บริโภค"
+              data={indicatorData}
+              isLoading={isLoading}
+              error={error}
+              onRetry={() => loadIndicatorData()}
+              onAddToCompare={handleAddToCompare}
+              comparedList={comparedList}
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+            />
+          )}
 
-        {activeTab === 'unemployment' && (
-          <IndicatorView
-            type="unemployment"
-            title={`อัตราการว่างงาน Unemployment Rate ประจำปี ${selectedYear}`}
-            subtitle="สำรวจโครงสร้างการจ้างงาน สัดส่วนประชากรในวัยทำงาน และศักยภาพตลาดแรงงาน"
-            data={indicatorData}
-            isLoading={isLoading}
-            error={error}
-            onRetry={loadIndicatorData}
-            onAddToCompare={handleAddToCompare}
-            comparedList={comparedList}            selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear}
-          />
-        )}
+          {activeTab === 'unemployment' && (
+            <IndicatorView
+              type="unemployment"
+              title={`อัตราการว่างงาน Unemployment Rate ประจำปี ${selectedYear}`}
+              subtitle="สำรวจโครงสร้างการจ้างงาน สัดส่วนประชากรในวัยทำงาน และศักยภาพตลาดแรงงาน"
+              data={indicatorData}
+              isLoading={isLoading}
+              error={error}
+              onRetry={() => loadIndicatorData()}
+              onAddToCompare={handleAddToCompare}
+              comparedList={comparedList}
+              selectedYear={selectedYear}
+              setSelectedYear={setSelectedYear}
+            />
+          )}
 
-        {activeTab === 'compare' && (
-          <ComparisonHub
-            comparedList={comparedList}
-            setComparedList={setComparedList}
-            onRemoveFromCompare={handleRemoveFromCompare}
-            selectedYear={selectedYear}
-          />
-        )}
+          {activeTab === 'compare' && (
+            <ComparisonHub
+              comparedList={comparedList}
+              setComparedList={setComparedList}
+              onRemoveFromCompare={handleRemoveFromCompare}
+              selectedYear={selectedYear}
+            />
+          )}
 
-        {activeTab === 'health' && (
-          <SystemHealthView
-            selectedYear={selectedYear}
-            setActiveTab={setActiveTab}
-          />
-        )}
+          {activeTab === 'health' && (
+            <SystemHealthView
+              selectedYear={selectedYear}
+              setActiveTab={setActiveTab}
+            />
+          )}
+        </Suspense>
       </main>
 
       {/* Universal Footer across ALL pages */}
       <Footer setActiveTab={setActiveTab} lenis={lenisInstance} />
 
-
-      {/* In-Page Instant Comparison Modal (Zero Page Disruption) */}
-      <CompareModal
-        isOpen={isCompareModalOpen}
-        onClose={() => setIsCompareModalOpen(false)}
-        comparedList={comparedList}
-        setComparedList={setComparedList}
-        onRemoveFromCompare={handleRemoveFromCompare}
-        currentTab={activeTab}
-        selectedYear={selectedYear}
-        onOpenFullHub={() => {
-          setActiveTab('compare');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-      />
+      {/* In-Page Instant Comparison Modal (Lazy-loaded only when opened) */}
+      {isCompareModalOpen && (
+        <Suspense fallback={null}>
+          <CompareModal
+            isOpen={isCompareModalOpen}
+            onClose={handleCloseCompareModal}
+            comparedList={comparedList}
+            setComparedList={setComparedList}
+            onRemoveFromCompare={handleRemoveFromCompare}
+            currentTab={activeTab}
+            selectedYear={selectedYear}
+            onOpenFullHub={handleOpenFullHub}
+          />
+        </Suspense>
+      )}
 
       {/* Floating Undo Notification */}
       <UndoToast
         message={toastMessage}
         onUndo={handleUndo}
-        onClose={() => setToastMessage(null)}
+        onClose={handleCloseToast}
       />
 
       {/* Mario Page Transition Loader */}

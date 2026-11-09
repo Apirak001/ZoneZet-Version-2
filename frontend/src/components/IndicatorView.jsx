@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useDeferredValue, memo } from 'react';
 import {
   TrendingUp,
   Percent,
@@ -51,7 +51,7 @@ const REGIONS = [
   'Central Asia'
 ];
 
-export default function IndicatorView({
+const IndicatorView = memo(function IndicatorView({
   type = 'gdp',
   title = 'อัตราการเติบโตทางเศรษฐกิจ GDP Growth (%)',
   subtitle = 'วิเคราะห์การขยายตัวทางเศรษฐกิจและมูลค่าผลผลิตมวลรวมในแต่ละประเทศ',
@@ -67,6 +67,7 @@ export default function IndicatorView({
   const [sortKey, setSortKey] = useState('value');
   const [sortDirection, setSortDirection] = useState('desc');
   const [tableSearch, setTableSearch] = useState('');
+  const deferredTableSearch = useDeferredValue(tableSearch);
   const [chartViewMode, setChartViewMode] = useState('top'); // 'top' or 'bottom'
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20); // 20 per page or -1 for All
@@ -180,8 +181,8 @@ export default function IndicatorView({
         item => item.region && item.region.toLowerCase() === selectedRegion.toLowerCase()
       );
     }
-    if (tableSearch.trim()) {
-      const q = tableSearch.toLowerCase().trim();
+    if (deferredTableSearch.trim()) {
+      const q = deferredTableSearch.toLowerCase().trim();
       list = list.filter(
         item =>
           item.country.toLowerCase().includes(q) ||
@@ -189,7 +190,7 @@ export default function IndicatorView({
       );
     }
     return list;
-  }, [data, selectedRegion, tableSearch]);
+  }, [data, selectedRegion, deferredTableSearch]);
 
   // Apply DSA: Merge Sort O(n log n)
   const sortedData = useMemo(() => {
@@ -208,22 +209,32 @@ export default function IndicatorView({
       };
     }
 
-    const sortedRaw = [...data].sort((a, b) => (b.value || 0) - (a.value || 0));
-    const topLeader = sortedRaw[0] || null;
-
-    const validNums = data.filter(d => typeof d.value === 'number' && !isNaN(d.value));
-    const totalCount = data.length;
-    const sum = validNums.reduce((acc, curr) => acc + curr.value, 0);
-    const average = validNums.length > 0 ? (sum / validNums.length).toFixed(1) : 0;
-
+    // Single-pass O(n) aggregation (js-combine-iterations & js-min-max-loop)
+    let topLeader = data[0] || null;
+    let sum = 0;
+    let validCount = 0;
     let positiveCount = 0;
-    if (type === 'gdp') {
-      positiveCount = validNums.filter(d => d.value > 0).length;
-    } else if (type === 'inflation') {
-      positiveCount = validNums.filter(d => d.value >= 0 && d.value <= 3).length;
-    } else {
-      positiveCount = validNums.filter(d => d.value <= 4).length;
+    const totalCount = data.length;
+
+    for (let i = 0; i < totalCount; i++) {
+      const d = data[i];
+      const val = d.value;
+      if (topLeader && (val || 0) > (topLeader.value || 0)) {
+        topLeader = d;
+      }
+      if (typeof val === 'number' && !isNaN(val)) {
+        sum += val;
+        validCount++;
+        if (type === 'gdp') {
+          if (val > 0) positiveCount++;
+        } else if (type === 'inflation') {
+          if (val >= 0 && val <= 3) positiveCount++;
+        } else {
+          if (val <= 4) positiveCount++;
+        }
+      }
     }
+    const average = validCount > 0 ? (sum / validCount).toFixed(1) : 0;
     const positivePercent = totalCount > 0 ? `${((positiveCount / totalCount) * 100).toFixed(1)}%` : '0.0%';
 
     return {
@@ -234,6 +245,21 @@ export default function IndicatorView({
       totalCount
     };
   }, [data, type]);
+
+
+  // Pre-compute region counts in a single pass O(n) instead of filtering 9 times per render
+  const regionCounts = useMemo(() => {
+    const counts = { All: Array.isArray(data) ? data.length : 0 };
+    if (!Array.isArray(data)) return counts;
+    for (let i = 0; i < data.length; i++) {
+      const reg = data[i].region;
+      if (reg) {
+        const key = reg.toLowerCase();
+        counts[key] = (counts[key] || 0) + 1;
+      }
+    }
+    return counts;
+  }, [data]);
 
   // Top 10 or Bottom 10 for interactive Bar Chart
   const distributionChartData = useMemo(() => {
@@ -405,6 +431,8 @@ export default function IndicatorView({
                 src={`https://flagcdn.com/w40/${kpiStats.topLeader.iso2.toLowerCase()}.png`}
                 alt={kpiStats.topLeader?.country}
                 className="indicator-kpi-flag"
+                loading="lazy"
+                decoding="async"
                 onError={(e) => { e.target.style.display = 'none'; }}
               />
             )}
@@ -664,8 +692,8 @@ export default function IndicatorView({
           <div className="indicator-region-pills-scroll">
             {REGIONS.map((reg) => {
               const count = reg === 'All'
-                ? data.length
-                : data.filter(d => d.region?.toLowerCase() === reg.toLowerCase()).length;
+                ? regionCounts.All
+                : (regionCounts[reg.toLowerCase()] || 0);
               const isActive = selectedRegion === reg;
 
               return (
@@ -797,6 +825,8 @@ export default function IndicatorView({
                               src={flagUrl}
                               alt={item.country}
                               className="indicator-flag-img"
+                              loading="lazy"
+                              decoding="async"
                               onError={(e) => { e.target.style.display = 'none'; }}
                             />
                           )}
@@ -941,4 +971,6 @@ export default function IndicatorView({
       )}
     </div>
   );
-}
+});
+
+export default IndicatorView;

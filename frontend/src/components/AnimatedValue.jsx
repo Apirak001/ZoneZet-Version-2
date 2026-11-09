@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
+
+const VALUE_PARSE_REGEX = /^([^\d\-+]*)([-+]?\d*(?:\.\d+)?)([^\d]*)$/;
 
 /**
  * AnimatedValue Component
  * Smooth count-up running number animation ("ตัวเลขวิ่ง")
  * Formats integers, decimals (e.g. 19.3%, 42.2%), +/- signs, and units cleanly.
  */
-export default function AnimatedValue({
+const AnimatedValue = memo(function AnimatedValue({
   value,
   duration = 1400,
   delay = 0,
@@ -22,7 +24,7 @@ export default function AnimatedValue({
     }
 
     // Match prefix (like "+", "$"), number with optional decimals/negatives, and suffix (like "%")
-    const match = rawStr.match(/^([^\d\-+]*)([-+]?\d*(?:\.\d+)?)([^\d]*)$/);
+    const match = rawStr.match(VALUE_PARSE_REGEX);
     let prefix = '';
     let suffix = '';
     let targetNum = 0;
@@ -96,4 +98,6 @@ export default function AnimatedValue({
       {displayStr || value}
     </span>
   );
-}
+});
+
+export default AnimatedValue;

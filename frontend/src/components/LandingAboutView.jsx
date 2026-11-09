@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import {
   ArrowRight,
   CheckCircle2,
@@ -70,7 +70,7 @@ function AnimatedCounter({ end, duration = 1800, prefix = '', suffix = '' }) {
   );
 }
 
-export default function LandingAboutView({
+const LandingAboutView = memo(function LandingAboutView({
   setActiveTab,
   selectedYear = '2025',
   topSummary = {},
@@ -80,6 +80,7 @@ export default function LandingAboutView({
   const [activeFeature, setActiveFeature] = useState(1);
   const chooseUsRef = useRef(null);
   const [isSpread, setIsSpread] = useState(false);
+  const isSpreadRef = useRef(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -98,7 +99,10 @@ export default function LandingAboutView({
       // Expand into 4 columns when cards enter viewport (top <= 75% screen)
       // Fold back into a center deck when scrolling back up (top > 75% screen)
       const shouldSpread = rect.top <= windowH * 0.75;
-      setIsSpread(shouldSpread);
+      if (shouldSpread !== isSpreadRef.current) {
+        isSpreadRef.current = shouldSpread;
+        setIsSpread(shouldSpread);
+      }
     };
 
     handleScroll();
@@ -341,6 +345,8 @@ export default function LandingAboutView({
                   src="/img/why-left-img.jpg"
                   alt="ZoneZet Enterprise Intelligence"
                   className="why-thumb-img"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>
@@ -612,4 +618,6 @@ export default function LandingAboutView({
       </section>
     </div>
   );
-}
+});
+
+export default LandingAboutView;

@@ -12,5 +12,24 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('recharts') || id.includes('d3-') || id.includes('victory-vendor')) {
+              return 'recharts-vendor';
+            }
+            if (id.includes('lucide-react') || id.includes('lenis')) {
+              return 'ui-vendor';
+            }
+            if (id.includes('react-dom') || id.includes('react') || id.includes('scheduler')) {
+              return 'react-vendor';
+            }
+          }
+        }
+      }
+    }
   }
 })

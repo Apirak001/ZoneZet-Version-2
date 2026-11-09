@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import {
   ArrowRight,
   Menu,
@@ -11,47 +11,47 @@ import {
   Users
 } from 'lucide-react';
 
-export default function Navbar({
+// Static navigation metadata hoisted outside component to avoid recreation on every render
+const DASHBOARD_SUB_ITEMS = [
+  {
+    id: 'home',
+    label: 'ภาพรวมแดชบอร์ด',
+    icon: LayoutDashboard,
+    color: '#c084fc'
+  },
+  {
+    id: 'gdp',
+    label: 'GDP Growth',
+    icon: TrendingUp,
+    color: '#34d399'
+  },
+  {
+    id: 'inflation',
+    label: 'อัตราเงินเฟ้อ',
+    icon: Percent,
+    color: '#f43f5e'
+  },
+  {
+    id: 'unemployment',
+    label: 'อัตราการว่างงาน',
+    icon: Users,
+    color: '#38bdf8'
+  }
+];
+
+const Navbar = memo(function Navbar({
   activeTab,
   setActiveTab,
+  onPreloadTab,
   compareCount = 0
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Dashboard views shown directly in the navbar
-  const dashboardSubItems = [
-    {
-      id: 'home',
-      label: 'ภาพรวมแดชบอร์ด',
-      icon: LayoutDashboard,
-      color: '#c084fc'
-    },
-    {
-      id: 'gdp',
-      label: 'GDP Growth',
-      icon: TrendingUp,
-      color: '#34d399'
-    },
-    {
-      id: 'inflation',
-      label: 'อัตราเงินเฟ้อ',
-      icon: Percent,
-      color: '#f43f5e'
-    },
-    {
-      id: 'unemployment',
-      label: 'อัตราการว่างงาน',
-      icon: Users,
-      color: '#38bdf8'
-    }
-  ];
-
-  // Pure, clean corporate navigation items with Lucide Icons
-  const navItems = [
+  const navItems = useMemo(() => [
     { id: 'landing', label: 'หน้าแรก', icon: Home },
-    ...dashboardSubItems,
+    ...DASHBOARD_SUB_ITEMS,
     { id: 'compare', label: 'ศูนย์เปรียบเทียบ', icon: GitCompare, badge: compareCount }
-  ];
+  ], [compareCount]);
 
   const handleNavClick = (tabId) => {
     setActiveTab(tabId);
@@ -63,11 +63,17 @@ export default function Navbar({
     <header className="biz-header">
       <div className="biz-nav-container">
         {/* Left: Real Project Logo (/img/logo.png) */}
-        <div className="biz-brand" onClick={() => handleNavClick('landing')} title="กลับสู่หน้าแรก ZoneZet">
+        <div
+          className="biz-brand"
+          onClick={() => handleNavClick('landing')}
+          onMouseEnter={() => onPreloadTab && onPreloadTab('landing')}
+          title="กลับสู่หน้าแรก ZoneZet"
+        >
           <img
             src="/img/logo.png"
             alt="ZoneZet Logo"
             className="biz-logo-img"
+            decoding="async"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = '/img/ZoneZet.png';
@@ -89,6 +95,8 @@ export default function Navbar({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
+                  onMouseEnter={() => onPreloadTab && onPreloadTab(item.id)}
+                  onFocus={() => onPreloadTab && onPreloadTab(item.id)}
                   className={`biz-nav-link ${isActive ? 'active' : ''}`}
                 >
                   <Icon size={16} className="biz-nav-icon" />
@@ -103,7 +111,7 @@ export default function Navbar({
 
           <button
             className="biz-mobile-toggle"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-label="Toggle Navigation"
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -145,4 +153,6 @@ export default function Navbar({
       )}
     </header>
   );
-}
+});
+
+export default Navbar;

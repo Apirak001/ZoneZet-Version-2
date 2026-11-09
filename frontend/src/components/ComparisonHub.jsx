@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback, useDeferredValue, memo } from 'react';
 import {
   GitCompare,
   Plus,
@@ -108,7 +108,59 @@ const fmt = (metricKey, v) => {
   return `${sign}${Number(v).toFixed(1)}%`;
 };
 
-export default function ComparisonHub({
+
+// Hoisted Tooltips outside ComparisonHub to prevent component recreation on every render (rerender-no-inline-components)
+const CompareTooltip = memo(function CompareTooltip({ active, payload, label, selectedMetric, metric, profileOf, colorOf }) {
+  if (!active || !payload || !payload.length) return null;
+  const rows = [...payload]
+    .map(e => ({ code: e.dataKey.split('_')[0], value: Number(e.value) }))
+    .filter(r => !isNaN(r.value))
+    .sort((a, b) => scoreOf(selectedMetric, b.value) - scoreOf(selectedMetric, a.value));
+  return (
+    <div className="cx-tooltip">
+      <div className="cx-tooltip-head">
+        <Calendar size={13} color="#c084fc" />
+        <span>ปี {label}</span>
+        <span className="cx-tooltip-metric" style={{ color: metric.color }}>{metric.label}</span>
+      </div>
+      {rows.map((r, i) => {
+        const p = profileOf(r.code);
+        return (
+          <div key={r.code} className="cx-tooltip-row">
+            <span className="cx-tooltip-rank">{i === 0 ? <Crown size={11} /> : i + 1}</span>
+            <span className="cx-dot" style={{ background: colorOf(r.code) }} />
+            <span className="cx-tooltip-name">{p.name}</span>
+            <span className="cx-tooltip-val" style={{ color: colorOf(r.code) }}>{fmt(selectedMetric, r.value)}</span>
+          </div>
+        );
+      })}
+      <div className="cx-tooltip-foot">{metric.hint}</div>
+    </div>
+  );
+});
+
+const RadarTooltip = memo(function RadarTooltip({ active, payload, profileOf, colorOf }) {
+  if (!active || !payload || !payload.length) return null;
+  const dp = payload[0]?.payload;
+  return (
+    <div className="cx-tooltip">
+      <div className="cx-tooltip-head">
+        <Sparkles size={13} color="#c084fc" />
+        <span>{dp?.fullName || dp?.pillar}</span>
+      </div>
+      {payload.map(e => (
+        <div key={e.dataKey} className="cx-tooltip-row">
+          <span className="cx-dot" style={{ background: colorOf(e.dataKey) }} />
+          <span className="cx-tooltip-name">{profileOf(e.dataKey).name}</span>
+          <span className="cx-tooltip-val" style={{ color: colorOf(e.dataKey) }}>{e.value} / 10</span>
+        </div>
+      ))}
+      <div className="cx-tooltip-foot">คะแนน 0–10 · ยิ่งสูงยิ่งดี</div>
+    </div>
+  );
+});
+
+const ComparisonHub = memo(function ComparisonHub({
   comparedList = ['THA', 'USA', 'JPN', 'VNM'],
   setComparedList,
   onRemoveFromCompare,
@@ -121,6 +173,7 @@ export default function ComparisonHub({
   const [selectedMetric, setSelectedMetric] = useState('gdp');
   const [chartType, setChartType] = useState('bar');
   const [searchFilter, setSearchFilter] = useState('');
+  const deferredSearchFilter = useDeferredValue(searchFilter);
   const [highlightedCountry, setHighlightedCountry] = useState(null);
   const [showDataLabels, setShowDataLabels] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
@@ -220,8 +273,8 @@ export default function ComparisonHub({
   };
 
   const filteredSearchCountries = useMemo(() => {
-    if (!searchFilter.trim()) return allCountries.slice(0, 12);
-    const q = searchFilter.toLowerCase().trim();
+    if (!deferredSearchFilter.trim()) return allCountries.slice(0, 12);
+    const q = deferredSearchFilter.toLowerCase().trim();
     return allCountries
       .filter(c =>
         (c.name && c.name.toLowerCase().includes(q)) ||
@@ -229,18 +282,36 @@ export default function ComparisonHub({
         (c.region && c.region.toLowerCase().includes(q))
       )
       .slice(0, 15);
-  }, [allCountries, searchFilter]);
+  }, [allCountries, deferredSearchFilter]);
 
-  // Profile lookup (name / flag / region) for any code
-  const profileOf = (code) =>
-    (comparisonData?.countries || []).find(c => c.code === code) ||
-    allCountries.find(c => c.code === code) ||
-    { code, name: code, iso2: code.toLowerCase(), region: '' };
+  // O(1) Index Map for fast country profile & set lookups (js-index-maps & js-set-map-lookups)
+  const comparedSet = useMemo(
+    () => new Set(comparedList.map(c => (c ? c.toUpperCase() : ''))),
+    [comparedList]
+  );
 
-  const colorOf = (code) => {
+  const profileMap = useMemo(() => {
+    const map = new Map();
+    for (let i = 0; i < allCountries.length; i++) {
+      const c = allCountries[i];
+      if (c?.code) map.set(c.code, c);
+    }
+    const cmpCountries = comparisonData?.countries || [];
+    for (let i = 0; i < cmpCountries.length; i++) {
+      const c = cmpCountries[i];
+      if (c?.code) map.set(c.code, c);
+    }
+    return map;
+  }, [allCountries, comparisonData]);
+
+  const profileOf = useCallback((code) => {
+    return profileMap.get(code) || { code, name: code, iso2: code.toLowerCase(), region: '' };
+  }, [profileMap]);
+
+  const colorOf = useCallback((code) => {
     const idx = comparedList.indexOf(code);
     return COUNTRY_COLORS[(idx >= 0 ? idx : 0) % COUNTRY_COLORS.length];
-  };
+  }, [comparedList]);
 
   const timeline = comparisonData?.timeline || [];
   const latestEntry = timeline[timeline.length - 1] || {};
@@ -320,57 +391,6 @@ export default function ComparisonHub({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comparisonData, comparedList]);
 
-  // ---------- Tooltips ----------
-  const CompareTooltip = ({ active, payload, label }) => {
-    if (!active || !payload || !payload.length) return null;
-    const rows = [...payload]
-      .map(e => ({ code: e.dataKey.split('_')[0], value: Number(e.value) }))
-      .filter(r => !isNaN(r.value))
-      .sort((a, b) => scoreOf(selectedMetric, b.value) - scoreOf(selectedMetric, a.value));
-    return (
-      <div className="cx-tooltip">
-        <div className="cx-tooltip-head">
-          <Calendar size={13} color="#c084fc" />
-          <span>ปี {label}</span>
-          <span className="cx-tooltip-metric" style={{ color: metric.color }}>{metric.label}</span>
-        </div>
-        {rows.map((r, i) => {
-          const p = profileOf(r.code);
-          return (
-            <div key={r.code} className="cx-tooltip-row">
-              <span className="cx-tooltip-rank">{i === 0 ? <Crown size={11} /> : i + 1}</span>
-              <span className="cx-dot" style={{ background: colorOf(r.code) }} />
-              <span className="cx-tooltip-name">{p.name}</span>
-              <span className="cx-tooltip-val" style={{ color: colorOf(r.code) }}>{fmt(selectedMetric, r.value)}</span>
-            </div>
-          );
-        })}
-        <div className="cx-tooltip-foot">{metric.hint}</div>
-      </div>
-    );
-  };
-
-  const RadarTooltip = ({ active, payload }) => {
-    if (!active || !payload || !payload.length) return null;
-    const dp = payload[0]?.payload;
-    return (
-      <div className="cx-tooltip">
-        <div className="cx-tooltip-head">
-          <Sparkles size={13} color="#c084fc" />
-          <span>{dp?.fullName || dp?.pillar}</span>
-        </div>
-        {payload.map(e => (
-          <div key={e.dataKey} className="cx-tooltip-row">
-            <span className="cx-dot" style={{ background: colorOf(e.dataKey) }} />
-            <span className="cx-tooltip-name">{profileOf(e.dataKey).name}</span>
-            <span className="cx-tooltip-val" style={{ color: colorOf(e.dataKey) }}>{e.value} / 10</span>
-          </div>
-        ))}
-        <div className="cx-tooltip-foot">คะแนน 0–10 · ยิ่งสูงยิ่งดี</div>
-      </div>
-    );
-  };
-
   // Shared chart pieces
   const axisPieces = () => [
     <CartesianGrid key="grid" strokeDasharray="4 6" stroke={showGrid ? 'rgba(168, 85, 247, 0.12)' : 'transparent'} vertical={false} />,
@@ -400,7 +420,7 @@ export default function ComparisonHub({
       tickLine={false}
       width={52}
     />,
-    <Tooltip key="tt" content={<CompareTooltip />} cursor={{ fill: 'rgba(168, 85, 247, 0.06)' }} />
+    <Tooltip key="tt" content={<CompareTooltip selectedMetric={selectedMetric} metric={metric} profileOf={profileOf} colorOf={colorOf} />} cursor={{ fill: 'rgba(168, 85, 247, 0.06)' }} />
   ];
 
   // Direct, instant label rendering with zero animation lag or duplicate flashing
@@ -426,7 +446,7 @@ export default function ComparisonHub({
           <PolarGrid stroke="rgba(168, 85, 247, 0.22)" />
           <PolarAngleAxis dataKey="pillar" tick={{ fill: '#e2e8f0', fontSize: 12, fontWeight: 600 }} />
           <PolarRadiusAxis domain={[0, 10]} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} />
-          <Tooltip content={<RadarTooltip />} />
+          <Tooltip content={<RadarTooltip profileOf={profileOf} colorOf={colorOf} />} />
           {comparedList.map(code => {
             const on = !highlightedCountry || highlightedCountry === code;
             return (
@@ -651,7 +671,7 @@ export default function ComparisonHub({
                     onWheel={(e) => e.stopPropagation()}
                   >
                     {filteredSearchCountries.map((c) => {
-                      const picked = comparedList.some(code => code && code.toUpperCase() === c.code.toUpperCase());
+                      const picked = comparedSet.has(c.code.toUpperCase());
                       return (
                         <button
                           key={c.code}
@@ -664,7 +684,7 @@ export default function ComparisonHub({
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
                             {c.iso2 && (
                               <img
-                                src={flagOf(c.iso2)}
+                                src={flagOf(c.iso2)} loading="lazy" decoding="async"
                                 alt={c.name}
                                 style={{ width: 22, height: 15, borderRadius: 3, objectFit: 'cover' }}
                                 onError={(e) => { e.target.style.display = 'none'; }}
@@ -706,7 +726,7 @@ export default function ComparisonHub({
               <div key={code} className="cx-slot filled" style={{ '--cx-c': c }}>
                 <span className="cx-slot-strip" />
                 {p.iso2 && (
-                  <img src={flagOf(p.iso2)} alt={p.name} className="cx-slot-flag" onError={(e) => { e.target.style.display = 'none'; }} />
+                  <img src={flagOf(p.iso2)} loading="lazy" decoding="async" alt={p.name} className="cx-slot-flag" onError={(e) => { e.target.style.display = 'none'; }} />
                 )}
                 <div className="cx-slot-text">
                   <span className="cx-slot-name">{p.name}</span>
@@ -805,7 +825,7 @@ export default function ComparisonHub({
                     title="คลิกเพื่อไฮไลต์ประเทศนี้ในกราฟ"
                   >
                     <span className={`cx-rank-num r${i + 1}`}>{i === 0 ? <Crown size={13} /> : i + 1}</span>
-                    {r.iso2 && <img src={flagOf(r.iso2)} alt="" className="cx-rank-flag" />}
+                    {r.iso2 && <img src={flagOf(r.iso2)} loading="lazy" decoding="async" alt="" className="cx-rank-flag" />}
                     <span className="cx-rank-body">
                       <span className="cx-rank-top">
                         <span className="cx-rank-name">{r.name}</span>
@@ -944,7 +964,7 @@ export default function ComparisonHub({
                       return (
                         <th key={code} style={{ '--cx-c': colorOf(code) }}>
                           <div className="cx-th-country">
-                            {p.iso2 && <img src={flagOf(p.iso2)} alt="" />}
+                            {p.iso2 && <img src={flagOf(p.iso2)} loading="lazy" decoding="async" alt="" />}
                             <span>{p.name}</span>
                           </div>
                         </th>
@@ -985,4 +1005,6 @@ export default function ComparisonHub({
       ) : null}
     </div>
   );
-}
+});
+
+export default ComparisonHub;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   TrendingUp,
   Percent,
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import AnimatedValue from './AnimatedValue';
 
-export default function MetricCard({
+const MetricCard = memo(function MetricCard({
   title,
   type = 'gdp',
   items = [],
@@ -77,6 +77,8 @@ export default function MetricCard({
                       src={flagUrl}
                       alt={item.country}
                       className="db-country-flag"
+                      loading="lazy"
+                      decoding="async"
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
                   )}
@@ -114,4 +116,6 @@ export default function MetricCard({
       </div>
     </div>
   );
-}
+});
+
+export default MetricCard;

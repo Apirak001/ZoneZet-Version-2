@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 
 /**
  * RunningBarLabel
  * Smooth count-up running number animation displayed on top of Recharts bars.
  * Animates in sync with bar rise animation using requestAnimationFrame with cubic ease-out curve.
  */
-export default function RunningBarLabel(props) {
+const RunningBarLabel = memo(function RunningBarLabel(props) {
   const {
     x = 0,
     y = 0,
@@ -86,4 +86,6 @@ export default function RunningBarLabel(props) {
       {labelText}
     </text>
   );
-}
+});
+
+export default RunningBarLabel;

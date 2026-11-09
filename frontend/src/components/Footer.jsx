@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import {
   ChevronUp,
-  ArrowUp,
   Home,
   LayoutDashboard,
   TrendingUp,
@@ -11,7 +10,7 @@ import {
   Globe
 } from 'lucide-react';
 
-export default function Footer({ setActiveTab, lenis }) {
+const Footer = memo(function Footer({ setActiveTab, lenis }) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
@@ -34,7 +33,6 @@ export default function Footer({ setActiveTab, lenis }) {
     if (activeLenis) {
       const onLenisScroll = (e) => {
         if (typeof e.progress === 'number') {
-          // Precise mathematical 0-100% progress matching Lenis scroll position
           setScrollProgress(Math.min(100, Math.max(0, e.progress * 100)));
         } else {
           updateProgressFromDOM();
@@ -137,6 +135,8 @@ export default function Footer({ setActiveTab, lenis }) {
                 src="/img/logo.png"
                 alt="ZoneZet Logo"
                 className="official-logo-img"
+                loading="lazy"
+                decoding="async"
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = '/img/ZoneZet.png';
@@ -272,4 +272,6 @@ export default function Footer({ setActiveTab, lenis }) {
       </button>
     </footer>
   );
-}
+});
+
+export default Footer;

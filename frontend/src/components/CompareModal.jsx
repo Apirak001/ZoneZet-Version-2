@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import {
   X,
   GitCompare,
@@ -54,7 +54,126 @@ const COUNTRY_COLORS = [
   '#a78bfa'  // Lavender
 ];
 
-export default function CompareModal({
+
+// Hoisted Custom Glassmorphism Tooltip for Modal Charts (rerender-no-inline-components)
+const CustomModalTooltip = memo(function CustomModalTooltip({ active, payload, label, selectedMetric, comparisonData, comparedList }) {
+  if (active && payload && payload.length) {
+    const sorted = [...payload].sort((a, b) => (b.value || 0) - (a.value || 0));
+    const sum = sorted.reduce((acc, curr) => acc + (Number(curr.value) || 0), 0);
+    const avg = (sum / sorted.length).toFixed(1);
+
+    return (
+      <div
+        className="db-custom-chart-tooltip"
+        style={{
+          minWidth: 260,
+          zIndex: 1200,
+          background: 'rgba(12, 6, 26, 0.95)',
+          border: '1px solid rgba(168, 85, 247, 0.4)',
+          boxShadow: '0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(168, 85, 247, 0.25)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: '12px',
+          padding: '0.8rem'
+        }}
+      >
+        <div
+          className="tooltip-country-header"
+          style={{
+            paddingBottom: '0.5rem',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+            <Calendar size={13} color="#c084fc" />
+            <span className="tooltip-country-name" style={{ fontWeight: 700 }}>ปี ค.ศ. {label}</span>
+          </div>
+          <span
+            className="tooltip-year-badge"
+            style={{
+              background: 'rgba(168, 85, 247, 0.2)',
+              color: '#c084fc',
+              fontSize: '0.72rem',
+              padding: '2px 7px',
+              borderRadius: '5px'
+            }}
+          >
+            เฉลี่ย {selectedMetric === 'gdp' && Number(avg) > 0 ? '+' : ''}{avg}%
+          </span>
+        </div>
+
+        <div className="tooltip-indicators-list" style={{ marginTop: '0.55rem' }}>
+          {sorted.map((entry, idx) => {
+            const countryCode = entry.dataKey ? entry.dataKey.split('_')[0] : '';
+            const profile = (comparisonData?.countries || []).find((c) => c.code === countryCode);
+            const flagUrl = profile?.iso2
+              ? `https://flagcdn.com/w40/${profile.iso2.toLowerCase()}.png`
+              : null;
+            const countryIdx = comparedList.indexOf(countryCode);
+            const bulletColor = countryIdx >= 0 ? COUNTRY_COLORS[countryIdx % COUNTRY_COLORS.length] : (entry.color || '#c084fc');
+            const val = typeof entry.value === 'number' ? entry.value : Number(entry.value) || 0;
+            const isLead = idx === 0;
+
+            return (
+              <div
+                key={entry.dataKey}
+                className="tooltip-indicator-row"
+                style={{
+                  padding: '0.3rem 0.45rem',
+                  borderRadius: '6px',
+                  background: isLead ? 'rgba(251, 191, 36, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+                  border: isLead ? '1px solid rgba(251, 191, 36, 0.3)' : '1px solid rgba(255, 255, 255, 0.04)',
+                  marginBottom: '0.3rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div className="tooltip-indicator-name" style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <span
+                    style={{
+                      fontSize: '0.64rem',
+                      fontWeight: 800,
+                      padding: '1px 4px',
+                      borderRadius: '3px',
+                      background: isLead ? '#fbbf24' : 'rgba(255, 255, 255, 0.12)',
+                      color: isLead ? '#110822' : '#94a3b8',
+                      fontFamily: 'var(--font-mono)'
+                    }}
+                  >
+                    {isLead ? '👑 #1' : `#${idx + 1}`}
+                  </span>
+                  {flagUrl && (
+                    <img
+                      src={flagUrl}
+                      alt={countryCode}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: 16, height: 11, borderRadius: 2, objectFit: 'cover' }}
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  )}
+                  <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '0.8rem' }}>
+                    {profile?.name || countryCode}
+                  </span>
+                </div>
+
+                <span className="tooltip-indicator-value" style={{ color: bulletColor, fontWeight: 800, fontSize: '0.86rem', fontFamily: 'var(--font-mono)' }}>
+                  {selectedMetric === 'gdp' && val > 0 ? '+' : ''}{val.toFixed(1)}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+  return null;
+});
+
+const CompareModal = memo(function CompareModal({
   isOpen = false,
   onClose,
   comparedList = [],
@@ -224,122 +343,6 @@ export default function CompareModal({
   }, [comparisonData, comparedList, selectedMetric]);
 
   if (!isOpen) return null;
-
-  // Custom Glassmorphism Tooltip for Modal Charts
-  const CustomModalTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const sorted = [...payload].sort((a, b) => (b.value || 0) - (a.value || 0));
-      const sum = sorted.reduce((acc, curr) => acc + (Number(curr.value) || 0), 0);
-      const avg = (sum / sorted.length).toFixed(1);
-
-      return (
-        <div
-          className="db-custom-chart-tooltip"
-          style={{
-            minWidth: 260,
-            zIndex: 1200,
-            background: 'rgba(12, 6, 26, 0.95)',
-            border: '1px solid rgba(168, 85, 247, 0.4)',
-            boxShadow: '0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(168, 85, 247, 0.25)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '12px',
-            padding: '0.8rem'
-          }}
-        >
-          <div
-            className="tooltip-country-header"
-            style={{
-              paddingBottom: '0.5rem',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-              <Calendar size={13} color="#c084fc" />
-              <span className="tooltip-country-name" style={{ fontWeight: 700 }}>ปี ค.ศ. {label}</span>
-            </div>
-            <span
-              className="tooltip-year-badge"
-              style={{
-                background: 'rgba(168, 85, 247, 0.2)',
-                color: '#c084fc',
-                fontSize: '0.72rem',
-                padding: '2px 7px',
-                borderRadius: '5px'
-              }}
-            >
-              เฉลี่ย {selectedMetric === 'gdp' && Number(avg) > 0 ? '+' : ''}{avg}%
-            </span>
-          </div>
-
-          <div className="tooltip-indicators-list" style={{ marginTop: '0.55rem' }}>
-            {sorted.map((entry, idx) => {
-              const countryCode = entry.dataKey ? entry.dataKey.split('_')[0] : '';
-              const profile = (comparisonData?.countries || []).find((c) => c.code === countryCode);
-              const flagUrl = profile?.iso2
-                ? `https://flagcdn.com/w40/${profile.iso2.toLowerCase()}.png`
-                : null;
-              const countryIdx = comparedList.indexOf(countryCode);
-              const bulletColor = countryIdx >= 0 ? COUNTRY_COLORS[countryIdx % COUNTRY_COLORS.length] : (entry.color || '#c084fc');
-              const val = typeof entry.value === 'number' ? entry.value : Number(entry.value) || 0;
-              const isLead = idx === 0;
-
-              return (
-                <div
-                  key={entry.dataKey}
-                  className="tooltip-indicator-row"
-                  style={{
-                    padding: '0.3rem 0.45rem',
-                    borderRadius: '6px',
-                    background: isLead ? 'rgba(251, 191, 36, 0.1)' : 'rgba(255, 255, 255, 0.03)',
-                    border: isLead ? '1px solid rgba(251, 191, 36, 0.3)' : '1px solid rgba(255, 255, 255, 0.04)',
-                    marginBottom: '0.3rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <div className="tooltip-indicator-name" style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                    <span
-                      style={{
-                        fontSize: '0.64rem',
-                        fontWeight: 800,
-                        padding: '1px 4px',
-                        borderRadius: '3px',
-                        background: isLead ? '#fbbf24' : 'rgba(255, 255, 255, 0.12)',
-                        color: isLead ? '#110822' : '#94a3b8',
-                        fontFamily: 'var(--font-mono)'
-                      }}
-                    >
-                      {isLead ? '👑 #1' : `#${idx + 1}`}
-                    </span>
-                    {flagUrl && (
-                      <img
-                        src={flagUrl}
-                        alt={countryCode}
-                        style={{ width: 16, height: 11, borderRadius: 2, objectFit: 'cover' }}
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
-                    )}
-                    <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '0.8rem' }}>
-                      {profile?.name || countryCode}
-                    </span>
-                  </div>
-
-                  <span className="tooltip-indicator-value" style={{ color: bulletColor, fontWeight: 800, fontSize: '0.86rem', fontFamily: 'var(--font-mono)' }}>
-                    {selectedMetric === 'gdp' && val > 0 ? '+' : ''}{val.toFixed(1)}%
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="compare-modal-backdrop" onClick={onClose}>
@@ -630,7 +633,7 @@ export default function CompareModal({
                           axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
                           tickLine={false}
                         />
-                        <Tooltip content={<CustomModalTooltip />} />
+                        <Tooltip content={<CustomModalTooltip selectedMetric={selectedMetric} comparisonData={comparisonData} comparedList={comparedList} />} />
                         <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '0.82rem' }} iconType="circle" />
                         {comparedList.map((code, idx) => {
                           const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
@@ -696,7 +699,7 @@ export default function CompareModal({
                           axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
                           tickLine={false}
                         />
-                        <Tooltip content={<CustomModalTooltip />} />
+                        <Tooltip content={<CustomModalTooltip selectedMetric={selectedMetric} comparisonData={comparisonData} comparedList={comparedList} />} />
                         <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '0.82rem' }} iconType="circle" />
                         {comparedList.map((code, idx) => {
                           const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
@@ -767,7 +770,7 @@ export default function CompareModal({
                           axisLine={{ stroke: 'rgba(168, 85, 247, 0.25)' }}
                           tickLine={false}
                         />
-                        <Tooltip content={<CustomModalTooltip />} />
+                        <Tooltip content={<CustomModalTooltip selectedMetric={selectedMetric} comparisonData={comparisonData} comparedList={comparedList} />} />
                         <Legend wrapperStyle={{ paddingTop: '15px', fontSize: '0.82rem' }} iconType="circle" />
                         {comparedList.map((code, idx) => {
                           const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
@@ -804,7 +807,7 @@ export default function CompareModal({
                           stroke="rgba(148, 163, 184, 0.35)"
                           tick={{ fill: '#94a3b8', fontSize: 9 }}
                         />
-                        <Tooltip content={<CustomModalTooltip />} />
+                        <Tooltip content={<CustomModalTooltip selectedMetric={selectedMetric} comparisonData={comparisonData} comparedList={comparedList} />} />
                         <Legend wrapperStyle={{ paddingTop: '10px', fontSize: '0.8rem' }} iconType="circle" />
                         {comparedList.map((code, idx) => {
                           const color = COUNTRY_COLORS[idx % COUNTRY_COLORS.length];
@@ -956,4 +959,6 @@ export default function CompareModal({
       </div>
     </div>
   );
-}
+});
+
+export default CompareModal;

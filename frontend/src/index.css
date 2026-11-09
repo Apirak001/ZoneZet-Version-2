@@ -9188,3 +9188,11 @@ a.tm-contact-row:hover .tm-contact-arrow {
   background: color-mix(in srgb, var(--cx-c) 12%, transparent);
   box-shadow: 0 0 20px color-mix(in srgb, var(--cx-c) 25%, transparent);
 }
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATION: Off-screen Table Row Rendering (rendering-content-visibility)
+   ============================================================================ */
+.indicator-table-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
 import MetricCard from './MetricCard';
 import AnimatedValue from './AnimatedValue';
 import RunningBarLabel from './RunningBarLabel';
@@ -112,7 +112,208 @@ function getRegionIconConfig(regionId, size = 18) {
 
 const AVAILABLE_YEARS = ['2025', '2024', '2023', '2022', '2021', '2020'];
 
-export default function DashboardHome({
+
+// Hoisted Custom Glassmorphism Tooltip (rerender-no-inline-components)
+const CustomTooltip = memo(function CustomTooltip({ active, payload, label, activeChartMode, selectedYear }) {
+  if (active && payload && payload.length) {
+    const dataPoint = payload[0]?.payload;
+
+    if (activeChartMode === 'all') {
+      const hasGdp = dataPoint?.GDP !== undefined && dataPoint?.GDP !== null;
+      const hasInf = dataPoint?.Inflation !== undefined && dataPoint?.Inflation !== null;
+      const hasUnemp = dataPoint?.Unemployment !== undefined && dataPoint?.Unemployment !== null;
+
+      return (
+        <div className="db-custom-chart-tooltip">
+          <div className="tooltip-country-header">
+            <span className="tooltip-country-dot" />
+            <span className="tooltip-country-name">เปรียบเทียบ {label} ของโลก</span>
+            <span className="tooltip-year-badge">{selectedYear}</span>
+          </div>
+          <div className="tooltip-indicators-list">
+            <div className="tooltip-indicator-row">
+              <div className="tooltip-indicator-name">
+                <span className="tooltip-color-bullet" style={{ background: '#34d399' }} />
+                <span>GDP Growth:</span>
+              </div>
+              <span className="tooltip-indicator-value" style={{ color: '#34d399' }}>
+                {dataPoint?.gdpCountry ? `${dataPoint.gdpCountry} ` : ''}
+                {hasGdp ? `(+${dataPoint.GDP}%)` : '-'}
+              </span>
+            </div>
+
+            <div className="tooltip-indicator-row">
+              <div className="tooltip-indicator-name">
+                <span className="tooltip-color-bullet" style={{ background: '#f43f5e' }} />
+                <span>อัตราเงินเฟ้อ:</span>
+              </div>
+              <span className="tooltip-indicator-value" style={{ color: '#fb7185' }}>
+                {dataPoint?.infCountry ? `${dataPoint.infCountry} ` : ''}
+                {hasInf ? `(${dataPoint.Inflation}%)` : '-'}
+              </span>
+            </div>
+
+            <div className="tooltip-indicator-row">
+              <div className="tooltip-indicator-name">
+                <span className="tooltip-color-bullet" style={{ background: '#38bdf8' }} />
+                <span>อัตราการว่างงาน:</span>
+              </div>
+              <span className="tooltip-indicator-value" style={{ color: '#38bdf8' }}>
+                {dataPoint?.unempCountry ? `${dataPoint.unempCountry} ` : ''}
+                {hasUnemp ? `(${dataPoint.Unemployment}%)` : '-'}
+              </span>
+            </div>
+          </div>
+          <div className="tooltip-footer">
+            <span className="tooltip-live-dot" />
+            <span>World Bank Verified Statistics v2</span>
+          </div>
+        </div>
+      );
+    }
+
+    const entry = payload[0];
+    return (
+      <div className="db-custom-chart-tooltip">
+        <div className="tooltip-country-header">
+          <span className="tooltip-country-dot" />
+          <span className="tooltip-country-name">{label}</span>
+          <span className="tooltip-year-badge">{selectedYear}</span>
+        </div>
+        <div className="tooltip-indicators-list">
+          <div className="tooltip-indicator-row">
+            <div className="tooltip-indicator-name">
+              <span
+                className="tooltip-color-bullet"
+                style={{ background: entry.color || entry.fill }}
+              />
+              <span>
+                {activeChartMode === 'gdp'
+                  ? 'GDP Growth'
+                  : activeChartMode === 'inflation'
+                  ? 'อัตราเงินเฟ้อ'
+                  : 'อัตราการว่างงาน'}
+                :
+              </span>
+            </div>
+            <span
+              className="tooltip-indicator-value"
+              style={{ color: entry.color || entry.fill || '#ffffff', fontSize: '1rem', fontWeight: 800 }}
+            >
+              {typeof entry.value === 'number' ? `${entry.value.toFixed(1)}%` : entry.value}
+            </span>
+          </div>
+        </div>
+        <div className="tooltip-footer">
+          <span className="tooltip-live-dot" />
+          <span>World Bank Official Statistics v2</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+});
+
+// Hoisted Regional Benchmark Tooltip (rerender-no-inline-components)
+const RegionalTooltip = memo(function RegionalTooltip({ active, payload, selectedYear }) {
+  if (active && payload && payload.length) {
+    const item = payload[0]?.payload;
+    if (!item) return null;
+
+    const iconCfg = getRegionIconConfig(item.id, 16);
+    const hasGdp = item.avgGdp !== undefined && item.avgGdp !== null;
+    const hasInf = item.avgInflation !== undefined && item.avgInflation !== null;
+    const hasUnemp = item.avgUnemployment !== undefined && item.avgUnemployment !== null;
+
+    return (
+      <div className="db-custom-chart-tooltip">
+        <div className="tooltip-country-header">
+          <span
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: 6,
+              background: iconCfg.bg,
+              border: `1px solid ${iconCfg.border}`,
+              color: iconCfg.color,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 6
+            }}
+          >
+            {iconCfg.icon}
+          </span>
+          <span className="tooltip-country-name">
+            {item.name} ({item.thai})
+          </span>
+          <span className="tooltip-year-badge">{selectedYear}</span>
+        </div>
+
+        <div className="tooltip-indicators-list">
+          <div className="tooltip-indicator-row">
+            <div className="tooltip-indicator-name">
+              <span className="tooltip-color-bullet" style={{ background: '#34d399' }} />
+              <span>GDP Growth เฉลี่ย:</span>
+            </div>
+            <span className="tooltip-indicator-value" style={{ color: '#34d399' }}>
+              {hasGdp ? `+${item.avgGdp}%` : '-'}
+            </span>
+          </div>
+
+          <div className="tooltip-indicator-row">
+            <div className="tooltip-indicator-name">
+              <span className="tooltip-color-bullet" style={{ background: '#f43f5e' }} />
+              <span>อัตราเงินเฟ้อเฉลี่ย:</span>
+            </div>
+            <span className="tooltip-indicator-value" style={{ color: '#fb7185' }}>
+              {hasInf ? `${item.avgInflation}%` : '-'}
+            </span>
+          </div>
+
+          <div className="tooltip-indicator-row">
+            <div className="tooltip-indicator-name">
+              <span className="tooltip-color-bullet" style={{ background: '#38bdf8' }} />
+              <span>อัตราว่างงานเฉลี่ย:</span>
+            </div>
+            <span className="tooltip-indicator-value" style={{ color: '#38bdf8' }}>
+              {hasUnemp ? `${item.avgUnemployment}%` : '-'}
+            </span>
+          </div>
+        </div>
+
+        {item.topCountry && (
+          <div
+            style={{
+              marginTop: '0.65rem',
+              paddingTop: '0.5rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              fontSize: '0.78rem',
+              color: '#cbd5e1',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem'
+            }}
+          >
+            <span style={{ color: '#94a3b8' }}>{item.isGlobal ? 'สถิติสูงสุด:' : 'ผู้นำ GDP:'}</span>
+            <strong style={{ color: '#ffffff' }}>{item.topCountry.name}</strong>
+            <span style={{ color: '#34d399', fontWeight: 700 }}>
+              (+{item.topCountry.val}%)
+            </span>
+          </div>
+        )}
+
+        <div className="tooltip-footer">
+          <span className="tooltip-live-dot" />
+          <span>คำนวณจาก {item.countryCount || (item.isGlobal ? 182 : '')} ประเทศจริงใน World Bank</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+});
+
+const DashboardHome = memo(function DashboardHome({
   topSummary = {},
   selectedYear = '2025',
   setSelectedYear,
@@ -207,206 +408,7 @@ export default function DashboardHome({
     displayValue: item.displayValue
   }));
 
-  // Custom Glassmorphism Tooltip
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const dataPoint = payload[0]?.payload;
-
-      if (activeChartMode === 'all') {
-        const hasGdp = dataPoint?.GDP !== undefined && dataPoint?.GDP !== null;
-        const hasInf = dataPoint?.Inflation !== undefined && dataPoint?.Inflation !== null;
-        const hasUnemp = dataPoint?.Unemployment !== undefined && dataPoint?.Unemployment !== null;
-
-        return (
-          <div className="db-custom-chart-tooltip">
-            <div className="tooltip-country-header">
-              <span className="tooltip-country-dot" />
-              <span className="tooltip-country-name">เปรียบเทียบ {label} ของโลก</span>
-              <span className="tooltip-year-badge">{selectedYear}</span>
-            </div>
-            <div className="tooltip-indicators-list">
-              <div className="tooltip-indicator-row">
-                <div className="tooltip-indicator-name">
-                  <span className="tooltip-color-bullet" style={{ background: '#34d399' }} />
-                  <span>GDP Growth:</span>
-                </div>
-                <span className="tooltip-indicator-value" style={{ color: '#34d399' }}>
-                  {dataPoint?.gdpCountry ? `${dataPoint.gdpCountry} ` : ''}
-                  {hasGdp ? `(+${dataPoint.GDP}%)` : '-'}
-                </span>
-              </div>
-
-              <div className="tooltip-indicator-row">
-                <div className="tooltip-indicator-name">
-                  <span className="tooltip-color-bullet" style={{ background: '#f43f5e' }} />
-                  <span>อัตราเงินเฟ้อ:</span>
-                </div>
-                <span className="tooltip-indicator-value" style={{ color: '#fb7185' }}>
-                  {dataPoint?.infCountry ? `${dataPoint.infCountry} ` : ''}
-                  {hasInf ? `(${dataPoint.Inflation}%)` : '-'}
-                </span>
-              </div>
-
-              <div className="tooltip-indicator-row">
-                <div className="tooltip-indicator-name">
-                  <span className="tooltip-color-bullet" style={{ background: '#38bdf8' }} />
-                  <span>อัตราการว่างงาน:</span>
-                </div>
-                <span className="tooltip-indicator-value" style={{ color: '#38bdf8' }}>
-                  {dataPoint?.unempCountry ? `${dataPoint.unempCountry} ` : ''}
-                  {hasUnemp ? `(${dataPoint.Unemployment}%)` : '-'}
-                </span>
-              </div>
-            </div>
-            <div className="tooltip-footer">
-              <span className="tooltip-live-dot" />
-              <span>World Bank Verified Statistics v2</span>
-            </div>
-          </div>
-        );
-      }
-
-      // Single indicator mode tooltip
-      const entry = payload[0];
-      return (
-        <div className="db-custom-chart-tooltip">
-          <div className="tooltip-country-header">
-            <span className="tooltip-country-dot" />
-            <span className="tooltip-country-name">{label}</span>
-            <span className="tooltip-year-badge">{selectedYear}</span>
-          </div>
-          <div className="tooltip-indicators-list">
-            <div className="tooltip-indicator-row">
-              <div className="tooltip-indicator-name">
-                <span
-                  className="tooltip-color-bullet"
-                  style={{ background: entry.color || entry.fill }}
-                />
-                <span>
-                  {activeChartMode === 'gdp'
-                    ? 'GDP Growth'
-                    : activeChartMode === 'inflation'
-                    ? 'อัตราเงินเฟ้อ'
-                    : 'อัตราการว่างงาน'}
-                  :
-                </span>
-              </div>
-              <span
-                className="tooltip-indicator-value"
-                style={{ color: entry.color || entry.fill || '#ffffff', fontSize: '1rem', fontWeight: 800 }}
-              >
-                {typeof entry.value === 'number' ? `${entry.value.toFixed(1)}%` : entry.value}
-              </span>
-            </div>
-          </div>
-          <div className="tooltip-footer">
-            <span className="tooltip-live-dot" />
-            <span>World Bank Official Statistics v2</span>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Custom Glassmorphism Tooltip specifically for Regional Benchmark Chart
-  const RegionalTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const item = payload[0]?.payload;
-      if (!item) return null;
-
-      const iconCfg = getRegionIconConfig(item.id, 16);
-      const hasGdp = item.avgGdp !== undefined && item.avgGdp !== null;
-      const hasInf = item.avgInflation !== undefined && item.avgInflation !== null;
-      const hasUnemp = item.avgUnemployment !== undefined && item.avgUnemployment !== null;
-
-      return (
-        <div className="db-custom-chart-tooltip">
-          <div className="tooltip-country-header">
-            <span
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: 6,
-                background: iconCfg.bg,
-                border: `1px solid ${iconCfg.border}`,
-                color: iconCfg.color,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: 6
-              }}
-            >
-              {iconCfg.icon}
-            </span>
-            <span className="tooltip-country-name">
-              {item.name} ({item.thai})
-            </span>
-            <span className="tooltip-year-badge">{selectedYear}</span>
-          </div>
-
-          <div className="tooltip-indicators-list">
-            <div className="tooltip-indicator-row">
-              <div className="tooltip-indicator-name">
-                <span className="tooltip-color-bullet" style={{ background: '#34d399' }} />
-                <span>GDP Growth เฉลี่ย:</span>
-              </div>
-              <span className="tooltip-indicator-value" style={{ color: '#34d399' }}>
-                {hasGdp ? `+${item.avgGdp}%` : '-'}
-              </span>
-            </div>
-
-            <div className="tooltip-indicator-row">
-              <div className="tooltip-indicator-name">
-                <span className="tooltip-color-bullet" style={{ background: '#f43f5e' }} />
-                <span>อัตราเงินเฟ้อเฉลี่ย:</span>
-              </div>
-              <span className="tooltip-indicator-value" style={{ color: '#fb7185' }}>
-                {hasInf ? `${item.avgInflation}%` : '-'}
-              </span>
-            </div>
-
-            <div className="tooltip-indicator-row">
-              <div className="tooltip-indicator-name">
-                <span className="tooltip-color-bullet" style={{ background: '#38bdf8' }} />
-                <span>อัตราว่างงานเฉลี่ย:</span>
-              </div>
-              <span className="tooltip-indicator-value" style={{ color: '#38bdf8' }}>
-                {hasUnemp ? `${item.avgUnemployment}%` : '-'}
-              </span>
-            </div>
-          </div>
-
-          {item.topCountry && (
-            <div
-              style={{
-                marginTop: '0.65rem',
-                paddingTop: '0.5rem',
-                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                fontSize: '0.78rem',
-                color: '#cbd5e1',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.45rem'
-              }}
-            >
-              <span style={{ color: '#94a3b8' }}>{item.isGlobal ? 'สถิติสูงสุด:' : 'ผู้นำ GDP:'}</span>
-              <strong style={{ color: '#ffffff' }}>{item.topCountry.name}</strong>
-              <span style={{ color: '#34d399', fontWeight: 700 }}>
-                (+{item.topCountry.val}%)
-              </span>
-            </div>
-          )}
-
-          <div className="tooltip-footer">
-            <span className="tooltip-live-dot" />
-            <span>คำนวณจาก {item.countryCount || (item.isGlobal ? 182 : '')} ประเทศจริงใน World Bank</span>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
+  const nonGlobalRegionalData = useMemo(() => regionalData.filter(r => !r.isGlobal), [regionalData]);
 
   return (
     <div className="dashboard-home-page">
@@ -602,7 +604,7 @@ export default function DashboardHome({
                     axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(168, 85, 247, 0.08)' }} />
+                  <Tooltip content={<CustomTooltip activeChartMode={activeChartMode} selectedYear={selectedYear} />} cursor={{ fill: 'rgba(168, 85, 247, 0.08)' }} />
                   <Legend
                     wrapperStyle={{ paddingTop: '20px', fontSize: '0.84rem' }}
                     iconType="circle"
@@ -681,7 +683,7 @@ export default function DashboardHome({
                     axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16, 185, 129, 0.08)' }} />
+                  <Tooltip content={<CustomTooltip activeChartMode={activeChartMode} selectedYear={selectedYear} />} cursor={{ fill: 'rgba(16, 185, 129, 0.08)' }} />
                   <Bar
                     dataKey="value"
                     fill="url(#gdpSoloGrad)"
@@ -726,7 +728,7 @@ export default function DashboardHome({
                     axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(244, 63, 94, 0.08)' }} />
+                  <Tooltip content={<CustomTooltip activeChartMode={activeChartMode} selectedYear={selectedYear} />} cursor={{ fill: 'rgba(244, 63, 94, 0.08)' }} />
                   <Bar
                     dataKey="value"
                     fill="url(#inflationSoloGrad)"
@@ -771,7 +773,7 @@ export default function DashboardHome({
                     axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                     tickLine={false}
                   />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }} />
+                  <Tooltip content={<CustomTooltip activeChartMode={activeChartMode} selectedYear={selectedYear} />} cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }} />
                   <Bar
                     dataKey="value"
                     fill="url(#unemploymentSoloGrad)"
@@ -934,7 +936,7 @@ export default function DashboardHome({
               <ResponsiveContainer width="100%" height="100%">
                 {regionalChartMode === 'all' ? (
                   <BarChart
-                    data={regionalData.filter(r => !r.isGlobal)}
+                    data={nonGlobalRegionalData}
                     margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                     barGap={6}
                   >
@@ -968,7 +970,7 @@ export default function DashboardHome({
                       axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
-                    <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(168, 85, 247, 0.08)' }} />
+                    <Tooltip content={<RegionalTooltip selectedYear={selectedYear} />} cursor={{ fill: 'rgba(168, 85, 247, 0.08)' }} />
                     <Legend
                       wrapperStyle={{ paddingTop: '20px', fontSize: '0.84rem' }}
                       iconType="circle"
@@ -1021,7 +1023,7 @@ export default function DashboardHome({
                   </BarChart>
                 ) : regionalChartMode === 'gdp' ? (
                   <BarChart
-                    data={regionalData.filter(r => !r.isGlobal)}
+                    data={nonGlobalRegionalData}
                     margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                   >
                     <defs>
@@ -1045,7 +1047,7 @@ export default function DashboardHome({
                       axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
-                    <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(16, 185, 129, 0.08)' }} />
+                    <Tooltip content={<RegionalTooltip selectedYear={selectedYear} />} cursor={{ fill: 'rgba(16, 185, 129, 0.08)' }} />
                     <Bar
                       dataKey="avgGdp"
                       fill="url(#regSoloGdp)"
@@ -1064,7 +1066,7 @@ export default function DashboardHome({
                   </BarChart>
                 ) : regionalChartMode === 'inflation' ? (
                   <BarChart
-                    data={regionalData.filter(r => !r.isGlobal)}
+                    data={nonGlobalRegionalData}
                     margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                   >
                     <defs>
@@ -1088,7 +1090,7 @@ export default function DashboardHome({
                       axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
-                    <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(244, 63, 94, 0.08)' }} />
+                    <Tooltip content={<RegionalTooltip selectedYear={selectedYear} />} cursor={{ fill: 'rgba(244, 63, 94, 0.08)' }} />
                     <Bar
                       dataKey="avgInflation"
                       fill="url(#regSoloInf)"
@@ -1107,7 +1109,7 @@ export default function DashboardHome({
                   </BarChart>
                 ) : (
                   <BarChart
-                    data={regionalData.filter(r => !r.isGlobal)}
+                    data={nonGlobalRegionalData}
                     margin={{ top: 32, right: 25, left: -10, bottom: 5 }}
                   >
                     <defs>
@@ -1131,7 +1133,7 @@ export default function DashboardHome({
                       axisLine={{ stroke: 'rgba(255, 255, 255, 0.1)' }}
                       tickLine={false}
                     />
-                    <Tooltip content={<RegionalTooltip />} cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }} />
+                    <Tooltip content={<RegionalTooltip selectedYear={selectedYear} />} cursor={{ fill: 'rgba(14, 165, 233, 0.08)' }} />
                     <Bar
                       dataKey="avgUnemployment"
                       fill="url(#regSoloUnemp)"
@@ -1156,4 +1158,6 @@ export default function DashboardHome({
       </div>
     </div>
   );
-}
+});
+
+export default DashboardHome;

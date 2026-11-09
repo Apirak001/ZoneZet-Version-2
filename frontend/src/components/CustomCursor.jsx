@@ -1,22 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
+
+const INTERACTIVE_SELECTOR =
+  'a, button, [role="button"], input, select, textarea, .dice-card, .tm-tile, .choose-us-block, .single-team_item, .plus-button, .floating-back-to-top, .official-brand, .hero-central-card, .floating-badge-box, .btn';
 
 /**
  * CustomCursor — Ultra-Smooth Luxury Trailing Cursor (Luxdrive Style)
- * Features:
- * - Instant responsive inner dot (0 input lag for precise clicking)
- * - Buttery-smooth delta-time normalized trailing aura disc (identical physics at 60Hz, 120Hz, 144Hz+)
- * - Organic fluid momentum that glides effortlessly on glass
- * - Soft translucent aura disc matching the website theme
- * - Automatic hover expansion over interactive elements
- * - Clean teardown & auto-hidden on touch/mobile
+ * Optimized with transient refs to avoid unnecessary React re-renders and listener re-subscriptions.
  */
-export default function CustomCursor() {
+const CustomCursor = memo(function CustomCursor() {
   const dotRef = useRef(null);
   const ringRef = useRef(null);
 
   const mousePos = useRef({ x: -100, y: -100 });
   const ringPos = useRef({ x: -100, y: -100 });
   const isFirstMove = useRef(true);
+  const isVisibleRef = useRef(false);
+  const isHoveredRef = useRef(false);
 
   const [isHovered, setIsHovered] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
@@ -31,7 +30,7 @@ export default function CustomCursor() {
     }
 
     const onTouchStart = () => setIsTouch(true);
-    window.addEventListener('touchstart', onTouchStart, { once: true });
+    window.addEventListener('touchstart', onTouchStart, { once: true, passive: true });
 
     const onMouseMove = (e) => {
       mousePos.current.x = e.clientX;
@@ -43,29 +42,43 @@ export default function CustomCursor() {
         isFirstMove.current = false;
       }
 
-      if (!isVisible) setIsVisible(true);
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
     };
 
     const onMouseDown = () => setIsClicking(true);
     const onMouseUp = () => setIsClicking(false);
 
-    const onMouseLeave = () => setIsVisible(false);
-    const onMouseEnter = () => setIsVisible(true);
+    const onMouseLeave = () => {
+      if (isVisibleRef.current) {
+        isVisibleRef.current = false;
+        setIsVisible(false);
+      }
+    };
+    const onMouseEnter = () => {
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
+    };
 
-    // Interactive target detection via delegation
+    // Interactive target detection via delegation (only setState when boolean changes)
     const onMouseOver = (e) => {
       const target = e.target;
-      const isInteractive = target.closest(
-        'a, button, [role="button"], input, select, textarea, .dice-card, .tm-tile, .choose-us-block, .single-team_item, .plus-button, .floating-back-to-top, .official-brand, .hero-central-card, .floating-badge-box, .btn'
-      );
-      setIsHovered(!!isInteractive);
+      const nextHovered = Boolean(target?.closest?.(INTERACTIVE_SELECTOR));
+      if (nextHovered !== isHoveredRef.current) {
+        isHoveredRef.current = nextHovered;
+        setIsHovered(nextHovered);
+      }
     };
 
     window.addEventListener('mousemove', onMouseMove, { passive: true });
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mouseup', onMouseUp);
-    document.addEventListener('mouseleave', onMouseLeave);
-    document.addEventListener('mouseenter', onMouseEnter);
+    window.addEventListener('mousedown', onMouseDown, { passive: true });
+    window.addEventListener('mouseup', onMouseUp, { passive: true });
+    document.addEventListener('mouseleave', onMouseLeave, { passive: true });
+    document.addEventListener('mouseenter', onMouseEnter, { passive: true });
     document.addEventListener('mouseover', onMouseOver, { passive: true });
 
     // Ultra-smooth delta-time normalized physics loop
@@ -73,17 +86,13 @@ export default function CustomCursor() {
     let animationFrameId;
 
     const render = (currentTime) => {
-      // Calculate delta time in seconds, clamped to avoid jumps during tab switches
       const dt = Math.min((currentTime - lastTime) / 1000, 0.05);
       lastTime = currentTime;
 
-      // 1. Instant dot tracking for zero input lag when clicking/aiming
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${mousePos.current.x}px, ${mousePos.current.y}px, 0)`;
       }
 
-      // 2. Buttery-smooth exponential decay easing for trailing follower disc
-      // Continuous decay rate k = 5.2 gives a velvety, liquid luxury glide
       const smoothFactor = 1 - Math.exp(-5.2 * dt);
       ringPos.current.x += (mousePos.current.x - ringPos.current.x) * smoothFactor;
       ringPos.current.y += (mousePos.current.y - ringPos.current.y) * smoothFactor;
@@ -107,7 +116,7 @@ export default function CustomCursor() {
       document.removeEventListener('mouseover', onMouseOver);
       window.removeEventListener('touchstart', onTouchStart);
     };
-  }, [isVisible]);
+  }, []);
 
   if (isTouch) return null;
 
@@ -129,4 +138,6 @@ export default function CustomCursor() {
       </div>
     </div>
   );
-}
+});
+
+export default CustomCursor;
