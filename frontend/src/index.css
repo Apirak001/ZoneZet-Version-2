@@ -3856,10 +3856,9 @@ section.why_choose_area {
   height: 50px;
 }
 
-.choose-us-block .inner-block .icon-block img {
+.choose-us-block .inner-block .icon-block svg {
   width: 50px;
   height: 50px;
-  object-fit: contain;
 }
 
 .choose-us-block .inner-block:hover .icon-block {
@@ -3925,9 +3924,10 @@ section.why_choose_area {
 /* ==========================================================================
    ZONEZET THEMED CARDS: COLOR VARIANTS
    ========================================================================== */
-/* 1. Theme Purple: Ultra-Low Latency */
-.choose-us-block.theme-purple .icon-block img {
-  filter: hue-rotate(240deg) brightness(1.3) drop-shadow(0 4px 14px rgba(168, 85, 247, 0.5));
+/* 1. Theme Purple: Data-Driven Strategy */
+.choose-us-block.theme-purple .icon-block svg {
+  color: #c084fc;
+  filter: drop-shadow(0 4px 14px rgba(168, 85, 247, 0.5));
 }
 .choose-us-block.theme-purple .title {
   color: #c084fc !important;
@@ -3948,9 +3948,10 @@ section.why_choose_area {
   box-shadow: 0 4px 15px rgba(168, 85, 247, 0.5);
 }
 
-/* 2. Theme Cyan: Dynamic Analytics */
-.choose-us-block.theme-cyan .icon-block img {
-  filter: hue-rotate(160deg) brightness(1.3) drop-shadow(0 4px 14px rgba(56, 189, 248, 0.5));
+/* 2. Theme Cyan: Insightful Visualization */
+.choose-us-block.theme-cyan .icon-block svg {
+  color: #38bdf8;
+  filter: drop-shadow(0 4px 14px rgba(56, 189, 248, 0.5));
 }
 .choose-us-block.theme-cyan .title {
   color: #38bdf8 !important;
@@ -3971,9 +3972,10 @@ section.why_choose_area {
   box-shadow: 0 4px 15px rgba(56, 189, 248, 0.5);
 }
 
-/* 3. Theme Pink: Sovereign Filtering */
-.choose-us-block.theme-pink .icon-block img {
-  filter: hue-rotate(290deg) brightness(1.3) drop-shadow(0 4px 14px rgba(244, 114, 182, 0.5));
+/* 3. Theme Pink: Real-Time Reliability */
+.choose-us-block.theme-pink .icon-block svg {
+  color: #f472b6;
+  filter: drop-shadow(0 4px 14px rgba(244, 114, 182, 0.5));
 }
 .choose-us-block.theme-pink .title {
   color: #f472b6 !important;
@@ -3994,9 +3996,10 @@ section.why_choose_area {
   box-shadow: 0 4px 15px rgba(244, 114, 182, 0.5);
 }
 
-/* 4. Theme Emerald: Zero-Crash SLA */
-.choose-us-block.theme-emerald .icon-block img {
-  filter: hue-rotate(95deg) brightness(1.3) drop-shadow(0 4px 14px rgba(52, 211, 153, 0.5));
+/* 4. Theme Emerald: Seamless Global Comparison */
+.choose-us-block.theme-emerald .icon-block svg {
+  color: #34d399;
+  filter: drop-shadow(0 4px 14px rgba(52, 211, 153, 0.5));
 }
 .choose-us-block.theme-emerald .title {
   color: #34d399 !important;
@@ -4524,6 +4527,10 @@ section.why_choose_area {
 }
 
 /* Contact rows */
+.tm-tile-contact {
+  grid-column: 1 / -1;
+}
+
 .tm-tile-contact .tm-tile-body {
   gap: 0.4rem;
 }

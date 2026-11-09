@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  GraduationCap,
   Briefcase,
   Code2,
   Terminal,
@@ -22,10 +21,6 @@ const TEAM = [
     role: 'Frontend Developer',
     photo: '/img/team_dream.jpg',
     index: '01',
-    education: {
-      id: '681310025',
-      major: 'วิทยาการคอมพิวเตอร์และสารสนเทศ'
-    },
     responsibility: {
       title: 'Frontend Architect & UX Lead',
       desc: 'ออกแบบ UI/UX, Data Visualization และสถาปัตยกรรม SPA'
@@ -47,10 +42,6 @@ const TEAM = [
     role: 'Backend Developer',
     photo: '/img/team_noor.jpg',
     index: '02',
-    education: {
-      id: '681310xxx',
-      major: 'วิทยาการคอมพิวเตอร์และสารสนเทศ'
-    },
     responsibility: {
       title: 'Backend & Distributed Systems',
       desc: 'พัฒนา Express API Gateway, Caching และ Data Pipeline'
@@ -131,21 +122,8 @@ function DevProfile({ dev }) {
         </div>
       </div>
 
-      {/* 4 personal info tiles (right, 2x2) */}
+      {/* Personal info tiles (right) */}
       <div className="tm-tiles">
-        {/* Education */}
-        <div className="tm-tile">
-          <div className="tm-tile-top">
-            <span className="tm-tile-icon"><GraduationCap size={18} /></span>
-            <span className="tm-tile-label">Education</span>
-          </div>
-          <div className="tm-tile-body">
-            <p className="tm-tile-kicker">รหัสนักศึกษา</p>
-            <p className="tm-tile-value tm-mono">{dev.education.id}</p>
-            <p className="tm-tile-desc">{dev.education.major}</p>
-          </div>
-        </div>
-
         {/* Responsibility */}
         <div className="tm-tile">
           <div className="tm-tile-top">

@@ -20,6 +20,10 @@ import {
   Cloud,
   Globe,
   Plus,
+  Target,
+  PieChart,
+  Activity,
+  Earth,
   GraduationCap,
   Briefcase,
   Code2,
@@ -464,7 +468,7 @@ export default function LandingAboutView({
               </h2>
             </div>
             <div className="top-icon">
-              <img src="/img/choose-us-icon1-1.png" alt="ZoneZet Intelligence Rotating Sunburst" />
+              <img src="/img/logo.png" alt="ZoneZet Logo" />
             </div>
           </div>
 
@@ -472,21 +476,21 @@ export default function LandingAboutView({
             ref={chooseUsRef}
             className={`row g-4 advance-wrap ${isSpread ? 'is-spread' : ''}`}
           >
-            {/* 1. Ultra-Low Latency */}
+            {/* 1. Data-Driven Strategy */}
             <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
               <div className="choose-us-block advance-item item-0 theme-purple">
                 <div className="inner-block">
                   <div className="icon-block">
-                    <img src="/img/choose-icon1-1.png" alt="Ultra-Low Latency" />
+                    <Target size={50} strokeWidth={1.5} />
                   </div>
                   <div className="content-block">
-                    <h4 className="title">Ultra-Low Latency</h4>
+                    <h4 className="title">Data-Driven Strategy</h4>
                     <p className="text">
-                      แคชข้อมูลในระดับ RAM ผ่าน In-Memory Hash Map ลดเวลาสืบค้นจาก 1,200ms เหลือเพียง 0.05ms ตอบสนองได้ทันทีโดยไม่ติด Rate Limit
+                      รวบรวมตัวชี้วัดเศรษฐกิจมหภาคที่สำคัญที่สุด เช่น GDP Growth, อัตราเงินเฟ้อ, อัตราการว่างงาน ไว้ในที่เดียว ช่วยให้องค์กร นักธุรกิจ หรือนักลงทุน สามารถประเมินความเสี่ยงและมองหาโอกาสทางการตลาดในแต่ละประเทศได้อย่างแม่นยำและมีหลักการ
                     </p>
                     <div className="button-items">
                       <div className="bottom-line"></div>
-                      <button type="button" className="plus-button" aria-label="Learn more about Ultra-Low Latency">
+                      <button type="button" className="plus-button" aria-label="Learn more about Data-Driven Strategy">
                         <Plus size={16} />
                       </button>
                     </div>
@@ -495,21 +499,21 @@ export default function LandingAboutView({
               </div>
             </div>
 
-            {/* 2. Dynamic Analytics */}
+            {/* 2. Insightful Visualization */}
             <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
               <div className="choose-us-block advance-item item-1 theme-cyan">
                 <div className="inner-block">
                   <div className="icon-block">
-                    <img src="/img/choose-icon1-2.png" alt="Dynamic Analytics" />
+                    <PieChart size={50} strokeWidth={1.5} />
                   </div>
                   <div className="content-block">
-                    <h4 className="title">Dynamic Analytics</h4>
+                    <h4 className="title">Insightful Visualization</h4>
                     <p className="text">
-                      เปลี่ยนตัวเลขดิบของ World Bank ให้เป็นกราฟิก Recharts โต้ตอบได้ ทั้ง Bar Chart เปรียบเทียบอันดับ และ Multi-Line Chart เทรนด์ 5 ปี
+                      บอกลาการนั่งจ้องไฟล์สเปรดชีตหรือข้อมูลดิบที่ปวดหัว ZoneZet แปลงสถิติมหาศาลระดับโลกให้อยู่ในรูปแบบกราฟิกและแดชบอร์ดที่สวยงาม สบายตา และ User-friendly ทำให้ผู้ใช้สามารถดึง Insight ไปใช้ตัดสินใจหรือทำสไลด์นำเสนอต่อได้ทันทีโดยไม่ต้องเสียเวลาวิเคราะห์ใหม่
                     </p>
                     <div className="button-items">
                       <div className="bottom-line"></div>
-                      <button type="button" className="plus-button" aria-label="Learn more about Dynamic Analytics">
+                      <button type="button" className="plus-button" aria-label="Learn more about Insightful Visualization">
                         <Plus size={16} />
                       </button>
                     </div>
@@ -518,21 +522,21 @@ export default function LandingAboutView({
               </div>
             </div>
 
-            {/* 3. Sovereign Filtering */}
+            {/* 3. Real-Time Reliability */}
             <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
               <div className="choose-us-block advance-item item-2 theme-pink">
                 <div className="inner-block">
                   <div className="icon-block">
-                    <img src="/img/choose-icon1-3.png" alt="Sovereign Filtering" />
+                    <Activity size={50} strokeWidth={1.5} />
                   </div>
                   <div className="content-block">
-                    <h4 className="title">Sovereign Filtering</h4>
+                    <h4 className="title">Real-Time Reliability</h4>
                     <p className="text">
-                      คัดกรองกลุ่มองค์กรและทวีปออกด้วย Hash Set O(1) ทำให้ได้ข้อมูลเฉพาะประเทศจริง 100% ปราศจากข้อมูลซ้ำซ้อนหรือความคลาดเคลื่อน
+                      ด้วยการดึงข้อมูลสดตรงจาก World Bank API ทำให้มั่นใจได้ว่าตัวเลขทุกตัวบนแพลตฟอร์มมาจากแหล่งอ้างอิงระดับสากลที่มีความน่าเชื่อถือสูงสุด อัปเดตทันเหตุการณ์ และปราศจากความคลาดเคลื่อนจากการป้อนข้อมูลด้วยมือ
                     </p>
                     <div className="button-items">
                       <div className="bottom-line"></div>
-                      <button type="button" className="plus-button" aria-label="Learn more about Sovereign Filtering">
+                      <button type="button" className="plus-button" aria-label="Learn more about Real-Time Reliability">
                         <Plus size={16} />
                       </button>
                     </div>
@@ -541,21 +545,21 @@ export default function LandingAboutView({
               </div>
             </div>
 
-            {/* 4. Zero-Crash SLA */}
+            {/* 4. Seamless Global Comparison */}
             <div className="col-xl-3 col-lg-6 col-md-6 advance-col">
               <div className="choose-us-block advance-item item-3 theme-emerald">
                 <div className="inner-block">
                   <div className="icon-block">
-                    <img src="/img/choose-icon1-4.png" alt="Zero-Crash SLA" />
+                    <Earth size={50} strokeWidth={1.5} />
                   </div>
                   <div className="content-block">
-                    <h4 className="title">Zero-Crash SLA</h4>
+                    <h4 className="title">Seamless Global Comparison</h4>
                     <p className="text">
-                      มีระบบ Safe Fallback รองรับข้อมูลออฟไลน์ 182 ประเทศ พร้อมระบบ Undo Stack (LIFO) กู้คืนรายการที่เผลอลบได้ทันที
+                      ออกแบบมาเพื่อตอบโจทย์การเปรียบเทียบโดยเฉพาะ ผู้ใช้สามารถกดเทียบกราฟแนวโน้มเศรษฐกิจของหลายประเทศพร้อมกันได้ในหน้าจอเดียว ทำให้เห็นความแตกต่าง ทิศทางของตลาดโลก และความเชื่อมโยงของเศรษฐกิจแต่ละภูมิภาคได้อย่างรวดเร็วในไม่กี่คลิก
                     </p>
                     <div className="button-items">
                       <div className="bottom-line"></div>
-                      <button type="button" className="plus-button" aria-label="Learn more about Zero-Crash SLA">
+                      <button type="button" className="plus-button" aria-label="Learn more about Seamless Global Comparison">
                         <Plus size={16} />
                       </button>
                     </div>
