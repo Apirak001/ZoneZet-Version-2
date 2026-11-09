@@ -33,7 +33,7 @@ export default function DashboardToolbar({
     },
     {
       id: 'inflation',
-      label: 'อัตราเงินเฟ้อ (CPI)',
+      label: 'อัตราเงินเฟ้อ',
       icon: Percent,
       color: '#f43f5e',
       activeGradient: 'linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)',

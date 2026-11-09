@@ -371,7 +371,7 @@ export default function LandingAboutView({
                     <div className="choose_content">
                       <h3 className="item-title">Global Macro Intelligence (196+ ประเทศ)</h3>
                       <p className="item-desc">
-                        เข้าถึงข้อมูล GDP, อัตราเงินเฟ้อ CPI และตลาดแรงงานทั่วโลกแบบเรียลไทม์ มองเห็นทิศทางและจับสัญญาณเศรษฐกิจได้ก่อนใคร เพื่อวางกลยุทธ์ได้อย่างแม่นยำ
+                        เข้าถึงข้อมูล GDP, อัตราเงินเฟ้อ และตลาดแรงงานทั่วโลกแบบเรียลไทม์ มองเห็นทิศทางและจับสัญญาณเศรษฐกิจได้ก่อนใคร เพื่อวางกลยุทธ์ได้อย่างแม่นยำ
                       </p>
                     </div>
                   </div>
@@ -420,7 +420,7 @@ export default function LandingAboutView({
               <span>✦ GLOBAL MACRO DATA NETWORK</span>
               <span>✦ 196+ NATIONS COVERAGE</span>
               <span>✦ REAL-TIME GDP GROWTH ANALYSIS</span>
-              <span>✦ INFLATION CPI TREND TRACKING</span>
+              <span>✦ INFLATION TREND TRACKING</span>
               <span>✦ UNEMPLOYMENT &amp; LABOR BENCHMARK</span>
               <span>✦ INSTANT MULTILATERAL COMPARISONS</span>
               <span>✦ SUB-MILLISECOND QUERY LATENCY</span>
@@ -430,7 +430,7 @@ export default function LandingAboutView({
               <span>✦ GLOBAL MACRO DATA NETWORK</span>
               <span>✦ 196+ NATIONS COVERAGE</span>
               <span>✦ REAL-TIME GDP GROWTH ANALYSIS</span>
-              <span>✦ INFLATION CPI TREND TRACKING</span>
+              <span>✦ INFLATION TREND TRACKING</span>
               <span>✦ UNEMPLOYMENT &amp; LABOR BENCHMARK</span>
               <span>✦ INSTANT MULTILATERAL COMPARISONS</span>
               <span>✦ SUB-MILLISECOND QUERY LATENCY</span>

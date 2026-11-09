@@ -63,7 +63,7 @@ const METRICS = {
   },
   inflation: {
     key: 'inflation',
-    label: 'เงินเฟ้อ (CPI)',
+    label: 'เงินเฟ้อ',
     th: 'อัตราเงินเฟ้อ',
     icon: Flame,
     color: '#f43f5e',

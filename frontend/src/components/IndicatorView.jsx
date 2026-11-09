@@ -99,7 +99,7 @@ export default function IndicatorView({
           gradStart: '#fb7185',
           gradEnd: '#e11d48',
           icon: Flame,
-          badgeLabel: 'INFLATION RATE (CPI)',
+          badgeLabel: 'INFLATION RATE',
           titleTh: 'อัตราเงินเฟ้อ',
           titleEn: 'Inflation Rate',
           defaultSubtitle: 'ติดตามเสถียรภาพระดับราคาสินค้า อัตราค่าครองชีพ และกำลังซื้อของผู้บริโภค',

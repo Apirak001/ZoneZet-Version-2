@@ -441,7 +441,7 @@ export default function CompareModal({
             className={`compare-modal-tab-btn inflation ${selectedMetric === 'inflation' ? 'active' : ''}`}
           >
             <Flame size={15} />
-            <span>อัตราเงินเฟ้อ CPI (%)</span>
+            <span>อัตราเงินเฟ้อ (%)</span>
           </button>
 
           <button
@@ -891,7 +891,7 @@ export default function CompareModal({
                             <div className="compare-matrix-metric-top">
                               <span className="compare-matrix-metric-label">
                                 <Flame size={12} color="#fb7185" />
-                                <span>เงินเฟ้อ CPI</span>
+                                <span>เงินเฟ้อ</span>
                               </span>
                               <span className="db-value-badge red">
                                 {infVal?.displayValue || `${infVal?.value ?? 0}%`}
