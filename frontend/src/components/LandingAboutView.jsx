@@ -156,6 +156,10 @@ export default function LandingAboutView({
     ? topSummary.inflation.find(c => c.value > 0)
     : { country: 'Thailand', countryCode: 'THA', value: 1.2, displayValue: '1.2%' };
 
+  const topUnemployment = (topSummary.unemployment && topSummary.unemployment[0])
+    ? topSummary.unemployment[0]
+    : { country: 'South Africa', countryCode: 'ZAF', value: 32.9, displayValue: '32.9%' };
+
   return (
     <div className="landing-page-purple">
       {/* ====================================================================
@@ -171,7 +175,7 @@ export default function LandingAboutView({
           <div className="hero-text-col">
             <div className="hero-badge-tag reveal-on-scroll">
               <span className="badge-sparkle">✦</span>
-              <span>ENTERPRISE MACROECONOMIC INTELLIGENCE</span>
+              <span>MACROECONOMIC ANALYSIS PLATFORM</span>
             </div>
 
             <h1 className="hero-bold-heading reveal-on-scroll reveal-delay-1">
@@ -218,37 +222,6 @@ export default function LandingAboutView({
                 <span>ศูนย์เปรียบเทียบ (Compare Hub)</span>
               </button>
             </div>
-
-            {/* Live Animated Metrics Ticker (Single Row Guarantee) */}
-            <div className="hero-trust-metrics reveal-on-scroll reveal-delay-4">
-              <div className="metric-tick-item">
-                <span className="metric-number">
-                  <AnimatedCounter end={196} duration={1600} suffix="+" />
-                </span>
-                <span className="metric-label">ประเทศทั่วโลก</span>
-              </div>
-
-              <div className="metric-tick-item">
-                <span className="metric-number">
-                  &lt; 0.1 <span className="metric-unit">ms</span>
-                </span>
-                <span className="metric-label">In-Memory Cache</span>
-              </div>
-
-              <div className="metric-tick-item">
-                <span className="metric-number">
-                  <AnimatedCounter end={25} duration={1400} suffix="x" />
-                </span>
-                <span className="metric-label">Faster MergeSort</span>
-              </div>
-
-              <div className="metric-tick-item">
-                <span className="metric-number">
-                  <AnimatedCounter end={100} duration={1500} suffix="%" />
-                </span>
-                <span className="metric-label">Zero-Crash SLA</span>
-              </div>
-            </div>
           </div>
 
           {/* Right Column: Visual Stage (Enlarged, Prominent, Real Dynamic Data) */}
@@ -285,6 +258,14 @@ export default function LandingAboutView({
                       </span>
                       <span className="mini-kpi-sub">{topInflation.country} ({topInflation.countryCode})</span>
                     </div>
+
+                    <div className="hero-mini-kpi">
+                      <span className="mini-kpi-label">Unemployment Rate</span>
+                      <span className="mini-kpi-val sky">
+                        {topUnemployment.displayValue || `${topUnemployment.value}%`}
+                      </span>
+                      <span className="mini-kpi-sub">{topUnemployment.country} ({topUnemployment.countryCode})</span>
+                    </div>
                   </div>
 
                   {/* Velocity Progress Bars with Smooth Animation */}
@@ -298,7 +279,7 @@ export default function LandingAboutView({
                           transition: 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)'
                         }}
                       />
-                      <span className="preview-bar-text">GDP Growth Velocity (88%)</span>
+                      <span className="preview-bar-text">GDP Growth Global</span>
                     </div>
 
                     <div className="preview-bar-track">
@@ -310,7 +291,7 @@ export default function LandingAboutView({
                           transition: 'width 1.4s cubic-bezier(0.16, 1, 0.3, 1)'
                         }}
                       />
-                      <span className="preview-bar-text">Inflation Moderation Index (64%)</span>
+                      <span className="preview-bar-text">Inflation Stability Global</span>
                     </div>
 
                     <div className="preview-bar-track">
@@ -322,20 +303,9 @@ export default function LandingAboutView({
                           transition: 'width 1.6s cubic-bezier(0.16, 1, 0.3, 1)'
                         }}
                       />
-                      <span className="preview-bar-text">Labor Force Stability (92%)</span>
+                      <span className="preview-bar-text">Labor Force Stability Global</span>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Floating Badge Card 1 (Top Left - High-Tech Cache Metric, Enlarged) */}
-              <div className="floating-badge-box badge-top-left">
-                <div className="floating-icon-wrap purple">
-                  <Zap size={22} />
-                </div>
-                <div>
-                  <div className="floating-title">In-Memory Cache O(1)</div>
-                  <div className="floating-desc">ดึงข้อมูลใน &lt; 0.1ms</div>
                 </div>
               </div>
 
@@ -379,7 +349,7 @@ export default function LandingAboutView({
                 <div className="why-section-title reveal-on-scroll">
                   <div className="hero-badge-tag" style={{ marginBottom: '1.25rem' }}>
                     <span className="badge-sparkle">✦</span>
-                    <span>ENTERPRISE MACROECONOMIC INTELLIGENCE</span>
+                    <span>MACROECONOMIC ANALYSIS PLATFORM</span>
                   </div>
                   <h2 className="why-main-heading">
                     For Speed &amp; Insights <br />
@@ -488,7 +458,7 @@ export default function LandingAboutView({
             <div className="sec-title">
               <div className="hero-badge-tag" style={{ marginBottom: '1.25rem', display: 'inline-flex' }}>
                 <span className="badge-sparkle">✦</span>
-                <span>ENTERPRISE MACROECONOMIC INTELLIGENCE</span>
+                <span>MACROECONOMIC ANALYSIS PLATFORM</span>
               </div>
               <h2 className="title split-title text-white">
                 <span className="title-en-gradient">Global Economic Intelligence</span>

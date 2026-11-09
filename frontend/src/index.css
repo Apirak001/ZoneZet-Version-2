@@ -2009,8 +2009,8 @@ body {
 
 .hero-kpi-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.15rem;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.85rem;
   margin-bottom: 1.35rem;
 }
 
@@ -2018,7 +2018,7 @@ body {
   background: rgba(10, 6, 20, 0.7);
   border: 1px solid rgba(168, 85, 247, 0.22);
   border-radius: 14px;
-  padding: 1.1rem 1.25rem;
+  padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
 }
@@ -2038,6 +2038,7 @@ body {
 
 .mini-kpi-val.green { color: #34d399; }
 .mini-kpi-val.purple { color: #c084fc; }
+.mini-kpi-val.sky { color: #38bdf8; }
 
 .mini-kpi-sub {
   font-size: 0.76rem;

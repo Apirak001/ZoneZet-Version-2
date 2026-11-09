@@ -475,19 +475,6 @@ export default function App() {
       {/* Universal Footer across ALL pages */}
       <Footer setActiveTab={setActiveTab} lenis={lenisInstance} />
 
-      {/* Persistent Multi-Country Floating Compare Dock (Zero Disruption) */}
-      {activeTab !== 'compare' && (
-        <CompareFloatingDock
-          comparedList={comparedList}
-          onRemoveFromCompare={handleRemoveFromCompare}
-          onClearAll={handleClearCompare}
-          onOpenCompareModal={() => setIsCompareModalOpen(true)}
-          onNavigateToCompare={() => {
-            setActiveTab('compare');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-        />
-      )}
 
       {/* In-Page Instant Comparison Modal (Zero Page Disruption) */}
       <CompareModal

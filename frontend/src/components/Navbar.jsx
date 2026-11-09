@@ -211,18 +211,8 @@ export default function Navbar({
           })}
         </nav>
 
-        {/* Right: Clean Action Button (Right Anchored) */}
+        {/* Right: Mobile Hamburger Toggle */}
         <div className="biz-nav-actions">
-          <button
-            onClick={() => handleNavClick('home')}
-            className="biz-cta-button"
-            title="เปิดเข้าสู่แดชบอร์ดสถิติ 196 ประเทศ"
-          >
-            <span>เข้าสู่แดชบอร์ด</span>
-            <ArrowRight size={14} className="biz-cta-arrow" />
-          </button>
-
-          {/* Mobile Hamburger Toggle */}
           <button
             className="biz-mobile-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
