@@ -752,8 +752,7 @@ export default function ComparisonHub({
       ) : comparedList.length === 0 ? (
         <EmptyState
           title="ยังไม่ได้เลือกประเทศ"
-          message="กด “เพิ่มประเทศ” ด้านบน หรือกดปุ่มด้านล่างเพื่อโหลดตัวอย่าง"
-          onReset={() => setComparedList(['THA', 'USA', 'JPN', 'VNM'])}
+          message="กรุณากดปุ่ม “+ เพิ่มประเทศ” ด้านบน เพื่อเริ่มต้นการเปรียบเทียบ"
         />
       ) : hasData ? (
         <>

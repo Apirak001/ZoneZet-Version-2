@@ -41,7 +41,12 @@ export function LoadingSkeleton({ text = 'กำลังโหลดข้อ�
   );
 }
 
-export function EmptyState({ title = 'ไม่พบข้อมูลที่ตรงกับเงื่อนไข', message = 'กรุณาปรับคำค้นหา หรือรีเซ็ตตัวกรองภูมิภาค', onReset }) {
+export function EmptyState({
+  title = 'ไม่พบข้อมูลที่ตรงกับเงื่อนไข',
+  message = 'กรุณาปรับคำค้นหา หรือรีเซ็ตตัวกรองภูมิภาค',
+  onReset,
+  buttonText = 'รีเซ็ตตัวกรองการค้นหา'
+}) {
   return (
     <div style={{ padding: '3.5rem 2rem', textAlign: 'center' }} className="glass-panel">
       <div style={{
@@ -63,7 +68,7 @@ export function EmptyState({ title = 'ไม่พบข้อมูลที่
       {onReset && (
         <button onClick={onReset} className="btn btn-secondary btn-sm" style={{ borderRadius: '6px', padding: '0.45rem 1.15rem' }}>
           <RefreshCw size={13} />
-          <span>รีเซ็ตตัวกรองการค้นหา</span>
+          <span>{buttonText}</span>
         </button>
       )}
     </div>
