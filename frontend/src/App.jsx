@@ -28,6 +28,12 @@ export default function App() {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
+      prevent: (node) => {
+        return (
+          node?.hasAttribute?.('data-lenis-prevent') ||
+          Boolean(node?.closest?.('[data-lenis-prevent], .compare-search-dropdown-menu, .compare-search-results-list, .compare-modal-content, .db-custom-dropdown-menu'))
+        );
+      },
       wheelMultiplier: 1.05,
       touchMultiplier: 1.5,
       infinite: false,

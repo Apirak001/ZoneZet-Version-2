@@ -19,8 +19,6 @@ import {
   Compass,
   Layers,
   Hash,
-  Lightbulb,
-  MousePointerClick,
   ListOrdered,
   Table2,
   Info
@@ -90,14 +88,6 @@ const METRICS = {
 
 const METRIC_KEYS = ['gdp', 'inflation', 'unemployment'];
 
-// Quick presets so users can start comparing with one click
-const PRESETS = [
-  { id: 'asean', label: 'อาเซียน', codes: ['THA', 'VNM', 'IDN', 'MYS'] },
-  { id: 'big', label: 'เศรษฐกิจใหญ่ของโลก', codes: ['USA', 'CHN', 'JPN', 'DEU'] },
-  { id: 'asia', label: 'เอเชียตะวันออก', codes: ['THA', 'JPN', 'KOR', 'CHN'] },
-  { id: 'tha-usa', label: 'ไทย vs มหาอำนาจ', codes: ['THA', 'USA', 'GBR', 'FRA'] }
-];
-
 const CHART_TYPES = [
   { id: 'bar', label: 'แท่ง', icon: BarChart3, tip: 'กราฟแท่ง — เทียบความต่างแต่ละปีได้ชัดที่สุด' },
   { id: 'line', label: 'เส้น', icon: TrendingUp, tip: 'กราฟเส้น — ดูแนวโน้มขึ้น/ลงตลอด 5 ปี' },
@@ -141,6 +131,7 @@ export default function ComparisonHub({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
+  const resultsListRef = useRef(null);
 
   const metric = METRICS[selectedMetric];
 
@@ -232,11 +223,6 @@ export default function ComparisonHub({
     setComparisonData(null);
   };
 
-  const applyPreset = (codes) => {
-    if (setComparedList) setComparedList(codes.slice(0, MAX_COUNTRIES));
-    setHighlightedCountry(null);
-  };
-
   const filteredSearchCountries = useMemo(() => {
     if (!searchFilter.trim()) return allCountries.slice(0, 12);
     const q = searchFilter.toLowerCase().trim();
@@ -295,21 +281,21 @@ export default function ComparisonHub({
     [ranking]
   );
 
-  // Plain-language summary sentence
-  const summary = useMemo(() => {
-    const valid = ranking.filter(r => r.value !== null);
-    if (valid.length < 2) return null;
-    const best = valid[0];
-    const worst = valid[valid.length - 1];
-    const gap = Math.abs(best.value - worst.value).toFixed(1);
-    if (selectedMetric === 'gdp') {
-      return { best, worst, text: `เศรษฐกิจโตเร็วที่สุด (${fmt('gdp', best.value)})`, worstText: `โตช้าที่สุด (${fmt('gdp', worst.value)})`, gap };
-    }
-    if (selectedMetric === 'inflation') {
-      return { best, worst, text: `เงินเฟ้อใกล้ระดับเหมาะสม 2% มากที่สุด (${fmt('inflation', best.value)})`, worstText: `ห่างจากระดับเหมาะสมมากที่สุด (${fmt('inflation', worst.value)})`, gap };
-    }
-    return { best, worst, text: `อัตราว่างงานต่ำที่สุด (${fmt('unemployment', best.value)})`, worstText: `อัตราว่างงานสูงที่สุด (${fmt('unemployment', worst.value)})`, gap };
-  }, [ranking, selectedMetric]);
+  const validRankings = useMemo(() => ranking.filter(r => r.value !== null), [ranking]);
+
+  const groupAverage = useMemo(() => {
+    if (validRankings.length === 0) return null;
+    const avg = validRankings.reduce((sum, r) => sum + r.value, 0) / validRankings.length;
+    return fmt(selectedMetric, avg);
+  }, [validRankings, selectedMetric]);
+
+  const groupSpread = useMemo(() => {
+    if (validRankings.length < 2) return null;
+    const values = validRankings.map(r => r.value);
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    return (max - min).toFixed(1);
+  }, [validRankings]);
 
   // Best country per metric, for table highlighting
   const bestPerMetric = useMemo(() => {
@@ -404,7 +390,7 @@ export default function ComparisonHub({
     );
   };
 
-  // ---------- Shared chart pieces (returned as arrays — Recharts needs direct children) ----------
+  // Shared chart pieces
   const axisPieces = () => [
     <CartesianGrid key="grid" strokeDasharray="4 6" stroke={showGrid ? 'rgba(168, 85, 247, 0.12)' : 'transparent'} vertical={false} />,
     <ReferenceLine key="zero" y={0} stroke="rgba(255, 255, 255, 0.3)" />,
@@ -436,14 +422,18 @@ export default function ComparisonHub({
     <Tooltip key="tt" content={<CompareTooltip />} cursor={{ fill: 'rgba(168, 85, 247, 0.06)' }} />
   ];
 
+  // Direct, instant label rendering with zero animation lag or duplicate flashing
   const labelFor = (code) =>
     showDataLabels && (!highlightedCountry || highlightedCountry === code) ? (
       <LabelList
         dataKey={`${code}_${selectedMetric}`}
         position="top"
         fill={colorOf(code)}
-        fontSize={10}
+        fontSize={11}
         fontWeight={700}
+        fontFamily="var(--font-mono)"
+        offset={8}
+        isAnimationActive={false}
         formatter={(v) => (v !== undefined && v !== null ? fmt(selectedMetric, Number(v)) : '')}
       />
     ) : null;
@@ -470,6 +460,7 @@ export default function ComparisonHub({
                 fillOpacity={on ? 0.22 : 0.03}
                 strokeWidth={on ? 2.5 : 1}
                 strokeOpacity={on ? 1 : 0.2}
+                isAnimationActive={false}
               />
             );
           })}
@@ -495,6 +486,7 @@ export default function ComparisonHub({
                 strokeOpacity={on ? 1 : 0.15}
                 dot={on ? { r: 4, strokeWidth: 2, fill: '#0c051a', stroke: c } : false}
                 activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff', fill: c }}
+                isAnimationActive={false}
               >
                 {labelFor(code)}
               </Line>
@@ -529,9 +521,8 @@ export default function ComparisonHub({
                 strokeOpacity={on ? 1 : 0.15}
                 fill={`url(#cxArea-${code})`}
                 fillOpacity={on ? 1 : 0.1}
-              >
-                {labelFor(code)}
-              </Area>
+                isAnimationActive={false}
+              />
             );
           })}
         </AreaChart>
@@ -560,6 +551,7 @@ export default function ComparisonHub({
               opacity={on ? 1 : 0.15}
               radius={[6, 6, 2, 2]}
               maxBarSize={30}
+              isAnimationActive={false}
             >
               {labelFor(code)}
             </Bar>
@@ -592,14 +584,14 @@ export default function ComparisonHub({
         </p>
 
         <ol className="cx-steps">
-          <li><span className="cx-step-num">1</span><span>เลือกประเทศ (หรือกดชุดสำเร็จรูป)</span></li>
+          <li><span className="cx-step-num">1</span><span>เลือกประเทศที่ต้องการเปรียบเทียบ (สูงสุด 4 ประเทศ)</span></li>
           <li><span className="cx-step-num">2</span><span>เลือกตัวชี้วัดที่อยากเทียบ</span></li>
-          <li><span className="cx-step-num">3</span><span>อ่านสรุป อันดับ และกราฟด้านล่าง</span></li>
+          <li><span className="cx-step-num">3</span><span>ดูอันดับและกราฟแนวโน้มด้านล่าง</span></li>
         </ol>
       </header>
 
       {/* ================= 2. COUNTRY PICKER ================= */}
-      <section className="cx-card cx-picker">
+      <section className={`cx-card cx-picker ${isDropdownOpen ? 'has-dropdown-open' : ''}`}>
         <div className="cx-section-head">
           <div className="cx-section-title">
             <span className="cx-step-num sm">1</span>
@@ -628,7 +620,16 @@ export default function ComparisonHub({
               </button>
 
               {isDropdownOpen && (
-                <div className="compare-search-dropdown-menu">
+                <div
+                  className="compare-search-dropdown-menu"
+                  data-lenis-prevent="true"
+                  onWheel={(e) => {
+                    e.stopPropagation();
+                    if (resultsListRef.current && !resultsListRef.current.contains(e.target)) {
+                      resultsListRef.current.scrollTop += e.deltaY;
+                    }
+                  }}
+                >
                   <div className="compare-search-input-box">
                     <Search size={14} color="#94a3b8" />
                     <input
@@ -649,7 +650,12 @@ export default function ComparisonHub({
                       </button>
                     )}
                   </div>
-                  <div className="compare-search-results-list">
+                  <div
+                    ref={resultsListRef}
+                    className="compare-search-results-list"
+                    data-lenis-prevent="true"
+                    onWheel={(e) => e.stopPropagation()}
+                  >
                     {filteredSearchCountries.map((c) => {
                       const picked = comparedList.some(code => code && code.toUpperCase() === c.code.toUpperCase());
                       return (
@@ -737,25 +743,6 @@ export default function ComparisonHub({
             </button>
           ))}
         </div>
-
-        {/* Presets */}
-        <div className="cx-presets">
-          <span className="cx-presets-label"><MousePointerClick size={13} /> ชุดสำเร็จรูป:</span>
-          {PRESETS.map(pr => {
-            const active = pr.codes.length === comparedList.length && pr.codes.every(c => comparedList.includes(c));
-            return (
-              <button
-                key={pr.id}
-                type="button"
-                className={`cx-preset ${active ? 'active' : ''}`}
-                onClick={() => applyPreset(pr.codes)}
-                title={pr.codes.join(' · ')}
-              >
-                {pr.label}
-              </button>
-            );
-          })}
-        </div>
       </section>
 
       {error && <ErrorBanner message={error} onRetry={() => setComparedList([...comparedList])} />}
@@ -765,12 +752,12 @@ export default function ComparisonHub({
       ) : comparedList.length === 0 ? (
         <EmptyState
           title="ยังไม่ได้เลือกประเทศ"
-          message="กด “เพิ่มประเทศ” หรือเลือกชุดสำเร็จรูปด้านบน — หรือกดปุ่มด้านล่างเพื่อโหลดตัวอย่าง"
+          message="กด “เพิ่มประเทศ” ด้านบน หรือกดปุ่มด้านล่างเพื่อโหลดตัวอย่าง"
           onReset={() => setComparedList(['THA', 'USA', 'JPN', 'VNM'])}
         />
       ) : hasData ? (
         <>
-          {/* ================= 3. METRIC SELECTOR ================= */}
+          {/* ================= 2. METRIC SELECTOR ================= */}
           <section className="cx-metric-section">
             <div className="cx-section-title" style={{ marginBottom: '0.9rem' }}>
               <span className="cx-step-num sm">2</span>
@@ -803,94 +790,71 @@ export default function ComparisonHub({
             </div>
           </section>
 
-          {/* ================= 4. SUMMARY + RANKING ================= */}
-          <div className="cx-section-title" style={{ marginBottom: '0.9rem' }}>
-            <span className="cx-step-num sm">3</span>
-            <h2>ผลการเปรียบเทียบ · {metric.label} ปี {latestYear}</h2>
-          </div>
-
-          <div className="cx-result-grid">
-            {/* Summary */}
-            <section className="cx-card cx-summary" style={{ '--cx-c': metric.color }}>
-              <div className="cx-card-label"><Lightbulb size={14} /> สรุปสั้น ๆ</div>
-              {summary ? (
-                <>
-                  <div className="cx-summary-winner">
-                    {summary.best.iso2 && <img src={flagOf(summary.best.iso2)} alt="" className="cx-summary-flag" />}
-                    <div>
-                      <div className="cx-summary-badge"><Crown size={12} /> ดีที่สุดในกลุ่ม</div>
-                      <div className="cx-summary-name">{summary.best.name}</div>
-                    </div>
-                  </div>
-                  <p className="cx-summary-text">
-                    <strong style={{ color: summary.best.color }}>{summary.best.name}</strong> {summary.text} ขณะที่{' '}
-                    <strong style={{ color: summary.worst.color }}>{summary.worst.name}</strong> {summary.worstText}
-                  </p>
-                  <div className="cx-summary-stats">
-                    <div>
-                      <span className="cx-stat-val">{summary.gap}</span>
-                      <span className="cx-stat-lbl">จุด · ส่วนต่างสูงสุด–ต่ำสุด</span>
-                    </div>
-                    <div>
-                      <span className="cx-stat-val">
-                        {fmt(selectedMetric, ranking.filter(r => r.value !== null).reduce((s, r) => s + r.value, 0) / Math.max(1, ranking.filter(r => r.value !== null).length))}
-                      </span>
-                      <span className="cx-stat-lbl">ค่าเฉลี่ยของกลุ่ม</span>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <p className="cx-summary-text">เพิ่มอย่างน้อย 2 ประเทศเพื่อดูสรุปผลเปรียบเทียบ</p>
-              )}
-            </section>
-
-            {/* Ranking */}
-            <section className="cx-card cx-ranking">
-              <div className="cx-card-label-row">
-                <div className="cx-card-label"><ListOrdered size={14} /> อันดับ (เรียงจากดีที่สุด)</div>
-                <span className="cx-hint-pill" style={{ color: metric.color, borderColor: `${metric.color}55` }}>{metric.hint}</span>
+          {/* ================= 3. RANKING & GROUP STATS ================= */}
+          <section className="cx-card cx-ranking">
+            <div className="cx-card-label-row">
+              <div className="cx-section-title">
+                <span className="cx-step-num sm">3</span>
+                <h2>อันดับและสถิติเปรียบเทียบ · {metric.label} ปี {latestYear}</h2>
               </div>
-              <div className="cx-rank-list">
-                {ranking.map((r, i) => {
-                  const pct = r.value === null ? 0 : Math.max(4, (Math.abs(r.value) / maxAbs) * 100);
-                  const focused = highlightedCountry === r.code;
-                  return (
-                    <button
-                      key={r.code}
-                      type="button"
-                      className={`cx-rank-row ${focused ? 'focused' : ''} ${highlightedCountry && !focused ? 'muted' : ''}`}
-                      style={{ '--cx-c': r.color }}
-                      onClick={() => setHighlightedCountry(focused ? null : r.code)}
-                      title="คลิกเพื่อไฮไลต์ประเทศนี้ในกราฟ"
-                    >
-                      <span className={`cx-rank-num r${i + 1}`}>{i === 0 ? <Crown size={13} /> : i + 1}</span>
-                      {r.iso2 && <img src={flagOf(r.iso2)} alt="" className="cx-rank-flag" />}
-                      <span className="cx-rank-body">
-                        <span className="cx-rank-top">
-                          <span className="cx-rank-name">{r.name}</span>
-                          <span className="cx-rank-val">{fmt(selectedMetric, r.value)}</span>
-                        </span>
-                        <span className="cx-rank-track">
-                          <span className={`cx-rank-fill ${r.value !== null && r.value < 0 ? 'neg' : ''}`} style={{ width: `${pct}%` }} />
-                        </span>
-                      </span>
-                      {r.diff !== null && (
-                        <span className={`cx-rank-diff ${r.improved ? 'good' : 'bad'}`} title="เปลี่ยนแปลงจากปีก่อน">
-                          {r.diff >= 0 ? <ArrowUp size={11} /> : <ArrowDown size={11} />}
-                          {Math.abs(r.diff).toFixed(1)}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                <span className="cx-hint-pill" style={{ color: metric.color, borderColor: `${metric.color}55` }}>
+                  {metric.hint}
+                </span>
+                {groupAverage !== null && (
+                  <span className="cx-stat-pill">
+                    ค่าเฉลี่ยกลุ่ม: <strong style={{ color: '#fff' }}>{groupAverage}</strong>
+                  </span>
+                )}
+                {groupSpread !== null && (
+                  <span className="cx-stat-pill">
+                    ส่วนต่าง: <strong style={{ color: '#fbbf24' }}>{groupSpread} จุด</strong>
+                  </span>
+                )}
               </div>
-              <p className="cx-footnote">
-                <Info size={12} /> ลูกศร <span className="good">เขียว</span> = ดีขึ้นจากปีก่อน · <span className="bad">แดง</span> = แย่ลง
-              </p>
-            </section>
-          </div>
+            </div>
 
-          {/* ================= 5. TREND CHART ================= */}
+            <div className="cx-rank-list">
+              {ranking.map((r, i) => {
+                const pct = r.value === null ? 0 : Math.max(6, (Math.abs(r.value) / maxAbs) * 100);
+                const focused = highlightedCountry === r.code;
+                return (
+                  <button
+                    key={r.code}
+                    type="button"
+                    className={`cx-rank-row ${focused ? 'focused' : ''} ${highlightedCountry && !focused ? 'muted' : ''}`}
+                    style={{ '--cx-c': r.color }}
+                    onClick={() => setHighlightedCountry(focused ? null : r.code)}
+                    title="คลิกเพื่อไฮไลต์ประเทศนี้ในกราฟ"
+                  >
+                    <span className={`cx-rank-num r${i + 1}`}>{i === 0 ? <Crown size={13} /> : i + 1}</span>
+                    {r.iso2 && <img src={flagOf(r.iso2)} alt="" className="cx-rank-flag" />}
+                    <span className="cx-rank-body">
+                      <span className="cx-rank-top">
+                        <span className="cx-rank-name">{r.name}</span>
+                        <span className="cx-rank-val">{fmt(selectedMetric, r.value)}</span>
+                      </span>
+                      <span className="cx-rank-track">
+                        <span className={`cx-rank-fill ${r.value !== null && r.value < 0 ? 'neg' : ''}`} style={{ width: `${pct}%` }} />
+                      </span>
+                    </span>
+                    {r.diff !== null && (
+                      <span className={`cx-rank-diff ${r.improved ? 'good' : 'bad'}`} title="เปลี่ยนแปลงจากปีก่อน">
+                        {r.diff >= 0 ? <ArrowUp size={11} /> : <ArrowDown size={11} />}
+                        {Math.abs(r.diff).toFixed(1)}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <p className="cx-footnote">
+              <Info size={12} /> ลูกศร <span className="good">เขียว</span> = ดีขึ้นจากปีก่อน · <span className="bad">แดง</span> = แย่ลง · คลิกที่การ์ดเพื่อไฮไลต์ในกราฟ
+            </p>
+          </section>
+
+          {/* ================= 4. TREND CHART ================= */}
           <section className="cx-card cx-chart-card">
             <div className="cx-chart-head">
               <div>
@@ -982,7 +946,7 @@ export default function ComparisonHub({
             </div>
           </section>
 
-          {/* ================= 6. SIDE-BY-SIDE TABLE ================= */}
+          {/* ================= 5. SIDE-BY-SIDE TABLE ================= */}
           <section className="cx-card cx-table-card">
             <div className="cx-card-label-row" style={{ marginBottom: '1rem' }}>
               <div>

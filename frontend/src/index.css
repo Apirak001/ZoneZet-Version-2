@@ -8813,3 +8813,47 @@ a.tm-contact-row:hover .tm-contact-arrow {
   .cx-slots { grid-template-columns: 1fr; }
   .cx-segment button span { display: none; }
 }
+
+/* Vertical ranking list & pills */
+.cx-stat-pill {
+  font-size: 0.76rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #cbd5e1;
+}
+
+.cx-card.cx-ranking .cx-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1.15rem;
+}
+
+.cx-card.cx-ranking .cx-rank-row {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  width: 100%;
+  padding: 0.85rem 1.15rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.18s ease;
+}
+
+.cx-card.cx-ranking .cx-rank-row:hover {
+  border-color: color-mix(in srgb, var(--cx-c) 45%, transparent);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(3px);
+}
+
+.cx-card.cx-ranking .cx-rank-row.focused {
+  border-color: var(--cx-c);
+  background: color-mix(in srgb, var(--cx-c) 12%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--cx-c) 25%, transparent);
+}
