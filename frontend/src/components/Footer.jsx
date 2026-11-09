@@ -8,11 +8,7 @@ import {
   Percent,
   Users,
   GitCompare,
-    Globe,
-  Zap,
-  BarChart3,
-  ShieldCheck,
-  CheckCircle2
+  Globe
 } from 'lucide-react';
 
 export default function Footer({ setActiveTab, lenis }) {
@@ -152,14 +148,14 @@ export default function Footer({ setActiveTab, lenis }) {
             </div>
 
             <p className="official-brand-desc">
-              ศูนย์รวมข้อมูลและวิเคราะห์เศรษฐกิจมหภาคระดับโลก 
-              เชื่อมโยงสถิติสด 196 ประเทศจาก World Bank 
+              แพลตฟอร์มวิเคราะห์และเปรียบเทียบข้อมูลเศรษฐกิจมหภาคระดับโลก
+              ที่เชื่อมต่อกับฐานข้อมูลของ World Bank API มากกว่า 196 ประเทศจากทั่วโลก
               ช่วยให้คุณมองเห็นทิศทางตลาดและตัดสินใจได้อย่างแม่นยำ
             </p>
 
             <div className="official-status-badge">
               <span className="status-dot-green" />
-              <span>All Systems Operational · World Bank Live Data</span>
+              <span>World Bank API</span>
             </div>
           </div>
 
@@ -188,7 +184,7 @@ export default function Footer({ setActiveTab, lenis }) {
               <li>
                 <button onClick={() => handleNav('inflation')} className="official-link-btn">
                   <Percent size={15} className="official-nav-icon" />
-                  <span>ดัชนีเงินเฟ้อ (CPI)</span>
+                  <span>ดัชนีเงินเฟ้อ</span>
                 </button>
               </li>
               <li>
@@ -216,30 +212,6 @@ export default function Footer({ setActiveTab, lenis }) {
                 </span>
                 <span>World Bank Open Data API v2</span>
               </li>
-              <li className="official-meta-item">
-                <span className="meta-icon-box">
-                  <Zap size={15} color="#c084fc" />
-                </span>
-                <span>High-Speed In-Memory Cache O(1)</span>
-              </li>
-              <li className="official-meta-item">
-                <span className="meta-icon-box">
-                  <BarChart3 size={15} color="#a855f7" />
-                </span>
-                <span>Multi-Dimensional Recharts Graphics</span>
-              </li>
-              <li className="official-meta-item">
-                <span className="meta-icon-box">
-                  <ShieldCheck size={15} color="#10b981" />
-                </span>
-                <span>Zero-Crash Safe Fallback Engine</span>
-              </li>
-              <li className="official-meta-item">
-                <span className="meta-icon-box">
-                  <CheckCircle2 size={15} color="#34d399" />
-                </span>
-                <span>Open Data License (CC-BY 4.0)</span>
-              </li>
             </ul>
           </div>
         </div>
@@ -247,15 +219,11 @@ export default function Footer({ setActiveTab, lenis }) {
         {/* Bottom Bar: Copyright & Reference */}
         <div className="official-bottom-bar">
           <div className="official-copyright">
-            © 2026 <strong>ZoneZet</strong>. All rights reserved. แพลตฟอร์มวิเคราะห์เศรษฐกิจมหภาคพหุภาคีระดับสากล
+            © 2026 <strong>ZoneZet</strong>. All rights reserved. แพลตฟอร์มวิเคราะห์เศรษฐกิจมหภาค
           </div>
 
           <div className="official-bottom-links">
-            <span>World Bank Open Data API</span>
-            <span className="bottom-separator">•</span>
-            <span>Creative Commons CC-BY 4.0</span>
-            <span className="bottom-separator">•</span>
-            <span>Zero-Crash SLA 100%</span>
+            <span>World Bank API V2</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  GraduationCap,
   Briefcase,
   Code2,
   Terminal,
@@ -21,6 +22,9 @@ const TEAM = [
     role: 'Frontend Developer',
     photo: '/img/team_dream.jpg',
     index: '01',
+    education: {
+      id: '681310025'
+    },
     responsibility: {
       title: 'Frontend Architect & UX Lead',
       desc: 'ออกแบบ UI/UX, Data Visualization และสถาปัตยกรรม SPA'
@@ -31,9 +35,9 @@ const TEAM = [
       tags: ['React 19', 'Vite', 'Recharts', 'Lucide']
     },
     contact: {
-      email: 'apirak.tham@zonezet.dev',
-      github: '@apirak-th',
-      line: 'dream.apirak'
+      email: 'aomapirak1122@gmail.com',
+      github: '@Apirak_TMK',
+      instagram: '@oomxq_tmk'
     }
   },
   {
@@ -42,6 +46,9 @@ const TEAM = [
     role: 'Backend Developer',
     photo: '/img/team_noor.jpg',
     index: '02',
+    education: {
+      id: '681310024'
+    },
     responsibility: {
       title: 'Backend & Distributed Systems',
       desc: 'พัฒนา Express API Gateway, Caching และ Data Pipeline'
@@ -52,9 +59,9 @@ const TEAM = [
       tags: ['Node.js', 'Express', 'REST API', 'Cache']
     },
     contact: {
-      email: 'anupong.pol@zonezet.dev',
-      github: '@anupong-pol',
-      line: 'noor.anupong'
+      email: 'ariyayam2429@gmail.com',
+      github: '@conankxng',
+      instagram: '@phonjanthuk.an'
     }
   }
 ];
@@ -96,20 +103,6 @@ function DevProfile({ dev }) {
           <div className="tm-photo-shade" />
           <div className="team-shine-sweep" />
 
-          <div className="team_social">
-            <ul>
-              {SOCIAL_ICONS.map((s) => (
-                <li key={s.label}>
-                  <a href={s.href} title={s.label} aria-label={s.label}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <path d={s.path} />
-                    </svg>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           <span className="tm-photo-index">{dev.index}</span>
 
           <div className="tm-photo-caption">
@@ -122,8 +115,20 @@ function DevProfile({ dev }) {
         </div>
       </div>
 
-      {/* Personal info tiles (right) */}
+      {/* 4 personal info tiles (right, 2x2) */}
       <div className="tm-tiles">
+        {/* Education */}
+        <div className="tm-tile">
+          <div className="tm-tile-top">
+            <span className="tm-tile-icon"><GraduationCap size={18} /></span>
+            <span className="tm-tile-label">Education</span>
+          </div>
+          <div className="tm-tile-body">
+            <p className="tm-tile-kicker">รหัสนักศึกษา</p>
+            <p className="tm-tile-value tm-mono">{dev.education.id}</p>
+          </div>
+        </div>
+
         {/* Responsibility */}
         <div className="tm-tile">
           <div className="tm-tile-top">
@@ -173,8 +178,19 @@ function DevProfile({ dev }) {
               <span>{dev.contact.github}</span>
             </div>
             <div className="tm-contact-row">
-              <MessageCircle size={13} />
-              <span>Line: {dev.contact.line}</span>
+              {dev.contact.instagram ? (
+                <>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                  </svg>
+                  <span>{dev.contact.instagram}</span>
+                </>
+              ) : (
+                <>
+                  <MessageCircle size={13} />
+                  <span>Line: {dev.contact.line}</span>
+                </>
+              )}
             </div>
           </div>
         </div>

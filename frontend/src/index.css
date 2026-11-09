@@ -4527,10 +4527,6 @@ section.why_choose_area {
 }
 
 /* Contact rows */
-.tm-tile-contact {
-  grid-column: 1 / -1;
-}
-
 .tm-tile-contact .tm-tile-body {
   gap: 0.4rem;
 }
