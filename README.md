@@ -1,27 +1,10 @@
-# 🌐 ZoneZet Version 2 · World Bank Economic Dashboard & Comparison Hub
+# 🌐 ZoneZet Version 2
 
-> **รหัสวิชา:** 801201 การออกแบบอัลกอริทึมและการพัฒนาเว็บ (Algorithm Design and Web Development)  
-> **ใบงาน:** ต่อยอดงาน API ด้วย React-Vite + Express  
-> **คะแนนเต็ม:** 15 คะแนน | **รูปแบบงาน:** กลุ่ม 2 คน  
-> **กำหนดส่ง:** ภายใน 22.00 น. วันอังคารที่ 10 พฤศจิกายน พ.ศ. 2569  
-> **ช่องทางส่ง:** กล่องส่งงาน Google Classroom  
-
----
-
-## 🔗 1. ข้อมูลการส่งงาน (Submission Links)
-
-* 🎥 **ลิงก์คลิปนำเสนอ (YouTube Unlisted):** `[แปะลิงก์คลิป YouTube Unlisted ที่นี่]` *(ความยาว 6–8 นาที)*
-* 🐙 **ลิงก์ GitHub Repository:** [https://github.com/Apirak001/ZoneZet-Version-2](https://github.com/Apirak001/ZoneZet-Version-2) *(มีโครงสร้าง `frontend/` และ `backend/` พร้อม Commit History ของสมาชิกทั้ง 2 คน)*
-
----
-
-## 📌 7. แบบตารางตามข้อกำหนดใบงาน
-
-### 7.1 ตารางส่วนร่วม (Contribution Table)
+### ตารางส่วนร่วม
 
 | ชื่อ-สกุล | รหัสนักศึกษา | ชิ้นงานที่รับผิดชอบ (ไฟล์ / component / route / DSA) | ช่วงที่นำเสนอในคลิป |
 |---|:---:|---|:---:|
-| **นาย อภิรักษ์ ธรรมแก้ว**<br>*(GitHub: `Apirak001`)* | `681310025` | **Frontend, UX/UI & Frontend DSA Lead:**<br>• `frontend/src/App.jsx`<br>• `frontend/src/components/Navbar.jsx`<br>• `frontend/src/components/Footer.jsx`<br>• `frontend/src/components/LandingAboutView.jsx`<br>• `frontend/src/components/TeamShowcase.jsx`<br>• `frontend/src/components/DashboardHome.jsx`<br>• `frontend/src/components/MetricCard.jsx`<br>• `frontend/src/components/IndicatorView.jsx`<br>• `frontend/src/components/ComparisonHub.jsx`<br>• `frontend/src/components/CompareModal.jsx`<br>• `frontend/src/components/RunningBarLabel.jsx`<br>• `frontend/src/components/AnimatedValue.jsx`<br>• `frontend/src/components/FeedbackStates.jsx`<br>• `frontend/src/components/UndoToast.jsx`<br>• **DSA (React):** `frontend/src/utils/dsa/mergeSort.js` (Merge Sort $O(n \log n)$), `frontend/src/utils/dsa/undoStack.js` (Stack LIFO $O(1)$) | **ช่วงที่ 1, 2, 3**<br>(0:00 – 3:30)<br>• ช่วง 1: เปิดคลิป แนะนำตัว และตารางส่วนร่วม<br>• ช่วง 2: Before → After เปรียบเทียบกับงานแรก<br>• ช่วง 3: Demo ระบบจริง & Comparison Hub |
+| **นาย อภิรักษ์ ธรรมแก้ว**<br>*(GitHub: `Apirak001`)* | `681310025` | **Frontend, UX/UI & Frontend DSA Lead:**<br>• `frontend/src/App.jsx`<br>• `frontend/src/components/Navbar.jsx`<br>• `frontend/src/components/Footer.jsx`<br>• `frontend/src/components/LandingAboutView.jsx`<br>• `frontend/src/components/TeamShowcase.jsx`<br>• `frontend/src/components/DashboardHome.jsx`<br>• `frontend/src/components/MetricCard.jsx`<br>• `frontend/src/components/IndicatorView.jsx`<br>• `frontend/src/components/ComparisonHub.jsx`<br>• `frontend/src/components/CompareModal.jsx`<br>• `frontend/src/components/RunningBarLabel.jsx`<br>• `frontend/src/components/AnimatedValue.jsx`<br>• `frontend/src/components/FeedbackStates.jsx`<br>• `frontend/src/components/UndoToast.jsx`<br>• **DSA (React):** `frontend/src/utils/dsa/mergeSort.js` (Merge Sort $O(n \log n)$), `frontend/src/utils/dsa/undoStack.js` (Stack LIFO $O(1)$) | **ช่วงที่ 1, 2, 3**• ช่วง 1: เปิดคลิป แนะนำตัว และตารางส่วนร่วม<br>• ช่วง 2: Before → After เปรียบเทียบกับงานแรก<br>• ช่วง 3: Demo ระบบจริง & Comparison Hub |
 | **นาย อนุพงค์ พลจันทึก**<br>*(GitHub: `conankxng`)* | `681310024` | **Backend Express, API Gateway & Backend DSA Lead:**<br>• `backend/server.js`<br>• `backend/routes/indicatorRoutes.js` (`/api/indicators`, `/api/dashboard/summary`, `/api/dashboard/regional-benchmark`, `/api/countries`, `/api/cache/stats`)<br>• `backend/routes/comparisonRoutes.js` (`/api/compare/countries`)<br>• `backend/services/worldBankService.js`<br>• `backend/utils/validation.js` (Input Validation Middleware)<br>• `backend/test-backend.js` (Automated Verification Suite)<br>• `frontend/src/services/api.js` (SWR Client Cache & Deduplication)<br>• `frontend/src/components/SystemHealthView.jsx`<br>• **DSA (Express):** `backend/utils/dsaCache.js` (In-Memory Hash Map Cache $O(1)$), `backend/utils/dsaQueue.js` (Task Queue FIFO), Hash Set Aggregates Filter $O(1)$ | **ช่วงที่ 4, 5, 6**<br>(3:30 – 7:00)<br>• ช่วง 4: เบื้องหลังระบบ (Architecture & Express Gateway)<br>• ช่วง 5: DSA เชิงลึก (Big-O, Verification Test & Cache)<br>• ช่วง 6: สรุปผล สิ่งที่ได้เรียนรู้ และข้อจำกัด |
 
 > *(หมายเหตุ: สมาชิกทั้ง 2 คนมีเวลาพูดคนละเกิน 2 นาทีตามเกณฑ์กลุ่ม 2 คน และมีชื่อ-รหัสกำกับบนจอขณะพูดตลอดเวลา)*
