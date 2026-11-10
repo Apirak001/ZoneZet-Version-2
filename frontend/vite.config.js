@@ -14,6 +14,9 @@ export default defineConfig({
     }
   },
   build: {
+    // Vercel's Output Directory setting expects "dist" at the repository root
+    outDir: '../dist',
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         manualChunks(id) {
