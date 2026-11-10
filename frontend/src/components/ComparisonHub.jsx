@@ -89,7 +89,7 @@ const CHART_TYPES = [
   { id: 'radar', label: 'เรดาร์', icon: Compass, tip: 'กราฟเรดาร์ — ดูความสมดุลรอบด้าน 5 มิติ' }
 ];
 
-const flagOf = (iso2) => (iso2 ? `https://flagcdn.com/w80/${iso2.toLowerCase()}.png` : null);
+const flagOf = (iso2) => (iso2 && iso2.length === 2 ? `https://flagcdn.com/w80/${iso2.toLowerCase()}.png` : null);
 
 // Higher score = better, regardless of indicator direction
 const scoreOf = (metricKey, v) => {
@@ -294,18 +294,19 @@ const ComparisonHub = memo(function ComparisonHub({
     const map = new Map();
     for (let i = 0; i < allCountries.length; i++) {
       const c = allCountries[i];
-      if (c?.code) map.set(c.code, c);
+      if (c?.code) map.set(c.code.toUpperCase(), c);
     }
     const cmpCountries = comparisonData?.countries || [];
     for (let i = 0; i < cmpCountries.length; i++) {
       const c = cmpCountries[i];
-      if (c?.code) map.set(c.code, c);
+      if (c?.code) map.set(c.code.toUpperCase(), c);
     }
     return map;
   }, [allCountries, comparisonData]);
 
   const profileOf = useCallback((code) => {
-    return profileMap.get(code) || { code, name: code, iso2: code.toLowerCase(), region: '' };
+    const clean = code ? code.toUpperCase() : '';
+    return profileMap.get(clean) || { code: clean, name: clean, iso2: clean.length === 2 ? clean.toLowerCase() : null, region: '' };
   }, [profileMap]);
 
   const colorOf = useCallback((code) => {
@@ -725,8 +726,8 @@ const ComparisonHub = memo(function ComparisonHub({
             return (
               <div key={code} className="cx-slot filled" style={{ '--cx-c': c }}>
                 <span className="cx-slot-strip" />
-                {p.iso2 && (
-                  <img src={flagOf(p.iso2)} loading="lazy" decoding="async" alt={p.name} className="cx-slot-flag" onError={(e) => { e.target.style.display = 'none'; }} />
+                {flagOf(p.iso2) && (
+                  <img key={p.iso2} src={flagOf(p.iso2)} loading="lazy" decoding="async" alt={p.name} className="cx-slot-flag" onError={(e) => { e.target.style.display = 'none'; }} />
                 )}
                 <div className="cx-slot-text">
                   <span className="cx-slot-name">{p.name}</span>
@@ -825,7 +826,7 @@ const ComparisonHub = memo(function ComparisonHub({
                     title="คลิกเพื่อไฮไลต์ประเทศนี้ในกราฟ"
                   >
                     <span className={`cx-rank-num r${i + 1}`}>{i === 0 ? <Crown size={13} /> : i + 1}</span>
-                    {r.iso2 && <img src={flagOf(r.iso2)} loading="lazy" decoding="async" alt="" className="cx-rank-flag" />}
+                    {flagOf(r.iso2) && <img key={r.iso2} src={flagOf(r.iso2)} loading="lazy" decoding="async" alt="" className="cx-rank-flag" />}
                     <span className="cx-rank-body">
                       <span className="cx-rank-top">
                         <span className="cx-rank-name">{r.name}</span>
@@ -964,7 +965,7 @@ const ComparisonHub = memo(function ComparisonHub({
                       return (
                         <th key={code} style={{ '--cx-c': colorOf(code) }}>
                           <div className="cx-th-country">
-                            {p.iso2 && <img src={flagOf(p.iso2)} loading="lazy" decoding="async" alt="" />}
+                            {flagOf(p.iso2) && <img key={p.iso2} src={flagOf(p.iso2)} loading="lazy" decoding="async" alt="" />}
                             <span>{p.name}</span>
                           </div>
                         </th>
