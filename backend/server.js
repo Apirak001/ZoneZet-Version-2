@@ -74,8 +74,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
-if (process.env.NODE_ENV !== 'test') {
+// Start Server (skipped when imported as a serverless function, e.g. on Vercel)
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`====================================================`);
     console.log(`🚀 ZoneZet Version 2 Backend is running!`);
